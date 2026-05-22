@@ -1,0 +1,25 @@
+services:
+  transformers-networks:
+    image: jupyter/pyspark-notebook
+    container_name: bigdata-pyspark
+    command: start-notebook.py --ServerApp.root_dir=/home/jovyan/work
+    ports:
+      - "8000:8888"
+      - "4040:4040"
+    environment:
+      JUPYTER_TOKEN: desarrollo
+    volumes:
+      - ./:/home/jovyan/work
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:8.0
+    container_name: bigdata-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:

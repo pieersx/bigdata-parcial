@@ -1,0 +1,10 @@
+{
+  "timestamp": "2026-05-21T23:55:31.877256",
+  "execution_id": "20260521_235530",
+  "error_type": "IngestionError",
+  "error_message": "No records returned for resource URL: https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search?resource_id=f2d375f8-9f67-4bf8-849f-9082e7a6eb89",
+  "context": {
+    "dataset": "sismepre",
+    "asset_name": "rentas_entidad_estado_diccionario.csv"
+  }
+}

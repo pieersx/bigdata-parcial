@@ -1,0 +1,8 @@
+"VARIABLE","TIPO_DATO","DESCRIPCION"
+"ANO_APLICACION","Numérico","Año de aplicación."
+"PERIODO","Numérico","Periodo."
+"FORMULARIO_ID","Numérico","Id. del formulario"
+"ANO_ESTADISTICA","Numérico","Año de la estadistica"
+"MES_ESTADISTICA","Numérico","Mes de la estadistica"
+"ESTADO_REGISTRO","Carácter","Estado del registro: (A) Activo, (I) Inactivo"
+"ANO_ESTADISTICA_DESC","Carácter","Descripción del año de estadística"

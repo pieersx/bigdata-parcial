@@ -1,0 +1,509 @@
+{
+  "metadata": {
+    "source": "bcr",
+    "endpoint": "exchange_rate/PD04639PD",
+    "ingestion_date": "2026-05-01T10:39:04.888299",
+    "status": "success",
+    "error_message": null,
+    "execution_time_ms": 128.7078857421875
+  },
+  "data": {
+    "config": {
+      "title": "Tipo de cambio",
+      "series": [
+        {
+          "name": "Tipo de cambio - TC Sistema bancario SBS (S/ por US$) - Compra",
+          "dec": "3"
+        }
+      ]
+    },
+    "periods": [
+      {
+        "name": "05.Ene.26",
+        "values": [
+          "3.356"
+        ]
+      },
+      {
+        "name": "06.Ene.26",
+        "values": [
+          "3.357"
+        ]
+      },
+      {
+        "name": "07.Ene.26",
+        "values": [
+          "3.359"
+        ]
+      },
+      {
+        "name": "08.Ene.26",
+        "values": [
+          "3.359"
+        ]
+      },
+      {
+        "name": "09.Ene.26",
+        "values": [
+          "3.358"
+        ]
+      },
+      {
+        "name": "12.Ene.26",
+        "values": [
+          "3.355"
+        ]
+      },
+      {
+        "name": "13.Ene.26",
+        "values": [
+          "3.356"
+        ]
+      },
+      {
+        "name": "14.Ene.26",
+        "values": [
+          "3.354"
+        ]
+      },
+      {
+        "name": "15.Ene.26",
+        "values": [
+          "3.357"
+        ]
+      },
+      {
+        "name": "16.Ene.26",
+        "values": [
+          "3.354"
+        ]
+      },
+      {
+        "name": "19.Ene.26",
+        "values": [
+          "3.353"
+        ]
+      },
+      {
+        "name": "20.Ene.26",
+        "values": [
+          "3.353"
+        ]
+      },
+      {
+        "name": "21.Ene.26",
+        "values": [
+          "3.353"
+        ]
+      },
+      {
+        "name": "22.Ene.26",
+        "values": [
+          "3.352"
+        ]
+      },
+      {
+        "name": "23.Ene.26",
+        "values": [
+          "3.349"
+        ]
+      },
+      {
+        "name": "26.Ene.26",
+        "values": [
+          "3.346"
+        ]
+      },
+      {
+        "name": "27.Ene.26",
+        "values": [
+          "3.345"
+        ]
+      },
+      {
+        "name": "28.Ene.26",
+        "values": [
+          "3.34"
+        ]
+      },
+      {
+        "name": "29.Ene.26",
+        "values": [
+          "3.34"
+        ]
+      },
+      {
+        "name": "30.Ene.26",
+        "values": [
+          "3.35"
+        ]
+      },
+      {
+        "name": "02.Feb.26",
+        "values": [
+          "3.358"
+        ]
+      },
+      {
+        "name": "03.Feb.26",
+        "values": [
+          "3.359"
+        ]
+      },
+      {
+        "name": "04.Feb.26",
+        "values": [
+          "3.356"
+        ]
+      },
+      {
+        "name": "05.Feb.26",
+        "values": [
+          "3.363"
+        ]
+      },
+      {
+        "name": "06.Feb.26",
+        "values": [
+          "3.355"
+        ]
+      },
+      {
+        "name": "09.Feb.26",
+        "values": [
+          "3.351"
+        ]
+      },
+      {
+        "name": "10.Feb.26",
+        "values": [
+          "3.353"
+        ]
+      },
+      {
+        "name": "11.Feb.26",
+        "values": [
+          "3.352"
+        ]
+      },
+      {
+        "name": "12.Feb.26",
+        "values": [
+          "3.351"
+        ]
+      },
+      {
+        "name": "13.Feb.26",
+        "values": [
+          "3.348"
+        ]
+      },
+      {
+        "name": "16.Feb.26",
+        "values": [
+          "3.344"
+        ]
+      },
+      {
+        "name": "17.Feb.26",
+        "values": [
+          "3.344"
+        ]
+      },
+      {
+        "name": "18.Feb.26",
+        "values": [
+          "3.345"
+        ]
+      },
+      {
+        "name": "19.Feb.26",
+        "values": [
+          "3.36"
+        ]
+      },
+      {
+        "name": "20.Feb.26",
+        "values": [
+          "3.353"
+        ]
+      },
+      {
+        "name": "23.Feb.26",
+        "values": [
+          "3.352"
+        ]
+      },
+      {
+        "name": "24.Feb.26",
+        "values": [
+          "3.354"
+        ]
+      },
+      {
+        "name": "25.Feb.26",
+        "values": [
+          "3.353"
+        ]
+      },
+      {
+        "name": "26.Feb.26",
+        "values": [
+          "3.353"
+        ]
+      },
+      {
+        "name": "27.Feb.26",
+        "values": [
+          "3.35"
+        ]
+      },
+      {
+        "name": "02.Mar.26",
+        "values": [
+          "3.359"
+        ]
+      },
+      {
+        "name": "03.Mar.26",
+        "values": [
+          "3.403"
+        ]
+      },
+      {
+        "name": "04.Mar.26",
+        "values": [
+          "3.405"
+        ]
+      },
+      {
+        "name": "05.Mar.26",
+        "values": [
+          "3.424"
+        ]
+      },
+      {
+        "name": "06.Mar.26",
+        "values": [
+          "3.467"
+        ]
+      },
+      {
+        "name": "09.Mar.26",
+        "values": [
+          "3.482"
+        ]
+      },
+      {
+        "name": "10.Mar.26",
+        "values": [
+          "3.434"
+        ]
+      },
+      {
+        "name": "11.Mar.26",
+        "values": [
+          "3.419"
+        ]
+      },
+      {
+        "name": "12.Mar.26",
+        "values": [
+          "3.44"
+        ]
+      },
+      {
+        "name": "13.Mar.26",
+        "values": [
+          "3.446"
+        ]
+      },
+      {
+        "name": "16.Mar.26",
+        "values": [
+          "3.425"
+        ]
+      },
+      {
+        "name": "17.Mar.26",
+        "values": [
+          "3.408"
+        ]
+      },
+      {
+        "name": "18.Mar.26",
+        "values": [
+          "3.425"
+        ]
+      },
+      {
+        "name": "19.Mar.26",
+        "values": [
+          "3.447"
+        ]
+      },
+      {
+        "name": "20.Mar.26",
+        "values": [
+          "3.469"
+        ]
+      },
+      {
+        "name": "23.Mar.26",
+        "values": [
+          "3.448"
+        ]
+      },
+      {
+        "name": "24.Mar.26",
+        "values": [
+          "3.455"
+        ]
+      },
+      {
+        "name": "25.Mar.26",
+        "values": [
+          "3.459"
+        ]
+      },
+      {
+        "name": "26.Mar.26",
+        "values": [
+          "3.458"
+        ]
+      },
+      {
+        "name": "27.Mar.26",
+        "values": [
+          "3.481"
+        ]
+      },
+      {
+        "name": "30.Mar.26",
+        "values": [
+          "3.48"
+        ]
+      },
+      {
+        "name": "31.Mar.26",
+        "values": [
+          "3.486"
+        ]
+      },
+      {
+        "name": "01.Abr.26",
+        "values": [
+          "3.455"
+        ]
+      },
+      {
+        "name": "06.Abr.26",
+        "values": [
+          "3.426"
+        ]
+      },
+      {
+        "name": "07.Abr.26",
+        "values": [
+          "3.425"
+        ]
+      },
+      {
+        "name": "08.Abr.26",
+        "values": [
+          "3.389"
+        ]
+      },
+      {
+        "name": "09.Abr.26",
+        "values": [
+          "3.374"
+        ]
+      },
+      {
+        "name": "10.Abr.26",
+        "values": [
+          "3.379"
+        ]
+      },
+      {
+        "name": "13.Abr.26",
+        "values": [
+          "3.365"
+        ]
+      },
+      {
+        "name": "14.Abr.26",
+        "values": [
+          "3.38"
+        ]
+      },
+      {
+        "name": "15.Abr.26",
+        "values": [
+          "3.425"
+        ]
+      },
+      {
+        "name": "16.Abr.26",
+        "values": [
+          "3.429"
+        ]
+      },
+      {
+        "name": "17.Abr.26",
+        "values": [
+          "3.435"
+        ]
+      },
+      {
+        "name": "20.Abr.26",
+        "values": [
+          "3.43"
+        ]
+      },
+      {
+        "name": "21.Abr.26",
+        "values": [
+          "3.433"
+        ]
+      },
+      {
+        "name": "22.Abr.26",
+        "values": [
+          "3.436"
+        ]
+      },
+      {
+        "name": "23.Abr.26",
+        "values": [
+          "3.456"
+        ]
+      },
+      {
+        "name": "24.Abr.26",
+        "values": [
+          "3.467"
+        ]
+      },
+      {
+        "name": "27.Abr.26",
+        "values": [
+          "3.498"
+        ]
+      },
+      {
+        "name": "28.Abr.26",
+        "values": [
+          "3.513"
+        ]
+      },
+      {
+        "name": "29.Abr.26",
+        "values": [
+          "3.523"
+        ]
+      }
+    ]
+  }
+}

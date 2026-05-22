@@ -1,0 +1,16 @@
+{
+  "check_id": "file_non_empty_renamu_renamu_2022_zip_20260521_235615",
+  "check_name": "file_non_empty_renamu_renamu_2022_zip",
+  "check_type": "completeness",
+  "status": "passed",
+  "timestamp": "2026-05-21T23:56:15.496363",
+  "dataset": "renamu",
+  "records_checked": 1,
+  "records_passed": 1,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "threshold": 0.05,
+    "validation_criteria": "validate_file"
+  }
+}

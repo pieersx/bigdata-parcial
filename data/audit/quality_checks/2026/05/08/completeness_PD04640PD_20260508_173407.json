@@ -1,0 +1,16 @@
+{
+  "check_id": "completeness_PD04640PD_20260508_173407",
+  "check_name": "completeness_PD04640PD",
+  "check_type": "completeness",
+  "status": "passed",
+  "timestamp": "2026-05-08T17:34:07.809123",
+  "dataset": "PD04640PD",
+  "records_checked": 82,
+  "records_passed": 82,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "threshold": 0.05,
+    "validation_criteria": "validate_record"
+  }
+}

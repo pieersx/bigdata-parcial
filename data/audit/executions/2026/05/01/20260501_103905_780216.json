@@ -1,0 +1,22 @@
+{
+  "audit_id": "20260501_103905_780216",
+  "pipeline_name": "bronze_exchange_rate",
+  "execution_id": "20260501_103903",
+  "timestamp": "2026-05-01T10:39:05.780240",
+  "status": "success",
+  "duration_seconds": 2.235402,
+  "records_processed": 4,
+  "records_success": 4,
+  "records_failed": 0,
+  "error_details": [],
+  "metadata": {
+    "series_codes": [
+      "PD04637PD",
+      "PD04638PD",
+      "PD04639PD",
+      "PD04640PD"
+    ],
+    "start_date": "2026-1-1",
+    "end_date": "2026-4-30"
+  }
+}

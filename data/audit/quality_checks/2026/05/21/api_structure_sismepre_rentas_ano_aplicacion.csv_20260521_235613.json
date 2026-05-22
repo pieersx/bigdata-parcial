@@ -1,0 +1,16 @@
+{
+  "check_id": "api_structure_sismepre_rentas_ano_aplicacion.csv_20260521_235613",
+  "check_name": "api_structure_sismepre_rentas_ano_aplicacion.csv",
+  "check_type": "completeness",
+  "status": "passed",
+  "timestamp": "2026-05-21T23:56:13.299027",
+  "dataset": "sismepre",
+  "records_checked": 26,
+  "records_passed": 26,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "threshold": 0.05,
+    "validation_criteria": "validate_record"
+  }
+}
