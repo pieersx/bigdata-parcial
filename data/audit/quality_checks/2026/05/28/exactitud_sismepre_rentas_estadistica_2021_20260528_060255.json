@@ -1,0 +1,24 @@
+{
+  "check_id": "exactitud_sismepre_rentas_estadistica_2021_20260528_060255",
+  "check_name": "exactitud_sismepre_rentas_estadistica_2021",
+  "check_type": "exactitud",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:02:55.639366",
+  "dataset": "sismepre",
+  "records_checked": 28,
+  "records_passed": 28,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_estadistica",
+    "year": "2021",
+    "score": 1.0,
+    "rules": {
+      "ano_estadistica_numerico": {
+        "expr": "ANO_ESTADISTICA RLIKE '^[0-9]{4}$'",
+        "score": 1.0
+      }
+    }
+  }
+}

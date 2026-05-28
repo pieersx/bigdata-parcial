@@ -1,0 +1,33 @@
+{
+  "check_id": "unicidad_ingresos_ingresos_2015_20260528_064831",
+  "check_name": "unicidad_ingresos_ingresos_2015",
+  "check_type": "unicidad",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:48:31.012084",
+  "dataset": "ingresos",
+  "records_checked": 7476,
+  "records_passed": 7476,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "ingresos",
+    "table_name": "ingresos",
+    "year": "2015",
+    "score": 1.0,
+    "unique_keys": [
+      "ANO_DOC",
+      "MES_DOC",
+      "SEC_EJEC",
+      "EJECUTORA",
+      "FUENTE_FINANCIAMIENTO",
+      "RUBRO",
+      "TIPO_RECURSO",
+      "GENERICA",
+      "SUBGENERICA",
+      "SUBGENERICA_DET",
+      "ESPECIFICA",
+      "ESPECIFICA_DET"
+    ],
+    "distinct_rows": 7476
+  }
+}

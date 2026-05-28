@@ -1,0 +1,32 @@
+{
+  "check_id": "validez_renamu_renamu_2022_20260528_061102",
+  "check_name": "validez_renamu_renamu_2022",
+  "check_type": "validez",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:11:02.160171",
+  "dataset": "renamu",
+  "records_checked": 3450,
+  "records_passed": 3450,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "renamu",
+    "table_name": "renamu",
+    "year": "2022",
+    "score": 1.0,
+    "rules": {
+      "year_matches_partition": {
+        "expr": "`Año` = year",
+        "score": 1.0
+      },
+      "tipomuni_dominio": {
+        "expr": "Tipomuni IN ('1', '2')",
+        "score": 1.0
+      },
+      "ubigeo_formato": {
+        "expr": "Ubigeo RLIKE '^[0-9]{6}$'",
+        "score": 1.0
+      }
+    }
+  }
+}

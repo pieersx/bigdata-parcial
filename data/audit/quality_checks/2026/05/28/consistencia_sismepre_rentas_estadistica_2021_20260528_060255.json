@@ -1,0 +1,19 @@
+{
+  "check_id": "consistencia_sismepre_rentas_estadistica_2021_20260528_060255",
+  "check_name": "consistencia_sismepre_rentas_estadistica_2021",
+  "check_type": "consistencia",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:02:55.483965",
+  "dataset": "sismepre",
+  "records_checked": 1,
+  "records_passed": 1,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_estadistica",
+    "year": "2021",
+    "score": 1.0,
+    "rules": []
+  }
+}

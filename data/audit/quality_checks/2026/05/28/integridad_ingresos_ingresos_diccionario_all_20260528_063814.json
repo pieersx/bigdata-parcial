@@ -1,0 +1,20 @@
+{
+  "check_id": "integridad_ingresos_ingresos_diccionario_all_20260528_063814",
+  "check_name": "integridad_ingresos_ingresos_diccionario_all",
+  "check_type": "integridad",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:38:14.886092",
+  "dataset": "ingresos",
+  "records_checked": 1,
+  "records_passed": 1,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "ingresos",
+    "table_name": "ingresos_diccionario",
+    "year": "all",
+    "score": 1.0,
+    "pairs": {},
+    "references": {}
+  }
+}

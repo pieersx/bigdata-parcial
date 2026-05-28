@@ -1,0 +1,24 @@
+{
+  "check_id": "exactitud_sismepre_rentas_ano_aplicacion_2026_20260528_060821",
+  "check_name": "exactitud_sismepre_rentas_ano_aplicacion_2026",
+  "check_type": "exactitud",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:08:21.149978",
+  "dataset": "sismepre",
+  "records_checked": 1,
+  "records_passed": 1,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_ano_aplicacion",
+    "year": "2026",
+    "score": 1.0,
+    "rules": {
+      "periodo_numerico": {
+        "expr": "PERIODO RLIKE '^[0-9]+$'",
+        "score": 1.0
+      }
+    }
+  }
+}

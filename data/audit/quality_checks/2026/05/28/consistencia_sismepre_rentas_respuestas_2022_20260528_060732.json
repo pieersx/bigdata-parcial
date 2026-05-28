@@ -1,0 +1,24 @@
+{
+  "check_id": "consistencia_sismepre_rentas_respuestas_2022_20260528_060732",
+  "check_name": "consistencia_sismepre_rentas_respuestas_2022",
+  "check_type": "consistencia",
+  "status": "failed",
+  "timestamp": "2026-05-28T06:07:32.165907",
+  "dataset": "sismepre",
+  "records_checked": 30600,
+  "records_passed": 25307,
+  "records_failed": 5293,
+  "failure_rate": 0.1729738562091503,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_respuestas",
+    "year": "2022",
+    "score": 0.827026,
+    "rules": {
+      "una_sola_respuesta_activa": {
+        "expr": "(CASE WHEN TRIM(RESPUESTA_TEXTO) <> '' THEN 1 ELSE 0 END + CASE WHEN TRIM(RESPUESTA_DECIMAL) <> '' AND TRIM(RESPUESTA_DECIMAL) <> '0' THEN 1 ELSE 0 END + CASE WHEN TRIM(RESPUESTA_ENTERO) <> '' AND TRIM(RESPUESTA_ENTERO) <> '0' THEN 1 ELSE 0 END + CASE WHEN TRIM(RESPUESTA_FECHA) <> '' THEN 1 ELSE 0 END) <= 1",
+        "score": 0.8270261437908497
+      }
+    }
+  }
+}

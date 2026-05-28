@@ -1,0 +1,24 @@
+{
+  "check_id": "exactitud_sismepre_rentas_formulario_diccionario_all_20260528_060154",
+  "check_name": "exactitud_sismepre_rentas_formulario_diccionario_all",
+  "check_type": "exactitud",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:01:54.614193",
+  "dataset": "sismepre",
+  "records_checked": 10,
+  "records_passed": 10,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_formulario_diccionario",
+    "year": "all",
+    "score": 1.0,
+    "rules": {
+      "descripcion_informada": {
+        "expr": "TRIM(DESCRIPCION) <> ''",
+        "score": 1.0
+      }
+    }
+  }
+}

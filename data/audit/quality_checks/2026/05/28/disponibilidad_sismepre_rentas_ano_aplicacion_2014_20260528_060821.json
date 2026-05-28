@@ -1,0 +1,20 @@
+{
+  "check_id": "disponibilidad_sismepre_rentas_ano_aplicacion_2014_20260528_060821",
+  "check_name": "disponibilidad_sismepre_rentas_ano_aplicacion_2014",
+  "check_type": "disponibilidad",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:08:21.848643",
+  "dataset": "sismepre",
+  "records_checked": 1,
+  "records_passed": 1,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_ano_aplicacion",
+    "year": "2014",
+    "score": 1.0,
+    "bronze_path": "/home/jovyan/work/data/bronze/sismepre/rentas_ano_aplicacion",
+    "records_count": 2
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "check_id": "disponibilidad_ingresos_ingresos_2015_20260528_062624",
+  "check_name": "disponibilidad_ingresos_ingresos_2015",
+  "check_type": "disponibilidad",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:26:24.343864",
+  "dataset": "ingresos",
+  "records_checked": 1,
+  "records_passed": 1,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "ingresos",
+    "table_name": "ingresos",
+    "year": "2015",
+    "score": 1.0,
+    "bronze_path": "/home/jovyan/work/data/bronze/ingresos",
+    "records_count": 7476
+  }
+}

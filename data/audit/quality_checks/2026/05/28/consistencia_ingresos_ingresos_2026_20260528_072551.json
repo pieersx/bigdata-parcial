@@ -1,0 +1,28 @@
+{
+  "check_id": "consistencia_ingresos_ingresos_2026_20260528_072551",
+  "check_name": "consistencia_ingresos_ingresos_2026",
+  "check_type": "consistencia",
+  "status": "passed",
+  "timestamp": "2026-05-28T07:25:51.142809",
+  "dataset": "ingresos",
+  "records_checked": 17120,
+  "records_passed": 17119,
+  "records_failed": 1,
+  "failure_rate": 5.841121495331336e-05,
+  "details": {
+    "dataset": "ingresos",
+    "table_name": "ingresos",
+    "year": "2026",
+    "score": 0.999942,
+    "rules": {
+      "year_matches_partition": {
+        "expr": "ANO_DOC = year",
+        "score": 1.0
+      },
+      "nivel_nombre_match": {
+        "expr": "CASE WHEN NIVEL_GOBIERNO = 'E' THEN NIVEL_GOBIERNO_NOMBRE = 'GOBIERNO NACIONAL' WHEN NIVEL_GOBIERNO = 'R' THEN NIVEL_GOBIERNO_NOMBRE = 'GOBIERNOS REGIONALES' WHEN NIVEL_GOBIERNO = 'M' THEN NIVEL_GOBIERNO_NOMBRE = 'GOBIERNOS LOCALES' ELSE false END",
+        "score": 0.9998831775700935
+      }
+    }
+  }
+}

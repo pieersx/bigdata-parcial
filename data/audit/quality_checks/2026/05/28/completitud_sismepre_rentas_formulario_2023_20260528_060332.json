@@ -1,0 +1,32 @@
+{
+  "check_id": "completitud_sismepre_rentas_formulario_2023_20260528_060332",
+  "check_name": "completitud_sismepre_rentas_formulario_2023",
+  "check_type": "completitud",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:03:32.361890",
+  "dataset": "sismepre",
+  "records_checked": 90,
+  "records_passed": 90,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_formulario",
+    "year": "2023",
+    "score": 1.0,
+    "required_columns": [
+      "ANO_APLICACION",
+      "PERIODO",
+      "FORMULARIO_ID",
+      "TITULO",
+      "TIPO_FORMULARIO"
+    ],
+    "column_scores": {
+      "ANO_APLICACION": 1.0,
+      "PERIODO": 1.0,
+      "FORMULARIO_ID": 1.0,
+      "TITULO": 1.0,
+      "TIPO_FORMULARIO": 1.0
+    }
+  }
+}

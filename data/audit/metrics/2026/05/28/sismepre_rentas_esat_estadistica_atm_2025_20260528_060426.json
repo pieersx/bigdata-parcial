@@ -1,0 +1,221 @@
+{
+  "dataset": "sismepre",
+  "table_name": "rentas_esat_estadistica_atm",
+  "year": "2025",
+  "generated_at": "2026-05-28T06:04:24.385312",
+  "dimensions": [
+    {
+      "check_id": "completitud_sismepre_rentas_esat_estadistica_atm_2025_20260528_060425",
+      "check_name": "completitud_sismepre_rentas_esat_estadistica_atm_2025",
+      "check_type": "completitud",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:04:25.207136",
+      "dataset": "sismepre",
+      "records_checked": 250950,
+      "records_passed": 250950,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_esat_estadistica_atm",
+        "year": "2025",
+        "score": 1.0,
+        "required_columns": [
+          "SEC_EJEC",
+          "ANO_APLICACION",
+          "PERIODO",
+          "DEPARTAMENTO_NOMBRE",
+          "PROVINCIA_NOMBRE",
+          "DISTRITO_NOMBRE",
+          "MUNICIPALIDAD_NOMBRE"
+        ],
+        "column_scores": {
+          "SEC_EJEC": 1.0,
+          "ANO_APLICACION": 1.0,
+          "PERIODO": 1.0,
+          "DEPARTAMENTO_NOMBRE": 1.0,
+          "PROVINCIA_NOMBRE": 1.0,
+          "DISTRITO_NOMBRE": 1.0,
+          "MUNICIPALIDAD_NOMBRE": 1.0
+        }
+      }
+    },
+    {
+      "check_id": "unicidad_sismepre_rentas_esat_estadistica_atm_2025_20260528_060425",
+      "check_name": "unicidad_sismepre_rentas_esat_estadistica_atm_2025",
+      "check_type": "unicidad",
+      "status": "failed",
+      "timestamp": "2026-05-28T06:04:25.319122",
+      "dataset": "sismepre",
+      "records_checked": 35850,
+      "records_passed": 4741,
+      "records_failed": 31109,
+      "failure_rate": 0.8677545327754532,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_esat_estadistica_atm",
+        "year": "2025",
+        "score": 0.132245,
+        "unique_keys": [
+          "SEC_EJEC",
+          "ANO_APLICACION",
+          "PERIODO",
+          "ANO_ESTADISTICA"
+        ],
+        "distinct_rows": 4741
+      }
+    },
+    {
+      "check_id": "validez_sismepre_rentas_esat_estadistica_atm_2025_20260528_060425",
+      "check_name": "validez_sismepre_rentas_esat_estadistica_atm_2025",
+      "check_type": "validez",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:04:25.515479",
+      "dataset": "sismepre",
+      "records_checked": 107550,
+      "records_passed": 107550,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_esat_estadistica_atm",
+        "year": "2025",
+        "score": 1.0,
+        "rules": {
+          "year_matches_partition": {
+            "expr": "ANO_APLICACION = year",
+            "score": 1.0
+          },
+          "periodo_numerico": {
+            "expr": "PERIODO RLIKE '^[0-9]+$'",
+            "score": 1.0
+          },
+          "ano_estadistica_numerico": {
+            "expr": "ANO_ESTADISTICA RLIKE '^[0-9]{4}$'",
+            "score": 1.0
+          }
+        }
+      }
+    },
+    {
+      "check_id": "consistencia_sismepre_rentas_esat_estadistica_atm_2025_20260528_060425",
+      "check_name": "consistencia_sismepre_rentas_esat_estadistica_atm_2025",
+      "check_type": "consistencia",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:04:25.575176",
+      "dataset": "sismepre",
+      "records_checked": 35850,
+      "records_passed": 35850,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_esat_estadistica_atm",
+        "year": "2025",
+        "score": 1.0,
+        "rules": {
+          "predios_total_no_vacio": {
+            "expr": "TRIM(NUM_PREDIOTOTAL) <> ''",
+            "score": 1.0
+          }
+        }
+      }
+    },
+    {
+      "check_id": "integridad_sismepre_rentas_esat_estadistica_atm_2025_20260528_060425",
+      "check_name": "integridad_sismepre_rentas_esat_estadistica_atm_2025",
+      "check_type": "integridad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:04:25.760324",
+      "dataset": "sismepre",
+      "records_checked": 107550,
+      "records_passed": 107550,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_esat_estadistica_atm",
+        "year": "2025",
+        "score": 1.0,
+        "pairs": {
+          "DEPARTAMENTO->DEPARTAMENTO_NOMBRE": 1.0,
+          "PROVINCIA->PROVINCIA_NOMBRE": 1.0,
+          "DISTRITO->DISTRITO_NOMBRE": 1.0
+        },
+        "references": {}
+      }
+    },
+    {
+      "check_id": "actualidad_sismepre_rentas_esat_estadistica_atm_2025_20260528_060425",
+      "check_name": "actualidad_sismepre_rentas_esat_estadistica_atm_2025",
+      "check_type": "actualidad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:04:25.837547",
+      "dataset": "sismepre",
+      "records_checked": 35850,
+      "records_passed": 35850,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_esat_estadistica_atm",
+        "year": "2025",
+        "score": 1.0,
+        "rules": {
+          "year_valido": {
+            "expr": "year RLIKE '^[0-9]{4}$' AND CAST(year AS INT) <= YEAR(CURRENT_DATE()) + 1",
+            "score": 1.0
+          }
+        }
+      }
+    },
+    {
+      "check_id": "disponibilidad_sismepre_rentas_esat_estadistica_atm_2025_20260528_060425",
+      "check_name": "disponibilidad_sismepre_rentas_esat_estadistica_atm_2025",
+      "check_type": "disponibilidad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:04:25.840498",
+      "dataset": "sismepre",
+      "records_checked": 1,
+      "records_passed": 1,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_esat_estadistica_atm",
+        "year": "2025",
+        "score": 1.0,
+        "bronze_path": "/home/jovyan/work/data/bronze/sismepre/rentas_esat_estadistica_atm",
+        "records_count": 35850
+      }
+    },
+    {
+      "check_id": "exactitud_sismepre_rentas_esat_estadistica_atm_2025_20260528_060425",
+      "check_name": "exactitud_sismepre_rentas_esat_estadistica_atm_2025",
+      "check_type": "exactitud",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:04:25.970328",
+      "dataset": "sismepre",
+      "records_checked": 71700,
+      "records_passed": 71700,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_esat_estadistica_atm",
+        "year": "2025",
+        "score": 1.0,
+        "rules": {
+          "recaudacion_actual_ordinaria_numerica": {
+            "expr": "MON_RECAUDACTUAL_ORDIN RLIKE '^-?[0-9]+(\\.[0-9]+)?$'",
+            "score": 1.0
+          },
+          "recaudacion_actual_coactiva_numerica": {
+            "expr": "MON_RECAUDACTUAL_COAC RLIKE '^-?[0-9]+(\\.[0-9]+)?$'",
+            "score": 1.0
+          }
+        }
+      }
+    }
+  ]
+}

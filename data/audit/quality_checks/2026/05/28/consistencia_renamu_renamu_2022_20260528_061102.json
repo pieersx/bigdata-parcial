@@ -1,0 +1,24 @@
+{
+  "check_id": "consistencia_renamu_renamu_2022_20260528_061102",
+  "check_name": "consistencia_renamu_renamu_2022",
+  "check_type": "consistencia",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:11:02.845953",
+  "dataset": "renamu",
+  "records_checked": 1150,
+  "records_passed": 1150,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "renamu",
+    "table_name": "renamu",
+    "year": "2022",
+    "score": 1.0,
+    "rules": {
+      "ubigeo_consistente": {
+        "expr": "Ubigeo = concat(ccdd, ccpp, ccdi)",
+        "score": 1.0
+      }
+    }
+  }
+}

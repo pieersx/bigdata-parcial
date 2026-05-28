@@ -1,0 +1,258 @@
+{
+  "dataset": "sismepre",
+  "table_name": "rentas_respuestas",
+  "year": "2022",
+  "generated_at": "2026-05-28T06:07:30.815616",
+  "dimensions": [
+    {
+      "check_id": "completitud_sismepre_rentas_respuestas_2022_20260528_060731",
+      "check_name": "completitud_sismepre_rentas_respuestas_2022",
+      "check_type": "completitud",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:07:31.490095",
+      "dataset": "sismepre",
+      "records_checked": 214200,
+      "records_passed": 214200,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_respuestas",
+        "year": "2022",
+        "score": 1.0,
+        "required_columns": [
+          "SEC_EJEC",
+          "ANO_APLICACION",
+          "PERIODO",
+          "FORMULARIO_ID",
+          "PREGUNTA_ID",
+          "RESPUESTA_ID",
+          "ESTADO_REGISTRO"
+        ],
+        "column_scores": {
+          "SEC_EJEC": 1.0,
+          "ANO_APLICACION": 1.0,
+          "PERIODO": 1.0,
+          "FORMULARIO_ID": 1.0,
+          "PREGUNTA_ID": 1.0,
+          "RESPUESTA_ID": 1.0,
+          "ESTADO_REGISTRO": 1.0
+        }
+      }
+    },
+    {
+      "check_id": "unicidad_sismepre_rentas_respuestas_2022_20260528_060731",
+      "check_name": "unicidad_sismepre_rentas_respuestas_2022",
+      "check_type": "unicidad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:07:31.807024",
+      "dataset": "sismepre",
+      "records_checked": 30600,
+      "records_passed": 30600,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_respuestas",
+        "year": "2022",
+        "score": 1.0,
+        "unique_keys": [
+          "SEC_EJEC",
+          "ANO_APLICACION",
+          "PERIODO",
+          "FORMULARIO_ID",
+          "PREGUNTA_ID",
+          "RESPUESTA_ID"
+        ],
+        "distinct_rows": 30600
+      }
+    },
+    {
+      "check_id": "validez_sismepre_rentas_respuestas_2022_20260528_060731",
+      "check_name": "validez_sismepre_rentas_respuestas_2022",
+      "check_type": "validez",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:07:31.997940",
+      "dataset": "sismepre",
+      "records_checked": 91800,
+      "records_passed": 91800,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_respuestas",
+        "year": "2022",
+        "score": 1.0,
+        "rules": {
+          "estado_registro_dominio": {
+            "expr": "ESTADO_REGISTRO IN ('A', 'I')",
+            "score": 1.0
+          },
+          "year_matches_partition": {
+            "expr": "ANO_APLICACION = year",
+            "score": 1.0
+          },
+          "periodo_numerico": {
+            "expr": "PERIODO RLIKE '^[0-9]+$'",
+            "score": 1.0
+          }
+        }
+      }
+    },
+    {
+      "check_id": "consistencia_sismepre_rentas_respuestas_2022_20260528_060732",
+      "check_name": "consistencia_sismepre_rentas_respuestas_2022",
+      "check_type": "consistencia",
+      "status": "failed",
+      "timestamp": "2026-05-28T06:07:32.165907",
+      "dataset": "sismepre",
+      "records_checked": 30600,
+      "records_passed": 25307,
+      "records_failed": 5293,
+      "failure_rate": 0.1729738562091503,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_respuestas",
+        "year": "2022",
+        "score": 0.827026,
+        "rules": {
+          "una_sola_respuesta_activa": {
+            "expr": "(CASE WHEN TRIM(RESPUESTA_TEXTO) <> '' THEN 1 ELSE 0 END + CASE WHEN TRIM(RESPUESTA_DECIMAL) <> '' AND TRIM(RESPUESTA_DECIMAL) <> '0' THEN 1 ELSE 0 END + CASE WHEN TRIM(RESPUESTA_ENTERO) <> '' AND TRIM(RESPUESTA_ENTERO) <> '0' THEN 1 ELSE 0 END + CASE WHEN TRIM(RESPUESTA_FECHA) <> '' THEN 1 ELSE 0 END) <= 1",
+            "score": 0.8270261437908497
+          }
+        }
+      }
+    },
+    {
+      "check_id": "integridad_sismepre_rentas_respuestas_2022_20260528_060733",
+      "check_name": "integridad_sismepre_rentas_respuestas_2022",
+      "check_type": "integridad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:07:33.954419",
+      "dataset": "sismepre",
+      "records_checked": 61200,
+      "records_passed": 61200,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_respuestas",
+        "year": "2022",
+        "score": 1.0,
+        "pairs": {},
+        "references": {
+          "rentas_preguntas": {
+            "join_columns": [
+              [
+                "ANO_APLICACION",
+                "ANO_APLICACION"
+              ],
+              [
+                "PERIODO",
+                "PERIODO"
+              ],
+              [
+                "FORMULARIO_ID",
+                "FORMULARIO_ID"
+              ],
+              [
+                "PREGUNTA_ID",
+                "PREGUNTA_ID"
+              ]
+            ],
+            "match_ratio": 1.0
+          },
+          "rentas_formulario": {
+            "join_columns": [
+              [
+                "ANO_APLICACION",
+                "ANO_APLICACION"
+              ],
+              [
+                "PERIODO",
+                "PERIODO"
+              ],
+              [
+                "FORMULARIO_ID",
+                "FORMULARIO_ID"
+              ]
+            ],
+            "match_ratio": 1.0
+          }
+        }
+      }
+    },
+    {
+      "check_id": "actualidad_sismepre_rentas_respuestas_2022_20260528_060734",
+      "check_name": "actualidad_sismepre_rentas_respuestas_2022",
+      "check_type": "actualidad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:07:34.038510",
+      "dataset": "sismepre",
+      "records_checked": 30600,
+      "records_passed": 30600,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_respuestas",
+        "year": "2022",
+        "score": 1.0,
+        "rules": {
+          "year_valido": {
+            "expr": "year RLIKE '^[0-9]{4}$' AND CAST(year AS INT) <= YEAR(CURRENT_DATE()) + 1",
+            "score": 1.0
+          }
+        }
+      }
+    },
+    {
+      "check_id": "disponibilidad_sismepre_rentas_respuestas_2022_20260528_060734",
+      "check_name": "disponibilidad_sismepre_rentas_respuestas_2022",
+      "check_type": "disponibilidad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:07:34.043976",
+      "dataset": "sismepre",
+      "records_checked": 1,
+      "records_passed": 1,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_respuestas",
+        "year": "2022",
+        "score": 1.0,
+        "bronze_path": "/home/jovyan/work/data/bronze/sismepre/rentas_respuestas",
+        "records_count": 30600
+      }
+    },
+    {
+      "check_id": "exactitud_sismepre_rentas_respuestas_2022_20260528_060734",
+      "check_name": "exactitud_sismepre_rentas_respuestas_2022",
+      "check_type": "exactitud",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:07:34.232406",
+      "dataset": "sismepre",
+      "records_checked": 61200,
+      "records_passed": 61200,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_respuestas",
+        "year": "2022",
+        "score": 1.0,
+        "rules": {
+          "respuesta_decimal_numerica": {
+            "expr": "TRIM(RESPUESTA_DECIMAL) = '' OR RESPUESTA_DECIMAL RLIKE '^-?[0-9]+(\\.[0-9]+)?$'",
+            "score": 1.0
+          },
+          "respuesta_entero_numerico": {
+            "expr": "TRIM(RESPUESTA_ENTERO) = '' OR RESPUESTA_ENTERO RLIKE '^-?[0-9]+$'",
+            "score": 1.0
+          }
+        }
+      }
+    }
+  ]
+}

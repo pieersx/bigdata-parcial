@@ -1,0 +1,24 @@
+{
+  "check_id": "unicidad_sismepre_rentas_formulario_2024_20260528_060331",
+  "check_name": "unicidad_sismepre_rentas_formulario_2024",
+  "check_type": "unicidad",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:03:31.611839",
+  "dataset": "sismepre",
+  "records_checked": 21,
+  "records_passed": 21,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_formulario",
+    "year": "2024",
+    "score": 1.0,
+    "unique_keys": [
+      "ANO_APLICACION",
+      "PERIODO",
+      "FORMULARIO_ID"
+    ],
+    "distinct_rows": 21
+  }
+}

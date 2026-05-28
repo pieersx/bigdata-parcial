@@ -1,6 +1,9 @@
 services:
   transformers-networks:
-    image: jupyter/pyspark-notebook
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: bigdata-pyspark-notebook
     container_name: bigdata-pyspark
     command: start-notebook.py --ServerApp.root_dir=/home/jovyan/work
     ports:
@@ -8,6 +11,8 @@ services:
       - "4040:4040"
     environment:
       JUPYTER_TOKEN: desarrollo
+      PYSPARK_PYTHON: python3
+      PYSPARK_DRIVER_PYTHON: python3
     volumes:
       - ./:/home/jovyan/work
     depends_on:

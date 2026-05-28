@@ -1,0 +1,24 @@
+{
+  "check_id": "unicidad_sismepre_rentas_entidad_estado_2015_20260528_060923",
+  "check_name": "unicidad_sismepre_rentas_entidad_estado_2015",
+  "check_type": "unicidad",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:09:23.734125",
+  "dataset": "sismepre",
+  "records_checked": 250,
+  "records_passed": 250,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_entidad_estado",
+    "year": "2015",
+    "score": 1.0,
+    "unique_keys": [
+      "SEC_EJEC",
+      "ANO_APLICACION",
+      "PERIODO"
+    ],
+    "distinct_rows": 250
+  }
+}

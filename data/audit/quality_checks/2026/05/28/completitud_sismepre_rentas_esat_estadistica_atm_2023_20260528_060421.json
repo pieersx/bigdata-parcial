@@ -1,0 +1,36 @@
+{
+  "check_id": "completitud_sismepre_rentas_esat_estadistica_atm_2023_20260528_060421",
+  "check_name": "completitud_sismepre_rentas_esat_estadistica_atm_2023",
+  "check_type": "completitud",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:04:21.691555",
+  "dataset": "sismepre",
+  "records_checked": 143535,
+  "records_passed": 143535,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_esat_estadistica_atm",
+    "year": "2023",
+    "score": 1.0,
+    "required_columns": [
+      "SEC_EJEC",
+      "ANO_APLICACION",
+      "PERIODO",
+      "DEPARTAMENTO_NOMBRE",
+      "PROVINCIA_NOMBRE",
+      "DISTRITO_NOMBRE",
+      "MUNICIPALIDAD_NOMBRE"
+    ],
+    "column_scores": {
+      "SEC_EJEC": 1.0,
+      "ANO_APLICACION": 1.0,
+      "PERIODO": 1.0,
+      "DEPARTAMENTO_NOMBRE": 1.0,
+      "PROVINCIA_NOMBRE": 1.0,
+      "DISTRITO_NOMBRE": 1.0,
+      "MUNICIPALIDAD_NOMBRE": 1.0
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "check_id": "actualidad_sismepre_rentas_preguntas_2024_20260528_060208",
+  "check_name": "actualidad_sismepre_rentas_preguntas_2024",
+  "check_type": "actualidad",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:02:08.657746",
+  "dataset": "sismepre",
+  "records_checked": 126,
+  "records_passed": 126,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_preguntas",
+    "year": "2024",
+    "score": 1.0,
+    "rules": {
+      "year_valido": {
+        "expr": "year RLIKE '^[0-9]{4}$'",
+        "score": 1.0
+      }
+    }
+  }
+}

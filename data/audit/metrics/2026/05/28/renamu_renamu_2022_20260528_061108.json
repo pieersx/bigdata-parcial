@@ -1,0 +1,232 @@
+{
+  "dataset": "renamu",
+  "table_name": "renamu",
+  "year": "2022",
+  "generated_at": "2026-05-28T06:10:50.427139",
+  "dimensions": [
+    {
+      "check_id": "completitud_renamu_renamu_2022_20260528_061059",
+      "check_name": "completitud_renamu_renamu_2022",
+      "check_type": "completitud",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:10:59.273051",
+      "dataset": "renamu",
+      "records_checked": 11500,
+      "records_passed": 11500,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "renamu",
+        "table_name": "renamu",
+        "year": "2022",
+        "score": 1.0,
+        "required_columns": [
+          "Año",
+          "idmunici",
+          "ccdd",
+          "ccpp",
+          "ccdi",
+          "Ubigeo",
+          "Departamento",
+          "Provincia",
+          "Distrito",
+          "Tipomuni"
+        ],
+        "column_scores": {
+          "Año": 1.0,
+          "idmunici": 1.0,
+          "ccdd": 1.0,
+          "ccpp": 1.0,
+          "ccdi": 1.0,
+          "Ubigeo": 1.0,
+          "Departamento": 1.0,
+          "Provincia": 1.0,
+          "Distrito": 1.0,
+          "Tipomuni": 1.0
+        }
+      }
+    },
+    {
+      "check_id": "unicidad_renamu_renamu_2022_20260528_061100",
+      "check_name": "unicidad_renamu_renamu_2022",
+      "check_type": "unicidad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:11:00.073766",
+      "dataset": "renamu",
+      "records_checked": 1150,
+      "records_passed": 1150,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "renamu",
+        "table_name": "renamu",
+        "year": "2022",
+        "score": 1.0,
+        "unique_keys": [
+          "idmunici"
+        ],
+        "distinct_rows": 1150
+      }
+    },
+    {
+      "check_id": "validez_renamu_renamu_2022_20260528_061102",
+      "check_name": "validez_renamu_renamu_2022",
+      "check_type": "validez",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:11:02.160171",
+      "dataset": "renamu",
+      "records_checked": 3450,
+      "records_passed": 3450,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "renamu",
+        "table_name": "renamu",
+        "year": "2022",
+        "score": 1.0,
+        "rules": {
+          "year_matches_partition": {
+            "expr": "`Año` = year",
+            "score": 1.0
+          },
+          "tipomuni_dominio": {
+            "expr": "Tipomuni IN ('1', '2')",
+            "score": 1.0
+          },
+          "ubigeo_formato": {
+            "expr": "Ubigeo RLIKE '^[0-9]{6}$'",
+            "score": 1.0
+          }
+        }
+      }
+    },
+    {
+      "check_id": "consistencia_renamu_renamu_2022_20260528_061102",
+      "check_name": "consistencia_renamu_renamu_2022",
+      "check_type": "consistencia",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:11:02.845953",
+      "dataset": "renamu",
+      "records_checked": 1150,
+      "records_passed": 1150,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "renamu",
+        "table_name": "renamu",
+        "year": "2022",
+        "score": 1.0,
+        "rules": {
+          "ubigeo_consistente": {
+            "expr": "Ubigeo = concat(ccdd, ccpp, ccdi)",
+            "score": 1.0
+          }
+        }
+      }
+    },
+    {
+      "check_id": "integridad_renamu_renamu_2022_20260528_061104",
+      "check_name": "integridad_renamu_renamu_2022",
+      "check_type": "integridad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:11:04.894612",
+      "dataset": "renamu",
+      "records_checked": 3450,
+      "records_passed": 3450,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "renamu",
+        "table_name": "renamu",
+        "year": "2022",
+        "score": 1.0,
+        "pairs": {
+          "ccdd->Departamento": 1.0,
+          "ccpp->Provincia": 1.0,
+          "ccdi->Distrito": 1.0
+        },
+        "references": {}
+      }
+    },
+    {
+      "check_id": "actualidad_renamu_renamu_2022_20260528_061105",
+      "check_name": "actualidad_renamu_renamu_2022",
+      "check_type": "actualidad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:11:05.577242",
+      "dataset": "renamu",
+      "records_checked": 1150,
+      "records_passed": 1150,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "renamu",
+        "table_name": "renamu",
+        "year": "2022",
+        "score": 1.0,
+        "rules": {
+          "year_renamu_2022": {
+            "expr": "year = '2022'",
+            "score": 1.0
+          }
+        }
+      }
+    },
+    {
+      "check_id": "disponibilidad_renamu_renamu_2022_20260528_061105",
+      "check_name": "disponibilidad_renamu_renamu_2022",
+      "check_type": "disponibilidad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:11:05.578982",
+      "dataset": "renamu",
+      "records_checked": 1,
+      "records_passed": 1,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "renamu",
+        "table_name": "renamu",
+        "year": "2022",
+        "score": 1.0,
+        "bronze_path": "/home/jovyan/work/data/bronze/renamu",
+        "records_count": 1150
+      }
+    },
+    {
+      "check_id": "exactitud_renamu_renamu_2022_20260528_061108",
+      "check_name": "exactitud_renamu_renamu_2022",
+      "check_type": "exactitud",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:11:08.550137",
+      "dataset": "renamu",
+      "records_checked": 4600,
+      "records_passed": 4600,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "renamu",
+        "table_name": "renamu",
+        "year": "2022",
+        "score": 1.0,
+        "rules": {
+          "idmunici_formato": {
+            "expr": "idmunici RLIKE '^[0-9]{6}$'",
+            "score": 1.0
+          },
+          "ccdd_formato": {
+            "expr": "ccdd RLIKE '^[0-9]{2}$'",
+            "score": 1.0
+          },
+          "ccpp_formato": {
+            "expr": "ccpp RLIKE '^[0-9]{2}$'",
+            "score": 1.0
+          },
+          "ccdi_formato": {
+            "expr": "ccdi RLIKE '^[0-9]{2}$'",
+            "score": 1.0
+          }
+        }
+      }
+    }
+  ]
+}

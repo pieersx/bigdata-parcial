@@ -1,0 +1,32 @@
+{
+  "check_id": "exactitud_ingresos_ingresos_2022_20260528_054258",
+  "check_name": "exactitud_ingresos_ingresos_2022",
+  "check_type": "exactitud",
+  "status": "passed",
+  "timestamp": "2026-05-28T05:42:58.398464",
+  "dataset": "ingresos",
+  "records_checked": 25485,
+  "records_passed": 25355,
+  "records_failed": 130,
+  "failure_rate": 0.005101039827349441,
+  "details": {
+    "dataset": "ingresos",
+    "table_name": "ingresos",
+    "year": "2022",
+    "score": 0.994899,
+    "rules": {
+      "pia_no_negativo": {
+        "expr": "CAST(MONTO_PIA AS DOUBLE) >= 0",
+        "score": 0.999882283696292
+      },
+      "pim_no_negativo": {
+        "expr": "CAST(MONTO_PIM AS DOUBLE) >= 0",
+        "score": 0.9992937021777516
+      },
+      "recaudado_no_negativo": {
+        "expr": "CAST(MONTO_RECAUDADO AS DOUBLE) >= 0",
+        "score": 0.9855208946439081
+      }
+    }
+  }
+}

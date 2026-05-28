@@ -1,0 +1,24 @@
+{
+  "check_id": "integridad_ingresos_ingresos_2017_20260528_063333",
+  "check_name": "integridad_ingresos_ingresos_2017",
+  "check_type": "integridad",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:33:33.041347",
+  "dataset": "ingresos",
+  "records_checked": 22266,
+  "records_passed": 22263,
+  "records_failed": 3,
+  "failure_rate": 0.0001347345728913707,
+  "details": {
+    "dataset": "ingresos",
+    "table_name": "ingresos",
+    "year": "2017",
+    "score": 0.999865,
+    "pairs": {
+      "DEPARTAMENTO_EJECUTORA->DEPARTAMENTO_EJECUTORA_NOMBRE": 0.9998652654271086,
+      "PROVINCIA_EJECUTORA->PROVINCIA_EJECUTORA_NOMBRE": 0.9998652654271086,
+      "DISTRITO_EJECUTORA->DISTRITO_EJECUTORA_NOMBRE": 0.9998652654271086
+    },
+    "references": {}
+  }
+}

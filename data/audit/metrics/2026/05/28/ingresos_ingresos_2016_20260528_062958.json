@@ -1,0 +1,247 @@
+{
+  "dataset": "ingresos",
+  "table_name": "ingresos",
+  "year": "2016",
+  "generated_at": "2026-05-28T06:29:57.295609",
+  "dimensions": [
+    {
+      "check_id": "completitud_ingresos_ingresos_2016_20260528_062957",
+      "check_name": "completitud_ingresos_ingresos_2016",
+      "check_type": "completitud",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:29:57.896977",
+      "dataset": "ingresos",
+      "records_checked": 59808,
+      "records_passed": 59807,
+      "records_failed": 1,
+      "failure_rate": 1.6720171214568147e-05,
+      "details": {
+        "dataset": "ingresos",
+        "table_name": "ingresos",
+        "year": "2016",
+        "score": 0.999983,
+        "required_columns": [
+          "ANO_DOC",
+          "MES_DOC",
+          "NIVEL_GOBIERNO",
+          "NIVEL_GOBIERNO_NOMBRE",
+          "SEC_EJEC",
+          "EJECUTORA",
+          "EJECUTORA_NOMBRE",
+          "MONTO_RECAUDADO"
+        ],
+        "column_scores": {
+          "ANO_DOC": 1.0,
+          "MES_DOC": 1.0,
+          "NIVEL_GOBIERNO": 1.0,
+          "NIVEL_GOBIERNO_NOMBRE": 1.0,
+          "SEC_EJEC": 1.0,
+          "EJECUTORA": 1.0,
+          "EJECUTORA_NOMBRE": 1.0,
+          "MONTO_RECAUDADO": 0.9998662386302836
+        }
+      }
+    },
+    {
+      "check_id": "unicidad_ingresos_ingresos_2016_20260528_062958",
+      "check_name": "unicidad_ingresos_ingresos_2016",
+      "check_type": "unicidad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:29:58.032656",
+      "dataset": "ingresos",
+      "records_checked": 7476,
+      "records_passed": 7476,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "ingresos",
+        "table_name": "ingresos",
+        "year": "2016",
+        "score": 1.0,
+        "unique_keys": [
+          "ANO_DOC",
+          "MES_DOC",
+          "SEC_EJEC",
+          "EJECUTORA",
+          "FUENTE_FINANCIAMIENTO",
+          "RUBRO",
+          "TIPO_RECURSO",
+          "GENERICA",
+          "SUBGENERICA",
+          "SUBGENERICA_DET",
+          "ESPECIFICA",
+          "ESPECIFICA_DET"
+        ],
+        "distinct_rows": 7476
+      }
+    },
+    {
+      "check_id": "validez_ingresos_ingresos_2016_20260528_062958",
+      "check_name": "validez_ingresos_ingresos_2016",
+      "check_type": "validez",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:29:58.330816",
+      "dataset": "ingresos",
+      "records_checked": 37380,
+      "records_passed": 37377,
+      "records_failed": 3,
+      "failure_rate": 8.02568218298827e-05,
+      "details": {
+        "dataset": "ingresos",
+        "table_name": "ingresos",
+        "year": "2016",
+        "score": 0.99992,
+        "rules": {
+          "mes_doc_rango": {
+            "expr": "MES_DOC RLIKE '^[0-9]{1,2}$' AND CAST(MES_DOC AS INT) BETWEEN 1 AND 12",
+            "score": 1.0
+          },
+          "nivel_gobierno_dominio": {
+            "expr": "NIVEL_GOBIERNO IN ('E', 'R', 'M')",
+            "score": 1.0
+          },
+          "monto_pia_numerico": {
+            "expr": "MONTO_PIA RLIKE '^-?[0-9]+(\\.[0-9]+)?$'",
+            "score": 0.9998662386302836
+          },
+          "monto_pim_numerico": {
+            "expr": "MONTO_PIM RLIKE '^-?[0-9]+(\\.[0-9]+)?$'",
+            "score": 0.9998662386302836
+          },
+          "monto_recaudado_numerico": {
+            "expr": "MONTO_RECAUDADO RLIKE '^-?[0-9]+(\\.[0-9]+)?$'",
+            "score": 0.9998662386302836
+          }
+        }
+      }
+    },
+    {
+      "check_id": "consistencia_ingresos_ingresos_2016_20260528_062958",
+      "check_name": "consistencia_ingresos_ingresos_2016",
+      "check_type": "consistencia",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:29:58.437851",
+      "dataset": "ingresos",
+      "records_checked": 14952,
+      "records_passed": 14952,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "ingresos",
+        "table_name": "ingresos",
+        "year": "2016",
+        "score": 1.0,
+        "rules": {
+          "year_matches_partition": {
+            "expr": "ANO_DOC = year",
+            "score": 1.0
+          },
+          "nivel_nombre_match": {
+            "expr": "CASE WHEN NIVEL_GOBIERNO = 'E' THEN NIVEL_GOBIERNO_NOMBRE = 'GOBIERNO NACIONAL' WHEN NIVEL_GOBIERNO = 'R' THEN NIVEL_GOBIERNO_NOMBRE = 'GOBIERNOS REGIONALES' WHEN NIVEL_GOBIERNO = 'M' THEN NIVEL_GOBIERNO_NOMBRE = 'GOBIERNOS LOCALES' ELSE false END",
+            "score": 1.0
+          }
+        }
+      }
+    },
+    {
+      "check_id": "integridad_ingresos_ingresos_2016_20260528_062958",
+      "check_name": "integridad_ingresos_ingresos_2016",
+      "check_type": "integridad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:29:58.630136",
+      "dataset": "ingresos",
+      "records_checked": 22428,
+      "records_passed": 22428,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "ingresos",
+        "table_name": "ingresos",
+        "year": "2016",
+        "score": 1.0,
+        "pairs": {
+          "DEPARTAMENTO_EJECUTORA->DEPARTAMENTO_EJECUTORA_NOMBRE": 1.0,
+          "PROVINCIA_EJECUTORA->PROVINCIA_EJECUTORA_NOMBRE": 1.0,
+          "DISTRITO_EJECUTORA->DISTRITO_EJECUTORA_NOMBRE": 1.0
+        },
+        "references": {}
+      }
+    },
+    {
+      "check_id": "actualidad_ingresos_ingresos_2016_20260528_062958",
+      "check_name": "actualidad_ingresos_ingresos_2016",
+      "check_type": "actualidad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:29:58.705220",
+      "dataset": "ingresos",
+      "records_checked": 7476,
+      "records_passed": 7476,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "ingresos",
+        "table_name": "ingresos",
+        "year": "2016",
+        "score": 1.0,
+        "rules": {
+          "year_rango_esperado": {
+            "expr": "year RLIKE '^[0-9]{4}$' AND CAST(year AS INT) BETWEEN 2012 AND YEAR(CURRENT_DATE()) + 1",
+            "score": 1.0
+          }
+        }
+      }
+    },
+    {
+      "check_id": "disponibilidad_ingresos_ingresos_2016_20260528_062958",
+      "check_name": "disponibilidad_ingresos_ingresos_2016",
+      "check_type": "disponibilidad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:29:58.707940",
+      "dataset": "ingresos",
+      "records_checked": 1,
+      "records_passed": 1,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "ingresos",
+        "table_name": "ingresos",
+        "year": "2016",
+        "score": 1.0,
+        "bronze_path": "/home/jovyan/work/data/bronze/ingresos",
+        "records_count": 7476
+      }
+    },
+    {
+      "check_id": "exactitud_ingresos_ingresos_2016_20260528_062958",
+      "check_name": "exactitud_ingresos_ingresos_2016",
+      "check_type": "exactitud",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:29:58.885487",
+      "dataset": "ingresos",
+      "records_checked": 22428,
+      "records_passed": 22338,
+      "records_failed": 90,
+      "failure_rate": 0.0040128410914928025,
+      "details": {
+        "dataset": "ingresos",
+        "table_name": "ingresos",
+        "year": "2016",
+        "score": 0.995987,
+        "rules": {
+          "pia_no_negativo": {
+            "expr": "CAST(MONTO_PIA AS DOUBLE) >= 0",
+            "score": 0.9998662386302836
+          },
+          "pim_no_negativo": {
+            "expr": "CAST(MONTO_PIM AS DOUBLE) >= 0",
+            "score": 0.9998662386302836
+          },
+          "recaudado_no_negativo": {
+            "expr": "CAST(MONTO_RECAUDADO AS DOUBLE) >= 0",
+            "score": 0.9882289994649546
+          }
+        }
+      }
+    }
+  ]
+}

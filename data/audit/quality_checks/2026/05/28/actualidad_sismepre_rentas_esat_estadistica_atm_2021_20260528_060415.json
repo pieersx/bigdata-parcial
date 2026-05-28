@@ -1,0 +1,24 @@
+{
+  "check_id": "actualidad_sismepre_rentas_esat_estadistica_atm_2021_20260528_060415",
+  "check_name": "actualidad_sismepre_rentas_esat_estadistica_atm_2021",
+  "check_type": "actualidad",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:04:15.549592",
+  "dataset": "sismepre",
+  "records_checked": 18032,
+  "records_passed": 18032,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_esat_estadistica_atm",
+    "year": "2021",
+    "score": 1.0,
+    "rules": {
+      "year_valido": {
+        "expr": "year RLIKE '^[0-9]{4}$' AND CAST(year AS INT) <= YEAR(CURRENT_DATE()) + 1",
+        "score": 1.0
+      }
+    }
+  }
+}

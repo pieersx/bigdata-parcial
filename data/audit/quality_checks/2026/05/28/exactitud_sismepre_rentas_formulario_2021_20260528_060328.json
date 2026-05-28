@@ -1,0 +1,24 @@
+{
+  "check_id": "exactitud_sismepre_rentas_formulario_2021_20260528_060328",
+  "check_name": "exactitud_sismepre_rentas_formulario_2021",
+  "check_type": "exactitud",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:03:28.503983",
+  "dataset": "sismepre",
+  "records_checked": 3,
+  "records_passed": 3,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_formulario",
+    "year": "2021",
+    "score": 1.0,
+    "rules": {
+      "orden_formulario_numerico": {
+        "expr": "ORDEN_FORMULARIO RLIKE '^[0-9]+$'",
+        "score": 1.0
+      }
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "check_id": "disponibilidad_sismepre_rentas_estadistica_2020_20260528_060256",
+  "check_name": "disponibilidad_sismepre_rentas_estadistica_2020",
+  "check_type": "disponibilidad",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:02:56.550098",
+  "dataset": "sismepre",
+  "records_checked": 1,
+  "records_passed": 1,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_estadistica",
+    "year": "2020",
+    "score": 1.0,
+    "bronze_path": "/home/jovyan/work/data/bronze/sismepre/rentas_estadistica",
+    "records_count": 18
+  }
+}

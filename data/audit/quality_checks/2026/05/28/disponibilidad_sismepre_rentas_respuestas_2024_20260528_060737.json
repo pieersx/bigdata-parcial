@@ -1,0 +1,20 @@
+{
+  "check_id": "disponibilidad_sismepre_rentas_respuestas_2024_20260528_060737",
+  "check_name": "disponibilidad_sismepre_rentas_respuestas_2024",
+  "check_type": "disponibilidad",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:07:37.083954",
+  "dataset": "sismepre",
+  "records_checked": 1,
+  "records_passed": 1,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_respuestas",
+    "year": "2024",
+    "score": 1.0,
+    "bronze_path": "/home/jovyan/work/data/bronze/sismepre/rentas_respuestas",
+    "records_count": 74336
+  }
+}

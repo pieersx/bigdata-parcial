@@ -1,0 +1,20 @@
+{
+  "check_id": "disponibilidad_sismepre_rentas_entidad_estado_2018_20260528_060927",
+  "check_name": "disponibilidad_sismepre_rentas_entidad_estado_2018",
+  "check_type": "disponibilidad",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:09:27.681852",
+  "dataset": "sismepre",
+  "records_checked": 1,
+  "records_passed": 1,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_entidad_estado",
+    "year": "2018",
+    "score": 1.0,
+    "bronze_path": "/home/jovyan/work/data/bronze/sismepre/rentas_entidad_estado",
+    "records_count": 2484
+  }
+}

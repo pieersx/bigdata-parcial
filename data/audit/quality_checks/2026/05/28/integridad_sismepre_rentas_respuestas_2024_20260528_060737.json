@@ -1,0 +1,59 @@
+{
+  "check_id": "integridad_sismepre_rentas_respuestas_2024_20260528_060737",
+  "check_name": "integridad_sismepre_rentas_respuestas_2024",
+  "check_type": "integridad",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:07:37.011490",
+  "dataset": "sismepre",
+  "records_checked": 148672,
+  "records_passed": 148672,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_respuestas",
+    "year": "2024",
+    "score": 1.0,
+    "pairs": {},
+    "references": {
+      "rentas_preguntas": {
+        "join_columns": [
+          [
+            "ANO_APLICACION",
+            "ANO_APLICACION"
+          ],
+          [
+            "PERIODO",
+            "PERIODO"
+          ],
+          [
+            "FORMULARIO_ID",
+            "FORMULARIO_ID"
+          ],
+          [
+            "PREGUNTA_ID",
+            "PREGUNTA_ID"
+          ]
+        ],
+        "match_ratio": 1.0
+      },
+      "rentas_formulario": {
+        "join_columns": [
+          [
+            "ANO_APLICACION",
+            "ANO_APLICACION"
+          ],
+          [
+            "PERIODO",
+            "PERIODO"
+          ],
+          [
+            "FORMULARIO_ID",
+            "FORMULARIO_ID"
+          ]
+        ],
+        "match_ratio": 1.0
+      }
+    }
+  }
+}

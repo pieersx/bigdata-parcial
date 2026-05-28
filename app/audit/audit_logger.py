@@ -86,7 +86,23 @@ class AuditLogger:
         
         with open(file_path, 'w', encoding='utf-8') as f:
             json.dump(error_log, f, indent=2, ensure_ascii=False)
-        
+
+        return file_path
+
+    def log_metrics_snapshot(self, metric_name: str, payload: Dict[str, Any]) -> Path:
+        date_partition = datetime.now().strftime("%Y/%m/%d")
+        output_dir = self.audit_path / "metrics" / date_partition
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        file_path = output_dir / f"{metric_name}.json"
+        with open(file_path, 'w', encoding='utf-8') as file_handle:
+            json.dump(payload, file_handle, indent=2, ensure_ascii=False)
+
+        self.logger.info(
+            "Metrics snapshot logged",
+            metric_name=metric_name,
+            file_path=str(file_path),
+        )
         return file_path
     
     def get_execution_summary(self, date: datetime = None) -> Dict[str, Any]:

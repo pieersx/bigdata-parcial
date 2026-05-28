@@ -1,0 +1,28 @@
+{
+  "check_id": "exactitud_sismepre_rentas_esat_estadistica_atm_2024_20260528_060424",
+  "check_name": "exactitud_sismepre_rentas_esat_estadistica_atm_2024",
+  "check_type": "exactitud",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:04:24.233732",
+  "dataset": "sismepre",
+  "records_checked": 70074,
+  "records_passed": 70074,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_esat_estadistica_atm",
+    "year": "2024",
+    "score": 1.0,
+    "rules": {
+      "recaudacion_actual_ordinaria_numerica": {
+        "expr": "MON_RECAUDACTUAL_ORDIN RLIKE '^-?[0-9]+(\\.[0-9]+)?$'",
+        "score": 1.0
+      },
+      "recaudacion_actual_coactiva_numerica": {
+        "expr": "MON_RECAUDACTUAL_COAC RLIKE '^-?[0-9]+(\\.[0-9]+)?$'",
+        "score": 1.0
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "check_id": "raw_file_non_empty_sismepre_rentas_esat_estadistica_atm_20260528_060403",
+  "check_name": "raw_file_non_empty_sismepre_rentas_esat_estadistica_atm",
+  "check_type": "availability",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:04:03.344820",
+  "dataset": "sismepre",
+  "records_checked": 1,
+  "records_passed": 1,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "threshold": 0.05,
+    "validation_criteria": "validate_file"
+  }
+}

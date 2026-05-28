@@ -1,0 +1,20 @@
+{
+  "check_id": "integridad_sismepre_rentas_preguntas_2023_20260528_060209",
+  "check_name": "integridad_sismepre_rentas_preguntas_2023",
+  "check_type": "integridad",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:02:09.670095",
+  "dataset": "sismepre",
+  "records_checked": 1,
+  "records_passed": 1,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_preguntas",
+    "year": "2023",
+    "score": 1.0,
+    "pairs": {},
+    "references": {}
+  }
+}

@@ -1,28 +1,77 @@
 import csv
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 from app.utils.logger import StructuredLogger
 
 
 class DataLake:
-    def __init__(self, base_path: Path):
-        self.base_path = base_path
-        self.base_path.mkdir(parents=True, exist_ok=True)
+    def __init__(
+        self,
+        raw_path: Path,
+        bronze_path: Path,
+        reports_path: Path,
+        legacy_bronze_path: Optional[Path] = None,
+    ):
+        self.raw_path = raw_path
+        self.bronze_path = bronze_path
+        self.reports_path = reports_path
+        self.legacy_bronze_path = legacy_bronze_path or bronze_path
         self.logger = StructuredLogger(self.__class__.__name__)
 
-    def resolve_bronze_file_path(self, dataset: str, filename: str) -> Path:
-        output_dir = self.base_path / dataset
+        for path in (self.raw_path, self.bronze_path, self.reports_path):
+            path.mkdir(parents=True, exist_ok=True)
+
+    def resolve_raw_file_path(self, dataset: str, filename: str) -> Path:
+        output_dir = self.raw_path / dataset
         output_dir.mkdir(parents=True, exist_ok=True)
         return output_dir / filename
 
-    def write_csv_pages(
+    def resolve_legacy_file_path(self, dataset: str, filename: str) -> Optional[Path]:
+        candidate = self.legacy_bronze_path / dataset / filename
+        if candidate.exists():
+            return candidate
+        return None
+
+    def resolve_existing_input_path(self, dataset: str, filename: str) -> Optional[Path]:
+        raw_candidate = self.resolve_raw_file_path(dataset, filename)
+        if raw_candidate.exists() and raw_candidate.stat().st_size > 0:
+            return raw_candidate
+        return self.resolve_legacy_file_path(dataset, filename)
+
+    def resolve_bronze_table_path(
+        self,
+        dataset: str,
+        table_name: str,
+        asset_role: str = "table",
+    ) -> Path:
+        dataset_dir = self.bronze_path / dataset
+        dataset_dir.mkdir(parents=True, exist_ok=True)
+
+        if asset_role == "reference":
+            output_dir = dataset_dir / "_references" / table_name
+        elif dataset == "sismepre" and table_name != dataset:
+            output_dir = dataset_dir / table_name
+        else:
+            output_dir = dataset_dir
+
+        output_dir.mkdir(parents=True, exist_ok=True)
+        return output_dir
+
+    def resolve_reports_path(self, dataset: str, table_name: Optional[str] = None) -> Path:
+        output_dir = self.reports_path / dataset
+        if table_name and table_name not in (dataset, ""):
+            output_dir = output_dir / table_name
+        output_dir.mkdir(parents=True, exist_ok=True)
+        return output_dir
+
+    def write_raw_csv_pages(
         self,
         dataset: str,
         filename: str,
-        pages: Iterable[List[Dict[str, Any]]]
+        pages: Iterable[List[Dict[str, Any]]],
     ) -> Tuple[Path, int]:
-        file_path = self.resolve_bronze_file_path(dataset, filename)
+        file_path = self.resolve_raw_file_path(dataset, filename)
         total_records = 0
         header_written = False
         writer = None
@@ -53,10 +102,10 @@ class DataLake:
         if not header_written:
             if file_path.exists():
                 file_path.unlink()
-            raise ValueError(f"No records available to write for {dataset}/{filename}")
+            raise ValueError(f"No records available to write for raw/{dataset}/{filename}")
 
         self.logger.info(
-            "Bronze CSV written",
+            "Raw CSV written",
             dataset=dataset,
             file_path=str(file_path),
             records_count=total_records,

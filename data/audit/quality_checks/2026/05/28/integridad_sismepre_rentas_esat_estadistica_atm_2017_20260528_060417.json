@@ -1,0 +1,24 @@
+{
+  "check_id": "integridad_sismepre_rentas_esat_estadistica_atm_2017_20260528_060417",
+  "check_name": "integridad_sismepre_rentas_esat_estadistica_atm_2017",
+  "check_type": "integridad",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:04:17.167621",
+  "dataset": "sismepre",
+  "records_checked": 1575,
+  "records_passed": 1575,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_esat_estadistica_atm",
+    "year": "2017",
+    "score": 1.0,
+    "pairs": {
+      "DEPARTAMENTO->DEPARTAMENTO_NOMBRE": 1.0,
+      "PROVINCIA->PROVINCIA_NOMBRE": 1.0,
+      "DISTRITO->DISTRITO_NOMBRE": 1.0
+    },
+    "references": {}
+  }
+}

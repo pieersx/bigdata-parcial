@@ -1,0 +1,22 @@
+{
+  "check_id": "unicidad_sismepre_rentas_esat_estadistica_atm_diccionario_all_20260528_060201",
+  "check_name": "unicidad_sismepre_rentas_esat_estadistica_atm_diccionario_all",
+  "check_type": "unicidad",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:02:01.143026",
+  "dataset": "sismepre",
+  "records_checked": 42,
+  "records_passed": 42,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_esat_estadistica_atm_diccionario",
+    "year": "all",
+    "score": 1.0,
+    "unique_keys": [
+      "VARIABLE"
+    ],
+    "distinct_rows": 42
+  }
+}

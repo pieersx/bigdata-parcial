@@ -1,0 +1,24 @@
+{
+  "check_id": "consistencia_sismepre_rentas_ano_aplicacion_2020_20260528_060819",
+  "check_name": "consistencia_sismepre_rentas_ano_aplicacion_2020",
+  "check_type": "consistencia",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:08:19.830530",
+  "dataset": "sismepre",
+  "records_checked": 1,
+  "records_passed": 1,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_ano_aplicacion",
+    "year": "2020",
+    "score": 1.0,
+    "rules": {
+      "anio_inicio_menor_igual_fin": {
+        "expr": "CAST(ANO_APLICACION_INICIO AS INT) <= CAST(ANO_APLICACION_FIN AS INT)",
+        "score": 1.0
+      }
+    }
+  }
+}

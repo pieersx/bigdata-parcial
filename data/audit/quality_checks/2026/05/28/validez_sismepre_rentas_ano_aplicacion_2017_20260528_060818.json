@@ -1,0 +1,28 @@
+{
+  "check_id": "validez_sismepre_rentas_ano_aplicacion_2017_20260528_060818",
+  "check_name": "validez_sismepre_rentas_ano_aplicacion_2017",
+  "check_type": "validez",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:08:18.550612",
+  "dataset": "sismepre",
+  "records_checked": 8,
+  "records_passed": 8,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_ano_aplicacion",
+    "year": "2017",
+    "score": 1.0,
+    "rules": {
+      "estado_dominio": {
+        "expr": "ESTADO IN ('A', 'I')",
+        "score": 1.0
+      },
+      "year_matches_partition": {
+        "expr": "ANO_APLICACION = year",
+        "score": 1.0
+      }
+    }
+  }
+}

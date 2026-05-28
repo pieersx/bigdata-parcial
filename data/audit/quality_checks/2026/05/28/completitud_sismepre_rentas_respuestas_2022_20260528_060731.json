@@ -1,0 +1,36 @@
+{
+  "check_id": "completitud_sismepre_rentas_respuestas_2022_20260528_060731",
+  "check_name": "completitud_sismepre_rentas_respuestas_2022",
+  "check_type": "completitud",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:07:31.490095",
+  "dataset": "sismepre",
+  "records_checked": 214200,
+  "records_passed": 214200,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_respuestas",
+    "year": "2022",
+    "score": 1.0,
+    "required_columns": [
+      "SEC_EJEC",
+      "ANO_APLICACION",
+      "PERIODO",
+      "FORMULARIO_ID",
+      "PREGUNTA_ID",
+      "RESPUESTA_ID",
+      "ESTADO_REGISTRO"
+    ],
+    "column_scores": {
+      "SEC_EJEC": 1.0,
+      "ANO_APLICACION": 1.0,
+      "PERIODO": 1.0,
+      "FORMULARIO_ID": 1.0,
+      "PREGUNTA_ID": 1.0,
+      "RESPUESTA_ID": 1.0,
+      "ESTADO_REGISTRO": 1.0
+    }
+  }
+}

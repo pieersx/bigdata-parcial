@@ -1,0 +1,28 @@
+{
+  "check_id": "validez_sismepre_rentas_estadistica_2024_20260528_060259",
+  "check_name": "validez_sismepre_rentas_estadistica_2024",
+  "check_type": "validez",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:02:59.208399",
+  "dataset": "sismepre",
+  "records_checked": 90,
+  "records_passed": 90,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_estadistica",
+    "year": "2024",
+    "score": 1.0,
+    "rules": {
+      "year_matches_partition": {
+        "expr": "ANO_APLICACION = year",
+        "score": 1.0
+      },
+      "mes_valido": {
+        "expr": "MES_ESTADISTICA RLIKE '^[0-9]{1,2}$' AND CAST(MES_ESTADISTICA AS INT) BETWEEN 1 AND 13",
+        "score": 1.0
+      }
+    }
+  }
+}

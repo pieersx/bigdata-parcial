@@ -1,0 +1,20 @@
+{
+  "check_id": "integridad_sismepre_rentas_entidad_estado_2021_20260528_060925",
+  "check_name": "integridad_sismepre_rentas_entidad_estado_2021",
+  "check_type": "integridad",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:09:25.974739",
+  "dataset": "sismepre",
+  "records_checked": 1,
+  "records_passed": 1,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_entidad_estado",
+    "year": "2021",
+    "score": 1.0,
+    "pairs": {},
+    "references": {}
+  }
+}

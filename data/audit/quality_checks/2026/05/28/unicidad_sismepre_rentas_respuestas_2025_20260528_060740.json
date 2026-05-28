@@ -1,0 +1,27 @@
+{
+  "check_id": "unicidad_sismepre_rentas_respuestas_2025_20260528_060740",
+  "check_name": "unicidad_sismepre_rentas_respuestas_2025",
+  "check_type": "unicidad",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:07:40.630119",
+  "dataset": "sismepre",
+  "records_checked": 21250,
+  "records_passed": 21250,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_respuestas",
+    "year": "2025",
+    "score": 1.0,
+    "unique_keys": [
+      "SEC_EJEC",
+      "ANO_APLICACION",
+      "PERIODO",
+      "FORMULARIO_ID",
+      "PREGUNTA_ID",
+      "RESPUESTA_ID"
+    ],
+    "distinct_rows": 21250
+  }
+}

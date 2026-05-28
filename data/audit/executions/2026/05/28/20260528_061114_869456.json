@@ -1,0 +1,18 @@
+{
+  "audit_id": "20260528_061114_869456",
+  "pipeline_name": "bronze_parquet_medallion",
+  "execution_id": "20260528_060140",
+  "timestamp": "2026-05-28T06:11:14.869484",
+  "status": "success",
+  "duration_seconds": 574.751852,
+  "records_processed": 17,
+  "records_success": 16,
+  "records_failed": 0,
+  "error_details": [],
+  "metadata": {
+    "datasets": [
+      "sismepre",
+      "renamu"
+    ]
+  }
+}

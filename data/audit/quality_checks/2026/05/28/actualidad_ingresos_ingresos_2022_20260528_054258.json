@@ -1,0 +1,24 @@
+{
+  "check_id": "actualidad_ingresos_ingresos_2022_20260528_054258",
+  "check_name": "actualidad_ingresos_ingresos_2022",
+  "check_type": "actualidad",
+  "status": "passed",
+  "timestamp": "2026-05-28T05:42:58.186995",
+  "dataset": "ingresos",
+  "records_checked": 8495,
+  "records_passed": 8495,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "ingresos",
+    "table_name": "ingresos",
+    "year": "2022",
+    "score": 1.0,
+    "rules": {
+      "year_rango_esperado": {
+        "expr": "year RLIKE '^[0-9]{4}$' AND CAST(year AS INT) BETWEEN 2012 AND YEAR(CURRENT_DATE()) + 1",
+        "score": 1.0
+      }
+    }
+  }
+}

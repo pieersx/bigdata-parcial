@@ -1,0 +1,28 @@
+{
+  "check_id": "completitud_ingresos_ingresos_diccionario_all_20260528_052217",
+  "check_name": "completitud_ingresos_ingresos_diccionario_all",
+  "check_type": "completitud",
+  "status": "passed",
+  "timestamp": "2026-05-28T05:22:17.144878",
+  "dataset": "ingresos",
+  "records_checked": 108,
+  "records_passed": 108,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "ingresos",
+    "table_name": "ingresos_diccionario",
+    "year": "all",
+    "score": 1.0,
+    "required_columns": [
+      "VARIABLE",
+      "TIPO_DATO",
+      "DESCRIPCION"
+    ],
+    "column_scores": {
+      "VARIABLE": 1.0,
+      "TIPO_DATO": 1.0,
+      "DESCRIPCION": 1.0
+    }
+  }
+}

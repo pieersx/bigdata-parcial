@@ -1,0 +1,25 @@
+{
+  "check_id": "unicidad_sismepre_rentas_esat_estadistica_atm_2023_20260528_060421",
+  "check_name": "unicidad_sismepre_rentas_esat_estadistica_atm_2023",
+  "check_type": "unicidad",
+  "status": "failed",
+  "timestamp": "2026-05-28T06:04:21.799114",
+  "dataset": "sismepre",
+  "records_checked": 20505,
+  "records_passed": 7145,
+  "records_failed": 13360,
+  "failure_rate": 0.6515484028285784,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_esat_estadistica_atm",
+    "year": "2023",
+    "score": 0.348452,
+    "unique_keys": [
+      "SEC_EJEC",
+      "ANO_APLICACION",
+      "PERIODO",
+      "ANO_ESTADISTICA"
+    ],
+    "distinct_rows": 7145
+  }
+}

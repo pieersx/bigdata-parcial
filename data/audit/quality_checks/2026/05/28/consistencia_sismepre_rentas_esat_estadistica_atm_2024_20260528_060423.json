@@ -1,0 +1,24 @@
+{
+  "check_id": "consistencia_sismepre_rentas_esat_estadistica_atm_2024_20260528_060423",
+  "check_name": "consistencia_sismepre_rentas_esat_estadistica_atm_2024",
+  "check_type": "consistencia",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:04:23.861277",
+  "dataset": "sismepre",
+  "records_checked": 35037,
+  "records_passed": 35037,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_esat_estadistica_atm",
+    "year": "2024",
+    "score": 1.0,
+    "rules": {
+      "predios_total_no_vacio": {
+        "expr": "TRIM(NUM_PREDIOTOTAL) <> ''",
+        "score": 1.0
+      }
+    }
+  }
+}

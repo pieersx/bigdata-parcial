@@ -1,0 +1,19 @@
+{
+  "check_id": "consistencia_ingresos_ingresos_diccionario_all_20260528_054341",
+  "check_name": "consistencia_ingresos_ingresos_diccionario_all",
+  "check_type": "consistencia",
+  "status": "passed",
+  "timestamp": "2026-05-28T05:43:41.811282",
+  "dataset": "ingresos",
+  "records_checked": 1,
+  "records_passed": 1,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "ingresos",
+    "table_name": "ingresos_diccionario",
+    "year": "all",
+    "score": 1.0,
+    "rules": []
+  }
+}

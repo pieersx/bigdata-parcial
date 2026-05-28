@@ -1,0 +1,42 @@
+{
+  "check_id": "completitud_renamu_renamu_2022_20260528_061059",
+  "check_name": "completitud_renamu_renamu_2022",
+  "check_type": "completitud",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:10:59.273051",
+  "dataset": "renamu",
+  "records_checked": 11500,
+  "records_passed": 11500,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "renamu",
+    "table_name": "renamu",
+    "year": "2022",
+    "score": 1.0,
+    "required_columns": [
+      "Año",
+      "idmunici",
+      "ccdd",
+      "ccpp",
+      "ccdi",
+      "Ubigeo",
+      "Departamento",
+      "Provincia",
+      "Distrito",
+      "Tipomuni"
+    ],
+    "column_scores": {
+      "Año": 1.0,
+      "idmunici": 1.0,
+      "ccdd": 1.0,
+      "ccpp": 1.0,
+      "ccdi": 1.0,
+      "Ubigeo": 1.0,
+      "Departamento": 1.0,
+      "Provincia": 1.0,
+      "Distrito": 1.0,
+      "Tipomuni": 1.0
+    }
+  }
+}

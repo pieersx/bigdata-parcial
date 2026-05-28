@@ -1,0 +1,24 @@
+{
+  "check_id": "consistencia_sismepre_rentas_preguntas_2022_20260528_060207",
+  "check_name": "consistencia_sismepre_rentas_preguntas_2022",
+  "check_type": "consistencia",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:02:07.370782",
+  "dataset": "sismepre",
+  "records_checked": 91,
+  "records_passed": 91,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_preguntas",
+    "year": "2022",
+    "score": 1.0,
+    "rules": {
+      "descripcion_informada": {
+        "expr": "TRIM(DESCRIPCION) <> ''",
+        "score": 1.0
+      }
+    }
+  }
+}

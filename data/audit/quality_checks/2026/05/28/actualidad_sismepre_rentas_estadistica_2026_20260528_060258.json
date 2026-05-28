@@ -1,0 +1,24 @@
+{
+  "check_id": "actualidad_sismepre_rentas_estadistica_2026_20260528_060258",
+  "check_name": "actualidad_sismepre_rentas_estadistica_2026",
+  "check_type": "actualidad",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:02:58.461209",
+  "dataset": "sismepre",
+  "records_checked": 26,
+  "records_passed": 26,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_estadistica",
+    "year": "2026",
+    "score": 1.0,
+    "rules": {
+      "year_valido": {
+        "expr": "year RLIKE '^[0-9]{4}$'",
+        "score": 1.0
+      }
+    }
+  }
+}

@@ -1,0 +1,184 @@
+{
+  "dataset": "sismepre",
+  "table_name": "rentas_estadistica_diccionario",
+  "year": "all",
+  "generated_at": "2026-05-28T06:01:51.750460",
+  "dimensions": [
+    {
+      "check_id": "completitud_sismepre_rentas_estadistica_diccionario_all_20260528_060152",
+      "check_name": "completitud_sismepre_rentas_estadistica_diccionario_all",
+      "check_type": "completitud",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:01:52.132457",
+      "dataset": "sismepre",
+      "records_checked": 21,
+      "records_passed": 21,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_estadistica_diccionario",
+        "year": "all",
+        "score": 1.0,
+        "required_columns": [
+          "VARIABLE",
+          "TIPO_DATO",
+          "DESCRIPCION"
+        ],
+        "column_scores": {
+          "VARIABLE": 1.0,
+          "TIPO_DATO": 1.0,
+          "DESCRIPCION": 1.0
+        }
+      }
+    },
+    {
+      "check_id": "unicidad_sismepre_rentas_estadistica_diccionario_all_20260528_060152",
+      "check_name": "unicidad_sismepre_rentas_estadistica_diccionario_all",
+      "check_type": "unicidad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:01:52.277996",
+      "dataset": "sismepre",
+      "records_checked": 7,
+      "records_passed": 7,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_estadistica_diccionario",
+        "year": "all",
+        "score": 1.0,
+        "unique_keys": [
+          "VARIABLE"
+        ],
+        "distinct_rows": 7
+      }
+    },
+    {
+      "check_id": "validez_sismepre_rentas_estadistica_diccionario_all_20260528_060152",
+      "check_name": "validez_sismepre_rentas_estadistica_diccionario_all",
+      "check_type": "validez",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:01:52.358523",
+      "dataset": "sismepre",
+      "records_checked": 7,
+      "records_passed": 7,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_estadistica_diccionario",
+        "year": "all",
+        "score": 1.0,
+        "rules": {
+          "tipo_dato_informado": {
+            "expr": "TRIM(TIPO_DATO) <> ''",
+            "score": 1.0
+          }
+        }
+      }
+    },
+    {
+      "check_id": "consistencia_sismepre_rentas_estadistica_diccionario_all_20260528_060152",
+      "check_name": "consistencia_sismepre_rentas_estadistica_diccionario_all",
+      "check_type": "consistencia",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:01:52.358548",
+      "dataset": "sismepre",
+      "records_checked": 1,
+      "records_passed": 1,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_estadistica_diccionario",
+        "year": "all",
+        "score": 1.0,
+        "rules": []
+      }
+    },
+    {
+      "check_id": "integridad_sismepre_rentas_estadistica_diccionario_all_20260528_060152",
+      "check_name": "integridad_sismepre_rentas_estadistica_diccionario_all",
+      "check_type": "integridad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:01:52.358559",
+      "dataset": "sismepre",
+      "records_checked": 1,
+      "records_passed": 1,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_estadistica_diccionario",
+        "year": "all",
+        "score": 1.0,
+        "pairs": {},
+        "references": {}
+      }
+    },
+    {
+      "check_id": "actualidad_sismepre_rentas_estadistica_diccionario_all_20260528_060152",
+      "check_name": "actualidad_sismepre_rentas_estadistica_diccionario_all",
+      "check_type": "actualidad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:01:52.358581",
+      "dataset": "sismepre",
+      "records_checked": 1,
+      "records_passed": 1,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_estadistica_diccionario",
+        "year": "all",
+        "score": 1.0,
+        "rules": []
+      }
+    },
+    {
+      "check_id": "disponibilidad_sismepre_rentas_estadistica_diccionario_all_20260528_060152",
+      "check_name": "disponibilidad_sismepre_rentas_estadistica_diccionario_all",
+      "check_type": "disponibilidad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:01:52.361801",
+      "dataset": "sismepre",
+      "records_checked": 1,
+      "records_passed": 1,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_estadistica_diccionario",
+        "year": "all",
+        "score": 1.0,
+        "bronze_path": "/home/jovyan/work/data/bronze/sismepre/_references/rentas_estadistica_diccionario",
+        "records_count": 7
+      }
+    },
+    {
+      "check_id": "exactitud_sismepre_rentas_estadistica_diccionario_all_20260528_060152",
+      "check_name": "exactitud_sismepre_rentas_estadistica_diccionario_all",
+      "check_type": "exactitud",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:01:52.434761",
+      "dataset": "sismepre",
+      "records_checked": 7,
+      "records_passed": 7,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_estadistica_diccionario",
+        "year": "all",
+        "score": 1.0,
+        "rules": {
+          "descripcion_informada": {
+            "expr": "TRIM(DESCRIPCION) <> ''",
+            "score": 1.0
+          }
+        }
+      }
+    }
+  ]
+}

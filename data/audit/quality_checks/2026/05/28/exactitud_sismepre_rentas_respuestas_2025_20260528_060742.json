@@ -1,0 +1,28 @@
+{
+  "check_id": "exactitud_sismepre_rentas_respuestas_2025_20260528_060742",
+  "check_name": "exactitud_sismepre_rentas_respuestas_2025",
+  "check_type": "exactitud",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:07:42.333556",
+  "dataset": "sismepre",
+  "records_checked": 42500,
+  "records_passed": 42500,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_respuestas",
+    "year": "2025",
+    "score": 1.0,
+    "rules": {
+      "respuesta_decimal_numerica": {
+        "expr": "TRIM(RESPUESTA_DECIMAL) = '' OR RESPUESTA_DECIMAL RLIKE '^-?[0-9]+(\\.[0-9]+)?$'",
+        "score": 1.0
+      },
+      "respuesta_entero_numerico": {
+        "expr": "TRIM(RESPUESTA_ENTERO) = '' OR RESPUESTA_ENTERO RLIKE '^-?[0-9]+$'",
+        "score": 1.0
+      }
+    }
+  }
+}

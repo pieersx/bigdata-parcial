@@ -1,0 +1,204 @@
+{
+  "dataset": "sismepre",
+  "table_name": "rentas_formulario",
+  "year": "2021",
+  "generated_at": "2026-05-28T06:03:27.624149",
+  "dimensions": [
+    {
+      "check_id": "completitud_sismepre_rentas_formulario_2021_20260528_060328",
+      "check_name": "completitud_sismepre_rentas_formulario_2021",
+      "check_type": "completitud",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:03:28.017164",
+      "dataset": "sismepre",
+      "records_checked": 15,
+      "records_passed": 15,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_formulario",
+        "year": "2021",
+        "score": 1.0,
+        "required_columns": [
+          "ANO_APLICACION",
+          "PERIODO",
+          "FORMULARIO_ID",
+          "TITULO",
+          "TIPO_FORMULARIO"
+        ],
+        "column_scores": {
+          "ANO_APLICACION": 1.0,
+          "PERIODO": 1.0,
+          "FORMULARIO_ID": 1.0,
+          "TITULO": 1.0,
+          "TIPO_FORMULARIO": 1.0
+        }
+      }
+    },
+    {
+      "check_id": "unicidad_sismepre_rentas_formulario_2021_20260528_060328",
+      "check_name": "unicidad_sismepre_rentas_formulario_2021",
+      "check_type": "unicidad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:03:28.211462",
+      "dataset": "sismepre",
+      "records_checked": 3,
+      "records_passed": 3,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_formulario",
+        "year": "2021",
+        "score": 1.0,
+        "unique_keys": [
+          "ANO_APLICACION",
+          "PERIODO",
+          "FORMULARIO_ID"
+        ],
+        "distinct_rows": 3
+      }
+    },
+    {
+      "check_id": "validez_sismepre_rentas_formulario_2021_20260528_060328",
+      "check_name": "validez_sismepre_rentas_formulario_2021",
+      "check_type": "validez",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:03:28.337517",
+      "dataset": "sismepre",
+      "records_checked": 6,
+      "records_passed": 6,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_formulario",
+        "year": "2021",
+        "score": 1.0,
+        "rules": {
+          "tipo_formulario_dominio": {
+            "expr": "TIPO_FORMULARIO IN ('C', 'E')",
+            "score": 1.0
+          },
+          "year_matches_partition": {
+            "expr": "ANO_APLICACION = year",
+            "score": 1.0
+          }
+        }
+      }
+    },
+    {
+      "check_id": "consistencia_sismepre_rentas_formulario_2021_20260528_060328",
+      "check_name": "consistencia_sismepre_rentas_formulario_2021",
+      "check_type": "consistencia",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:03:28.399791",
+      "dataset": "sismepre",
+      "records_checked": 3,
+      "records_passed": 3,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_formulario",
+        "year": "2021",
+        "score": 1.0,
+        "rules": {
+          "titulo_informado": {
+            "expr": "TRIM(TITULO) <> ''",
+            "score": 1.0
+          }
+        }
+      }
+    },
+    {
+      "check_id": "integridad_sismepre_rentas_formulario_2021_20260528_060328",
+      "check_name": "integridad_sismepre_rentas_formulario_2021",
+      "check_type": "integridad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:03:28.399837",
+      "dataset": "sismepre",
+      "records_checked": 1,
+      "records_passed": 1,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_formulario",
+        "year": "2021",
+        "score": 1.0,
+        "pairs": {},
+        "references": {}
+      }
+    },
+    {
+      "check_id": "actualidad_sismepre_rentas_formulario_2021_20260528_060328",
+      "check_name": "actualidad_sismepre_rentas_formulario_2021",
+      "check_type": "actualidad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:03:28.447196",
+      "dataset": "sismepre",
+      "records_checked": 3,
+      "records_passed": 3,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_formulario",
+        "year": "2021",
+        "score": 1.0,
+        "rules": {
+          "year_valido": {
+            "expr": "year RLIKE '^[0-9]{4}$'",
+            "score": 1.0
+          }
+        }
+      }
+    },
+    {
+      "check_id": "disponibilidad_sismepre_rentas_formulario_2021_20260528_060328",
+      "check_name": "disponibilidad_sismepre_rentas_formulario_2021",
+      "check_type": "disponibilidad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:03:28.449732",
+      "dataset": "sismepre",
+      "records_checked": 1,
+      "records_passed": 1,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_formulario",
+        "year": "2021",
+        "score": 1.0,
+        "bronze_path": "/home/jovyan/work/data/bronze/sismepre/rentas_formulario",
+        "records_count": 3
+      }
+    },
+    {
+      "check_id": "exactitud_sismepre_rentas_formulario_2021_20260528_060328",
+      "check_name": "exactitud_sismepre_rentas_formulario_2021",
+      "check_type": "exactitud",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:03:28.503983",
+      "dataset": "sismepre",
+      "records_checked": 3,
+      "records_passed": 3,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_formulario",
+        "year": "2021",
+        "score": 1.0,
+        "rules": {
+          "orden_formulario_numerico": {
+            "expr": "ORDEN_FORMULARIO RLIKE '^[0-9]+$'",
+            "score": 1.0
+          }
+        }
+      }
+    }
+  ]
+}

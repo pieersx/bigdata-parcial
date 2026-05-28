@@ -1,0 +1,33 @@
+{
+  "check_id": "unicidad_ingresos_ingresos_2026_20260528_072550",
+  "check_name": "unicidad_ingresos_ingresos_2026",
+  "check_type": "unicidad",
+  "status": "passed",
+  "timestamp": "2026-05-28T07:25:50.742328",
+  "dataset": "ingresos",
+  "records_checked": 8560,
+  "records_passed": 8560,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "ingresos",
+    "table_name": "ingresos",
+    "year": "2026",
+    "score": 1.0,
+    "unique_keys": [
+      "ANO_DOC",
+      "MES_DOC",
+      "SEC_EJEC",
+      "EJECUTORA",
+      "FUENTE_FINANCIAMIENTO",
+      "RUBRO",
+      "TIPO_RECURSO",
+      "GENERICA",
+      "SUBGENERICA",
+      "SUBGENERICA_DET",
+      "ESPECIFICA",
+      "ESPECIFICA_DET"
+    ],
+    "distinct_rows": 8560
+  }
+}

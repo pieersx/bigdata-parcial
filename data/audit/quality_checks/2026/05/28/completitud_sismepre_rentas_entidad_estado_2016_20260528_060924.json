@@ -1,0 +1,32 @@
+{
+  "check_id": "completitud_sismepre_rentas_entidad_estado_2016_20260528_060924",
+  "check_name": "completitud_sismepre_rentas_entidad_estado_2016",
+  "check_type": "completitud",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:09:24.383313",
+  "dataset": "sismepre",
+  "records_checked": 2500,
+  "records_passed": 2500,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_entidad_estado",
+    "year": "2016",
+    "score": 1.0,
+    "required_columns": [
+      "SEC_EJEC",
+      "ANO_APLICACION",
+      "PERIODO",
+      "ESTADO",
+      "CLASIFICACION"
+    ],
+    "column_scores": {
+      "SEC_EJEC": 1.0,
+      "ANO_APLICACION": 1.0,
+      "PERIODO": 1.0,
+      "ESTADO": 1.0,
+      "CLASIFICACION": 1.0
+    }
+  }
+}

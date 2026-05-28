@@ -1,0 +1,204 @@
+{
+  "dataset": "sismepre",
+  "table_name": "rentas_entidad_estado",
+  "year": "2024",
+  "generated_at": "2026-05-28T06:09:30.999263",
+  "dimensions": [
+    {
+      "check_id": "completitud_sismepre_rentas_entidad_estado_2024_20260528_060931",
+      "check_name": "completitud_sismepre_rentas_entidad_estado_2024",
+      "check_type": "completitud",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:09:31.286428",
+      "dataset": "sismepre",
+      "records_checked": 11310,
+      "records_passed": 11310,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_entidad_estado",
+        "year": "2024",
+        "score": 1.0,
+        "required_columns": [
+          "SEC_EJEC",
+          "ANO_APLICACION",
+          "PERIODO",
+          "ESTADO",
+          "CLASIFICACION"
+        ],
+        "column_scores": {
+          "SEC_EJEC": 1.0,
+          "ANO_APLICACION": 1.0,
+          "PERIODO": 1.0,
+          "ESTADO": 1.0,
+          "CLASIFICACION": 1.0
+        }
+      }
+    },
+    {
+      "check_id": "unicidad_sismepre_rentas_entidad_estado_2024_20260528_060931",
+      "check_name": "unicidad_sismepre_rentas_entidad_estado_2024",
+      "check_type": "unicidad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:09:31.355117",
+      "dataset": "sismepre",
+      "records_checked": 2262,
+      "records_passed": 2262,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_entidad_estado",
+        "year": "2024",
+        "score": 1.0,
+        "unique_keys": [
+          "SEC_EJEC",
+          "ANO_APLICACION",
+          "PERIODO"
+        ],
+        "distinct_rows": 2262
+      }
+    },
+    {
+      "check_id": "validez_sismepre_rentas_entidad_estado_2024_20260528_060931",
+      "check_name": "validez_sismepre_rentas_entidad_estado_2024",
+      "check_type": "validez",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:09:31.434371",
+      "dataset": "sismepre",
+      "records_checked": 4524,
+      "records_passed": 4524,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_entidad_estado",
+        "year": "2024",
+        "score": 1.0,
+        "rules": {
+          "estado_dominio": {
+            "expr": "ESTADO IN ('A', 'I')",
+            "score": 1.0
+          },
+          "year_matches_partition": {
+            "expr": "ANO_APLICACION = year",
+            "score": 1.0
+          }
+        }
+      }
+    },
+    {
+      "check_id": "consistencia_sismepre_rentas_entidad_estado_2024_20260528_060931",
+      "check_name": "consistencia_sismepre_rentas_entidad_estado_2024",
+      "check_type": "consistencia",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:09:31.475957",
+      "dataset": "sismepre",
+      "records_checked": 2262,
+      "records_passed": 2262,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_entidad_estado",
+        "year": "2024",
+        "score": 1.0,
+        "rules": {
+          "sec_ejec_presente": {
+            "expr": "TRIM(SEC_EJEC) <> '' OR TRIM(SEC_EJE) <> ''",
+            "score": 1.0
+          }
+        }
+      }
+    },
+    {
+      "check_id": "integridad_sismepre_rentas_entidad_estado_2024_20260528_060931",
+      "check_name": "integridad_sismepre_rentas_entidad_estado_2024",
+      "check_type": "integridad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:09:31.475984",
+      "dataset": "sismepre",
+      "records_checked": 1,
+      "records_passed": 1,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_entidad_estado",
+        "year": "2024",
+        "score": 1.0,
+        "pairs": {},
+        "references": {}
+      }
+    },
+    {
+      "check_id": "actualidad_sismepre_rentas_entidad_estado_2024_20260528_060931",
+      "check_name": "actualidad_sismepre_rentas_entidad_estado_2024",
+      "check_type": "actualidad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:09:31.514029",
+      "dataset": "sismepre",
+      "records_checked": 2262,
+      "records_passed": 2262,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_entidad_estado",
+        "year": "2024",
+        "score": 1.0,
+        "rules": {
+          "year_valido": {
+            "expr": "year RLIKE '^[0-9]{4}$'",
+            "score": 1.0
+          }
+        }
+      }
+    },
+    {
+      "check_id": "disponibilidad_sismepre_rentas_entidad_estado_2024_20260528_060931",
+      "check_name": "disponibilidad_sismepre_rentas_entidad_estado_2024",
+      "check_type": "disponibilidad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:09:31.516041",
+      "dataset": "sismepre",
+      "records_checked": 1,
+      "records_passed": 1,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_entidad_estado",
+        "year": "2024",
+        "score": 1.0,
+        "bronze_path": "/home/jovyan/work/data/bronze/sismepre/rentas_entidad_estado",
+        "records_count": 2262
+      }
+    },
+    {
+      "check_id": "exactitud_sismepre_rentas_entidad_estado_2024_20260528_060931",
+      "check_name": "exactitud_sismepre_rentas_entidad_estado_2024",
+      "check_type": "exactitud",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:09:31.562393",
+      "dataset": "sismepre",
+      "records_checked": 2262,
+      "records_passed": 2262,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "sismepre",
+        "table_name": "rentas_entidad_estado",
+        "year": "2024",
+        "score": 1.0,
+        "rules": {
+          "periodo_numerico": {
+            "expr": "PERIODO RLIKE '^[0-9]+$'",
+            "score": 1.0
+          }
+        }
+      }
+    }
+  ]
+}

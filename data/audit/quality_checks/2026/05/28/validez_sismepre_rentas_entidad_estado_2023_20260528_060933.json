@@ -1,0 +1,28 @@
+{
+  "check_id": "validez_sismepre_rentas_entidad_estado_2023_20260528_060933",
+  "check_name": "validez_sismepre_rentas_entidad_estado_2023",
+  "check_type": "validez",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:09:33.027511",
+  "dataset": "sismepre",
+  "records_checked": 2724,
+  "records_passed": 2724,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_entidad_estado",
+    "year": "2023",
+    "score": 1.0,
+    "rules": {
+      "estado_dominio": {
+        "expr": "ESTADO IN ('A', 'I')",
+        "score": 1.0
+      },
+      "year_matches_partition": {
+        "expr": "ANO_APLICACION = year",
+        "score": 1.0
+      }
+    }
+  }
+}

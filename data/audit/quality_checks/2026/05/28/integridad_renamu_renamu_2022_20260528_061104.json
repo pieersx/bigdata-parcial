@@ -1,0 +1,24 @@
+{
+  "check_id": "integridad_renamu_renamu_2022_20260528_061104",
+  "check_name": "integridad_renamu_renamu_2022",
+  "check_type": "integridad",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:11:04.894612",
+  "dataset": "renamu",
+  "records_checked": 3450,
+  "records_passed": 3450,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "renamu",
+    "table_name": "renamu",
+    "year": "2022",
+    "score": 1.0,
+    "pairs": {
+      "ccdd->Departamento": 1.0,
+      "ccpp->Provincia": 1.0,
+      "ccdi->Distrito": 1.0
+    },
+    "references": {}
+  }
+}

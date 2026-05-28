@@ -1,0 +1,32 @@
+{
+  "check_id": "validez_sismepre_rentas_respuestas_2024_20260528_060735",
+  "check_name": "validez_sismepre_rentas_respuestas_2024",
+  "check_type": "validez",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:07:35.442899",
+  "dataset": "sismepre",
+  "records_checked": 223008,
+  "records_passed": 223008,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_respuestas",
+    "year": "2024",
+    "score": 1.0,
+    "rules": {
+      "estado_registro_dominio": {
+        "expr": "ESTADO_REGISTRO IN ('A', 'I')",
+        "score": 1.0
+      },
+      "year_matches_partition": {
+        "expr": "ANO_APLICACION = year",
+        "score": 1.0
+      },
+      "periodo_numerico": {
+        "expr": "PERIODO RLIKE '^[0-9]+$'",
+        "score": 1.0
+      }
+    }
+  }
+}

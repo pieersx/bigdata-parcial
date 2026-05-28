@@ -1,0 +1,184 @@
+{
+  "dataset": "ingresos",
+  "table_name": "ingresos_diccionario",
+  "year": "all",
+  "generated_at": "2026-05-28T06:38:13.462113",
+  "dimensions": [
+    {
+      "check_id": "completitud_ingresos_ingresos_diccionario_all_20260528_063814",
+      "check_name": "completitud_ingresos_ingresos_diccionario_all",
+      "check_type": "completitud",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:38:14.208395",
+      "dataset": "ingresos",
+      "records_checked": 108,
+      "records_passed": 108,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "ingresos",
+        "table_name": "ingresos_diccionario",
+        "year": "all",
+        "score": 1.0,
+        "required_columns": [
+          "VARIABLE",
+          "TIPO_DATO",
+          "DESCRIPCION"
+        ],
+        "column_scores": {
+          "VARIABLE": 1.0,
+          "TIPO_DATO": 1.0,
+          "DESCRIPCION": 1.0
+        }
+      }
+    },
+    {
+      "check_id": "unicidad_ingresos_ingresos_diccionario_all_20260528_063814",
+      "check_name": "unicidad_ingresos_ingresos_diccionario_all",
+      "check_type": "unicidad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:38:14.679320",
+      "dataset": "ingresos",
+      "records_checked": 36,
+      "records_passed": 36,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "ingresos",
+        "table_name": "ingresos_diccionario",
+        "year": "all",
+        "score": 1.0,
+        "unique_keys": [
+          "VARIABLE"
+        ],
+        "distinct_rows": 36
+      }
+    },
+    {
+      "check_id": "validez_ingresos_ingresos_diccionario_all_20260528_063814",
+      "check_name": "validez_ingresos_ingresos_diccionario_all",
+      "check_type": "validez",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:38:14.886048",
+      "dataset": "ingresos",
+      "records_checked": 36,
+      "records_passed": 36,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "ingresos",
+        "table_name": "ingresos_diccionario",
+        "year": "all",
+        "score": 1.0,
+        "rules": {
+          "tipo_dato_informado": {
+            "expr": "TRIM(TIPO_DATO) <> ''",
+            "score": 1.0
+          }
+        }
+      }
+    },
+    {
+      "check_id": "consistencia_ingresos_ingresos_diccionario_all_20260528_063814",
+      "check_name": "consistencia_ingresos_ingresos_diccionario_all",
+      "check_type": "consistencia",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:38:14.886079",
+      "dataset": "ingresos",
+      "records_checked": 1,
+      "records_passed": 1,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "ingresos",
+        "table_name": "ingresos_diccionario",
+        "year": "all",
+        "score": 1.0,
+        "rules": []
+      }
+    },
+    {
+      "check_id": "integridad_ingresos_ingresos_diccionario_all_20260528_063814",
+      "check_name": "integridad_ingresos_ingresos_diccionario_all",
+      "check_type": "integridad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:38:14.886092",
+      "dataset": "ingresos",
+      "records_checked": 1,
+      "records_passed": 1,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "ingresos",
+        "table_name": "ingresos_diccionario",
+        "year": "all",
+        "score": 1.0,
+        "pairs": {},
+        "references": {}
+      }
+    },
+    {
+      "check_id": "actualidad_ingresos_ingresos_diccionario_all_20260528_063814",
+      "check_name": "actualidad_ingresos_ingresos_diccionario_all",
+      "check_type": "actualidad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:38:14.886105",
+      "dataset": "ingresos",
+      "records_checked": 1,
+      "records_passed": 1,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "ingresos",
+        "table_name": "ingresos_diccionario",
+        "year": "all",
+        "score": 1.0,
+        "rules": []
+      }
+    },
+    {
+      "check_id": "disponibilidad_ingresos_ingresos_diccionario_all_20260528_063814",
+      "check_name": "disponibilidad_ingresos_ingresos_diccionario_all",
+      "check_type": "disponibilidad",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:38:14.890819",
+      "dataset": "ingresos",
+      "records_checked": 1,
+      "records_passed": 1,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "ingresos",
+        "table_name": "ingresos_diccionario",
+        "year": "all",
+        "score": 1.0,
+        "bronze_path": "/home/jovyan/work/data/bronze/ingresos/_references/ingresos_diccionario",
+        "records_count": 36
+      }
+    },
+    {
+      "check_id": "exactitud_ingresos_ingresos_diccionario_all_20260528_063815",
+      "check_name": "exactitud_ingresos_ingresos_diccionario_all",
+      "check_type": "exactitud",
+      "status": "passed",
+      "timestamp": "2026-05-28T06:38:15.006444",
+      "dataset": "ingresos",
+      "records_checked": 36,
+      "records_passed": 36,
+      "records_failed": 0,
+      "failure_rate": 0.0,
+      "details": {
+        "dataset": "ingresos",
+        "table_name": "ingresos_diccionario",
+        "year": "all",
+        "score": 1.0,
+        "rules": {
+          "descripcion_informada": {
+            "expr": "TRIM(DESCRIPCION) <> ''",
+            "score": 1.0
+          }
+        }
+      }
+    }
+  ]
+}

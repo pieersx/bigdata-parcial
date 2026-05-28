@@ -1,0 +1,17 @@
+{
+  "audit_id": "20260528_072941_842951",
+  "pipeline_name": "bronze_parquet_medallion",
+  "execution_id": "20260528_063806",
+  "timestamp": "2026-05-28T07:29:41.842980",
+  "status": "success",
+  "duration_seconds": 3095.324862,
+  "records_processed": 16,
+  "records_success": 16,
+  "records_failed": 0,
+  "error_details": [],
+  "metadata": {
+    "datasets": [
+      "ingresos"
+    ]
+  }
+}

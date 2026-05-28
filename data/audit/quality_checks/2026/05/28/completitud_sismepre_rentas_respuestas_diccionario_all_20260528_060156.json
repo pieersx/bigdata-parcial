@@ -1,0 +1,28 @@
+{
+  "check_id": "completitud_sismepre_rentas_respuestas_diccionario_all_20260528_060156",
+  "check_name": "completitud_sismepre_rentas_respuestas_diccionario_all",
+  "check_type": "completitud",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:01:56.643738",
+  "dataset": "sismepre",
+  "records_checked": 33,
+  "records_passed": 33,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_respuestas_diccionario",
+    "year": "all",
+    "score": 1.0,
+    "required_columns": [
+      "VARIABLE",
+      "TIPO_DATO",
+      "DESCRIPCION"
+    ],
+    "column_scores": {
+      "VARIABLE": 1.0,
+      "TIPO_DATO": 1.0,
+      "DESCRIPCION": 1.0
+    }
+  }
+}

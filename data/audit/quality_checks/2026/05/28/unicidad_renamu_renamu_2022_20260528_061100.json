@@ -1,0 +1,22 @@
+{
+  "check_id": "unicidad_renamu_renamu_2022_20260528_061100",
+  "check_name": "unicidad_renamu_renamu_2022",
+  "check_type": "unicidad",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:11:00.073766",
+  "dataset": "renamu",
+  "records_checked": 1150,
+  "records_passed": 1150,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "renamu",
+    "table_name": "renamu",
+    "year": "2022",
+    "score": 1.0,
+    "unique_keys": [
+      "idmunici"
+    ],
+    "distinct_rows": 1150
+  }
+}

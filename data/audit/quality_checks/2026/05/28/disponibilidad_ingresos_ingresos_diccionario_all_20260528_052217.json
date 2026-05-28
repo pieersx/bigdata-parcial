@@ -1,0 +1,20 @@
+{
+  "check_id": "disponibilidad_ingresos_ingresos_diccionario_all_20260528_052217",
+  "check_name": "disponibilidad_ingresos_ingresos_diccionario_all",
+  "check_type": "disponibilidad",
+  "status": "passed",
+  "timestamp": "2026-05-28T05:22:17.984546",
+  "dataset": "ingresos",
+  "records_checked": 1,
+  "records_passed": 1,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "ingresos",
+    "table_name": "ingresos_diccionario",
+    "year": "all",
+    "score": 1.0,
+    "bronze_path": "/home/jovyan/work/data/bronze/ingresos/_references/ingresos_diccionario",
+    "records_count": 36
+  }
+}

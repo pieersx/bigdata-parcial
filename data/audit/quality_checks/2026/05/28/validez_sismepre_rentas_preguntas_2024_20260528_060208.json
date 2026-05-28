@@ -1,0 +1,28 @@
+{
+  "check_id": "validez_sismepre_rentas_preguntas_2024_20260528_060208",
+  "check_name": "validez_sismepre_rentas_preguntas_2024",
+  "check_type": "validez",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:02:08.532731",
+  "dataset": "sismepre",
+  "records_checked": 252,
+  "records_passed": 252,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_preguntas",
+    "year": "2024",
+    "score": 1.0,
+    "rules": {
+      "estado_registro_dominio": {
+        "expr": "ESTADO_REGISTRO IN ('A', 'I')",
+        "score": 1.0
+      },
+      "year_matches_partition": {
+        "expr": "ANO_APLICACION = year",
+        "score": 1.0
+      }
+    }
+  }
+}

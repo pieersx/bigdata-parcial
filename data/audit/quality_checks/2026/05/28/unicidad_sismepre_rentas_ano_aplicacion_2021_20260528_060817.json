@@ -1,0 +1,24 @@
+{
+  "check_id": "unicidad_sismepre_rentas_ano_aplicacion_2021_20260528_060817",
+  "check_name": "unicidad_sismepre_rentas_ano_aplicacion_2021",
+  "check_type": "unicidad",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:08:17.816801",
+  "dataset": "sismepre",
+  "records_checked": 1,
+  "records_passed": 1,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_ano_aplicacion",
+    "year": "2021",
+    "score": 1.0,
+    "unique_keys": [
+      "ANO_APLICACION",
+      "PERIODO",
+      "ANO_APLICACION_FIN"
+    ],
+    "distinct_rows": 1
+  }
+}

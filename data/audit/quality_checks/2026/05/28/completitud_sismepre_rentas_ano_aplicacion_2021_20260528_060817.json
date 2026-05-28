@@ -1,0 +1,28 @@
+{
+  "check_id": "completitud_sismepre_rentas_ano_aplicacion_2021_20260528_060817",
+  "check_name": "completitud_sismepre_rentas_ano_aplicacion_2021",
+  "check_type": "completitud",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:08:17.765530",
+  "dataset": "sismepre",
+  "records_checked": 3,
+  "records_passed": 3,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_ano_aplicacion",
+    "year": "2021",
+    "score": 1.0,
+    "required_columns": [
+      "ANO_APLICACION",
+      "PERIODO",
+      "ESTADO"
+    ],
+    "column_scores": {
+      "ANO_APLICACION": 1.0,
+      "PERIODO": 1.0,
+      "ESTADO": 1.0
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "check_id": "exactitud_ingresos_ingresos_diccionario_all_20260528_054341",
+  "check_name": "exactitud_ingresos_ingresos_diccionario_all",
+  "check_type": "exactitud",
+  "status": "passed",
+  "timestamp": "2026-05-28T05:43:41.979917",
+  "dataset": "ingresos",
+  "records_checked": 36,
+  "records_passed": 36,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "ingresos",
+    "table_name": "ingresos_diccionario",
+    "year": "all",
+    "score": 1.0,
+    "rules": {
+      "descripcion_informada": {
+        "expr": "TRIM(DESCRIPCION) <> ''",
+        "score": 1.0
+      }
+    }
+  }
+}

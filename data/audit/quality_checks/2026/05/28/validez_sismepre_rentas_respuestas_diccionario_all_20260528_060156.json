@@ -1,0 +1,24 @@
+{
+  "check_id": "validez_sismepre_rentas_respuestas_diccionario_all_20260528_060156",
+  "check_name": "validez_sismepre_rentas_respuestas_diccionario_all",
+  "check_type": "validez",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:01:56.819571",
+  "dataset": "sismepre",
+  "records_checked": 11,
+  "records_passed": 11,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_respuestas_diccionario",
+    "year": "all",
+    "score": 1.0,
+    "rules": {
+      "tipo_dato_informado": {
+        "expr": "TRIM(TIPO_DATO) <> ''",
+        "score": 1.0
+      }
+    }
+  }
+}

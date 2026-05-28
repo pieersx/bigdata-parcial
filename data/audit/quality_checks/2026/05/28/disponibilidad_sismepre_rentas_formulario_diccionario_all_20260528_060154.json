@@ -1,0 +1,20 @@
+{
+  "check_id": "disponibilidad_sismepre_rentas_formulario_diccionario_all_20260528_060154",
+  "check_name": "disponibilidad_sismepre_rentas_formulario_diccionario_all",
+  "check_type": "disponibilidad",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:01:54.532943",
+  "dataset": "sismepre",
+  "records_checked": 1,
+  "records_passed": 1,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_formulario_diccionario",
+    "year": "all",
+    "score": 1.0,
+    "bronze_path": "/home/jovyan/work/data/bronze/sismepre/_references/rentas_formulario_diccionario",
+    "records_count": 10
+  }
+}

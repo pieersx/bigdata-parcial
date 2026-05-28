@@ -1,0 +1,24 @@
+{
+  "check_id": "exactitud_sismepre_rentas_formulario_2022_20260528_060330",
+  "check_name": "exactitud_sismepre_rentas_formulario_2022",
+  "check_type": "exactitud",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:03:30.230409",
+  "dataset": "sismepre",
+  "records_checked": 10,
+  "records_passed": 10,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_formulario",
+    "year": "2022",
+    "score": 1.0,
+    "rules": {
+      "orden_formulario_numerico": {
+        "expr": "ORDEN_FORMULARIO RLIKE '^[0-9]+$'",
+        "score": 1.0
+      }
+    }
+  }
+}

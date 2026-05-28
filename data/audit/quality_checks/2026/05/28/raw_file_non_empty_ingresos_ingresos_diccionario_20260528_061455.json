@@ -1,0 +1,16 @@
+{
+  "check_id": "raw_file_non_empty_ingresos_ingresos_diccionario_20260528_061455",
+  "check_name": "raw_file_non_empty_ingresos_ingresos_diccionario",
+  "check_type": "availability",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:14:55.167967",
+  "dataset": "ingresos",
+  "records_checked": 1,
+  "records_passed": 1,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "threshold": 0.05,
+    "validation_criteria": "validate_file"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "check_id": "completitud_sismepre_rentas_esat_estadistica_atm_2025_20260528_060425",
+  "check_name": "completitud_sismepre_rentas_esat_estadistica_atm_2025",
+  "check_type": "completitud",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:04:25.207136",
+  "dataset": "sismepre",
+  "records_checked": 250950,
+  "records_passed": 250950,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_esat_estadistica_atm",
+    "year": "2025",
+    "score": 1.0,
+    "required_columns": [
+      "SEC_EJEC",
+      "ANO_APLICACION",
+      "PERIODO",
+      "DEPARTAMENTO_NOMBRE",
+      "PROVINCIA_NOMBRE",
+      "DISTRITO_NOMBRE",
+      "MUNICIPALIDAD_NOMBRE"
+    ],
+    "column_scores": {
+      "SEC_EJEC": 1.0,
+      "ANO_APLICACION": 1.0,
+      "PERIODO": 1.0,
+      "DEPARTAMENTO_NOMBRE": 1.0,
+      "PROVINCIA_NOMBRE": 1.0,
+      "DISTRITO_NOMBRE": 1.0,
+      "MUNICIPALIDAD_NOMBRE": 1.0
+    }
+  }
+}

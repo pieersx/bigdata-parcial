@@ -129,20 +129,23 @@ class ControlManager:
                 "validation_criteria": validation_func.__name__
             }
         )
-        
-        # Registrar verificación
+
+        self.record_quality_check(quality_check)
+        return quality_check
+
+    def record_quality_check(self, quality_check: DataQualityCheck) -> DataQualityCheck:
         self.audit_logger.log_quality_check(quality_check)
-        
+
         if self.current_execution:
             self.current_execution.quality_checks.append(quality_check)
-        
+
         self.logger.info(
             "Quality check performed",
-            check_name=check_name,
-            status=status,
-            failure_rate=failure_rate
+            check_name=quality_check.check_name,
+            status=quality_check.status,
+            failure_rate=quality_check.failure_rate,
         )
-        
+
         return quality_check
     
     def log_pipeline_error(

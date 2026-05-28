@@ -1,0 +1,38 @@
+{
+  "check_id": "completitud_ingresos_ingresos_2017_20260528_052855",
+  "check_name": "completitud_ingresos_ingresos_2017",
+  "check_type": "completitud",
+  "status": "passed",
+  "timestamp": "2026-05-28T05:28:55.737792",
+  "dataset": "ingresos",
+  "records_checked": 59376,
+  "records_passed": 59375,
+  "records_failed": 1,
+  "failure_rate": 1.6841821611435215e-05,
+  "details": {
+    "dataset": "ingresos",
+    "table_name": "ingresos",
+    "year": "2017",
+    "score": 0.999983,
+    "required_columns": [
+      "ANO_DOC",
+      "MES_DOC",
+      "NIVEL_GOBIERNO",
+      "NIVEL_GOBIERNO_NOMBRE",
+      "SEC_EJEC",
+      "EJECUTORA",
+      "EJECUTORA_NOMBRE",
+      "MONTO_RECAUDADO"
+    ],
+    "column_scores": {
+      "ANO_DOC": 1.0,
+      "MES_DOC": 1.0,
+      "NIVEL_GOBIERNO": 1.0,
+      "NIVEL_GOBIERNO_NOMBRE": 1.0,
+      "SEC_EJEC": 1.0,
+      "EJECUTORA": 1.0,
+      "EJECUTORA_NOMBRE": 1.0,
+      "MONTO_RECAUDADO": 0.9998652654271086
+    }
+  }
+}

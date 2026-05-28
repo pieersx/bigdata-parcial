@@ -7,12 +7,18 @@ from pydantic import BaseModel, Field
 class ResourceMetadata(BaseModel):
     dataset: str
     asset_name: str
+    asset_role: Optional[str] = None
+    table_name: Optional[str] = None
     source_type: str
     source_url: str
     ingestion_date: datetime = Field(default_factory=datetime.now)
     status: str
     skipped: bool = False
+    raw_path: Optional[str] = None
     file_path: Optional[str] = None
+    bronze_path: Optional[str] = None
+    format: Optional[str] = None
+    partition_columns: Optional[str] = None
     size_bytes: Optional[int] = None
     records_count: Optional[int] = None
     execution_time_ms: Optional[float] = None

@@ -1,0 +1,24 @@
+{
+  "check_id": "exactitud_sismepre_rentas_entidad_estado_2026_20260528_060930",
+  "check_name": "exactitud_sismepre_rentas_entidad_estado_2026",
+  "check_type": "exactitud",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:09:30.149275",
+  "dataset": "sismepre",
+  "records_checked": 1354,
+  "records_passed": 1354,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_entidad_estado",
+    "year": "2026",
+    "score": 1.0,
+    "rules": {
+      "periodo_numerico": {
+        "expr": "PERIODO RLIKE '^[0-9]+$'",
+        "score": 1.0
+      }
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "check_id": "unicidad_sismepre_rentas_estadistica_2024_20260528_060259",
+  "check_name": "unicidad_sismepre_rentas_estadistica_2024",
+  "check_type": "unicidad",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:02:59.106853",
+  "dataset": "sismepre",
+  "records_checked": 45,
+  "records_passed": 45,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_estadistica",
+    "year": "2024",
+    "score": 1.0,
+    "unique_keys": [
+      "ANO_APLICACION",
+      "PERIODO",
+      "FORMULARIO_ID",
+      "ANO_ESTADISTICA",
+      "MES_ESTADISTICA"
+    ],
+    "distinct_rows": 45
+  }
+}

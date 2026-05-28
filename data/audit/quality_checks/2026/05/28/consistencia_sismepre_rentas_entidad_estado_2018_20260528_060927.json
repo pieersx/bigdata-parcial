@@ -1,0 +1,24 @@
+{
+  "check_id": "consistencia_sismepre_rentas_entidad_estado_2018_20260528_060927",
+  "check_name": "consistencia_sismepre_rentas_entidad_estado_2018",
+  "check_type": "consistencia",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:09:27.634658",
+  "dataset": "sismepre",
+  "records_checked": 2484,
+  "records_passed": 2484,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_entidad_estado",
+    "year": "2018",
+    "score": 1.0,
+    "rules": {
+      "sec_ejec_presente": {
+        "expr": "TRIM(SEC_EJEC) <> '' OR TRIM(SEC_EJE) <> ''",
+        "score": 1.0
+      }
+    }
+  }
+}

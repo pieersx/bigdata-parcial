@@ -1,0 +1,24 @@
+{
+  "check_id": "exactitud_sismepre_rentas_preguntas_2022_20260528_060207",
+  "check_name": "exactitud_sismepre_rentas_preguntas_2022",
+  "check_type": "exactitud",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:02:07.525599",
+  "dataset": "sismepre",
+  "records_checked": 91,
+  "records_passed": 91,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_preguntas",
+    "year": "2022",
+    "score": 1.0,
+    "rules": {
+      "formulario_id_numerico": {
+        "expr": "FORMULARIO_ID RLIKE '^[0-9]+$'",
+        "score": 1.0
+      }
+    }
+  }
+}

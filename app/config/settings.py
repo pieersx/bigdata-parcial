@@ -35,6 +35,18 @@ class Settings:
         return self.config['datasets']
 
     @property
+    def spark(self) -> Dict[str, Any]:
+        return self.config.get('spark', {})
+
+    @property
+    def profiling(self) -> Dict[str, Any]:
+        return self.config.get('profiling', {})
+
+    @property
+    def quality(self) -> Dict[str, Any]:
+        return self.config.get('quality', {})
+
+    @property
     def timeout(self) -> int:
         return int(os.getenv("HTTP_TIMEOUT", "30"))
 
@@ -55,12 +67,27 @@ class Settings:
         return self._resolve_project_path(self.config['paths']['bronze'], "BRONZE_PATH")
 
     @property
+    def raw_path(self) -> Path:
+        return self._resolve_project_path(self.config['paths']['raw'], "RAW_PATH")
+
+    @property
     def silver_path(self) -> Path:
         return self._resolve_project_path(self.config['paths']['silver'], "SILVER_PATH")
 
     @property
     def gold_path(self) -> Path:
         return self._resolve_project_path(self.config['paths']['gold'], "GOLD_PATH")
+
+    @property
+    def reports_path(self) -> Path:
+        return self._resolve_project_path(self.config['paths']['reports'], "REPORTS_PATH")
+
+    @property
+    def legacy_bronze_path(self) -> Path:
+        bronze_path = Path(self.config['paths']['bronze'])
+        if bronze_path.is_absolute():
+            return bronze_path
+        return self.project_root / bronze_path
 
     @property
     def audit_path(self) -> Path:

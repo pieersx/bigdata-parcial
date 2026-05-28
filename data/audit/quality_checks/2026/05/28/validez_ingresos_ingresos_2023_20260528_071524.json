@@ -1,0 +1,40 @@
+{
+  "check_id": "validez_ingresos_ingresos_2023_20260528_071524",
+  "check_name": "validez_ingresos_ingresos_2023",
+  "check_type": "validez",
+  "status": "passed",
+  "timestamp": "2026-05-28T07:15:24.011771",
+  "dataset": "ingresos",
+  "records_checked": 42635,
+  "records_passed": 42632,
+  "records_failed": 3,
+  "failure_rate": 7.036472381849457e-05,
+  "details": {
+    "dataset": "ingresos",
+    "table_name": "ingresos",
+    "year": "2023",
+    "score": 0.99993,
+    "rules": {
+      "mes_doc_rango": {
+        "expr": "MES_DOC RLIKE '^[0-9]{1,2}$' AND CAST(MES_DOC AS INT) BETWEEN 1 AND 12",
+        "score": 1.0
+      },
+      "nivel_gobierno_dominio": {
+        "expr": "NIVEL_GOBIERNO IN ('E', 'R', 'M')",
+        "score": 0.9998827254603025
+      },
+      "monto_pia_numerico": {
+        "expr": "MONTO_PIA RLIKE '^-?[0-9]+(\\.[0-9]+)?$'",
+        "score": 0.9998827254603025
+      },
+      "monto_pim_numerico": {
+        "expr": "MONTO_PIM RLIKE '^-?[0-9]+(\\.[0-9]+)?$'",
+        "score": 1.0
+      },
+      "monto_recaudado_numerico": {
+        "expr": "MONTO_RECAUDADO RLIKE '^-?[0-9]+(\\.[0-9]+)?$'",
+        "score": 0.9998827254603025
+      }
+    }
+  }
+}

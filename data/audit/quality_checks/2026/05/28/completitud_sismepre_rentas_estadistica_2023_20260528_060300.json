@@ -1,0 +1,32 @@
+{
+  "check_id": "completitud_sismepre_rentas_estadistica_2023_20260528_060300",
+  "check_name": "completitud_sismepre_rentas_estadistica_2023",
+  "check_type": "completitud",
+  "status": "passed",
+  "timestamp": "2026-05-28T06:03:00.032086",
+  "dataset": "sismepre",
+  "records_checked": 185,
+  "records_passed": 185,
+  "records_failed": 0,
+  "failure_rate": 0.0,
+  "details": {
+    "dataset": "sismepre",
+    "table_name": "rentas_estadistica",
+    "year": "2023",
+    "score": 1.0,
+    "required_columns": [
+      "ANO_APLICACION",
+      "PERIODO",
+      "FORMULARIO_ID",
+      "ANO_ESTADISTICA",
+      "MES_ESTADISTICA"
+    ],
+    "column_scores": {
+      "ANO_APLICACION": 1.0,
+      "PERIODO": 1.0,
+      "FORMULARIO_ID": 1.0,
+      "ANO_ESTADISTICA": 1.0,
+      "MES_ESTADISTICA": 1.0
+    }
+  }
+}

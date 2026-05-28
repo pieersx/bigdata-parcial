@@ -1,0 +1,1 @@
+from app.profiling.profiling_generator import ProfilingGenerator
