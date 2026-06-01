@@ -38,7 +38,7 @@ class LandingService:
     def _fetch_direct_download(self, dataset: str, asset: Dict[str, Any]) -> Dict[str, Any]:
         filename = asset["filename"]
         source_url = asset["url"]
-        existing_path = self.data_lake.resolve_existing_input_path(dataset, filename)
+        existing_path = self.data_lake.resolve_existing_raw_path(dataset, filename)
         if existing_path and existing_path.stat().st_size > 0:
             materialized_path = self._materialize_raw_copy(dataset, filename, existing_path)
             self._record_file_availability_check(dataset, asset["name"], materialized_path)
@@ -73,7 +73,7 @@ class LandingService:
     def _fetch_api_resource(self, dataset: str, asset: Dict[str, Any]) -> Dict[str, Any]:
         filename = asset["filename"]
         source_url = asset["url"]
-        existing_path = self.data_lake.resolve_existing_input_path(dataset, filename)
+        existing_path = self.data_lake.resolve_existing_raw_path(dataset, filename)
         if existing_path and existing_path.stat().st_size > 0:
             materialized_path = self._materialize_raw_copy(dataset, filename, existing_path)
             self._record_file_availability_check(dataset, asset["name"], materialized_path)
@@ -136,7 +136,7 @@ class LandingService:
 
     def _fetch_extracted_csv(self, dataset: str, asset: Dict[str, Any]) -> Dict[str, Any]:
         filename = asset["filename"]
-        existing_path = self.data_lake.resolve_existing_input_path(dataset, filename)
+        existing_path = self.data_lake.resolve_existing_raw_path(dataset, filename)
         if existing_path and existing_path.stat().st_size > 0:
             materialized_path = self._materialize_raw_copy(dataset, filename, existing_path)
             self._record_file_availability_check(dataset, asset["name"], materialized_path)
@@ -150,7 +150,7 @@ class LandingService:
                 skipped=True,
             )
 
-        archive_path = self.data_lake.resolve_existing_input_path(dataset, asset["archive_filename"])
+        archive_path = self.data_lake.resolve_existing_raw_path(dataset, asset["archive_filename"])
         if not archive_path:
             return self._handle_fetch_error(
                 dataset,
@@ -194,7 +194,7 @@ class LandingService:
         if not raw_target.exists() or raw_target.stat().st_size == 0:
             shutil.copy2(source_path, raw_target)
             self.logger.info(
-                "Legacy source copied to raw landing",
+                "Source copied to raw landing",
                 dataset=dataset,
                 source_path=str(source_path),
                 raw_target=str(raw_target),

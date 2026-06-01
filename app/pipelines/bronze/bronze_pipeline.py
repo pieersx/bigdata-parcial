@@ -19,9 +19,6 @@ from app.storage.parquet_storage import ParquetStorage
 from app.utils.logger import StructuredLogger
 
 
-SUCCESSFUL_STATUSES = {"success", "skipped_existing", "skipped_optional"}
-
-
 class BronzePipeline:
     def __init__(self):
         self.logger = StructuredLogger(self.__class__.__name__)
@@ -30,7 +27,6 @@ class BronzePipeline:
             raw_path=settings.raw_path,
             bronze_path=settings.bronze_path,
             reports_path=settings.reports_path,
-            legacy_bronze_path=settings.legacy_bronze_path,
         )
         self.audit_logger = AuditLogger(audit_path=settings.audit_path)
         self.control_manager = ControlManager(audit_logger=self.audit_logger)
@@ -92,6 +88,7 @@ class BronzePipeline:
         }
 
     def run(self, dataset_names: Optional[List[str]] = None) -> Dict[str, Any]:
+        self.data_lake.validate_bronze_contract()
         selected_datasets = dataset_names or list(self.dataset_pipelines.keys())
         execution = self.control_manager.start_execution(
             pipeline_name="bronze_parquet_medallion",
@@ -129,8 +126,14 @@ class BronzePipeline:
         skipped_existing = sum(1 for result in results if result["status"] == "skipped_existing")
         skipped_optional = sum(1 for result in results if result["status"] == "skipped_optional")
         failed_count = len(asset_errors)
+        failed_quality_checks = [
+            quality_check
+            for result in results
+            for quality_check in result.get("quality_checks", [])
+            if quality_check["status"] == "failed"
+        ]
 
-        if failed_count == 0 and not errors:
+        if failed_count == 0 and not errors and not failed_quality_checks:
             final_status = ExecutionStatus.SUCCESS
         elif success_count == 0 and skipped_existing == 0 and skipped_optional == 0:
             final_status = ExecutionStatus.FAILED
@@ -143,6 +146,7 @@ class BronzePipeline:
             "skipped_existing": skipped_existing,
             "skipped_optional": skipped_optional,
             "failed": failed_count,
+            "failed_quality_checks": len(failed_quality_checks),
             "errors": errors,
             "details": results,
         }

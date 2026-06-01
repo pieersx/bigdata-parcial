@@ -6,35 +6,61 @@ __pycache__/
 dist/
 build/
 *.egg
+.pytest_cache/
 
 # Virtual environment
 venv/
+env/
+.venv/
+
+# Environment variables (sensibles)
 .env
 .env.local
+.env.*.local
 
 # Jupyter
 .ipynb_checkpoints/
 .ipython/
 .jupyter/
-
-# Local config
-.local/
+*_checkpoint.ipynb
 
 # IDE
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
 
 # OS
 .DS_Store
 Thumbs.db
+.DS_Store?
+._*
 
-# Data (optional - uncomment if you don't want to track data files)
-# data/
-# *.csv
-# *.parquet
+# Local config
+.local/
 
 # Logs
 *.log
+logs/
 
-# Notebook checkpoints
-*_checkpoint.ipynb
+# Data files (archivos grandes - NO subir)
+data/
+*.csv
+*.parquet
+*.parquet.bak
+*.csv.gz
+
+# Spark temp files
+**/warehouse/
+**/metastore_db/
+**/spark-warehouse/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# MacOS
+.AppleDouble/
+.LSOverride/

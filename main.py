@@ -29,6 +29,7 @@ def main():
         print(f"Skipped Existing: {result['skipped_existing']}")
         print(f"Skipped Optional: {result['skipped_optional']}")
         print(f"Failed: {result['failed']}")
+        print(f"Failed Quality Checks: {result['failed_quality_checks']}")
         print("\nExecution Report:")
         print(json.dumps(result['execution_report'], indent=2, default=str))
     finally:

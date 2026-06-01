@@ -47,6 +47,10 @@ class Settings:
         return self.config.get('quality', {})
 
     @property
+    def silver(self) -> Dict[str, Any]:
+        return self.config.get('silver', {})
+
+    @property
     def timeout(self) -> int:
         return int(os.getenv("HTTP_TIMEOUT", "30"))
 
@@ -81,13 +85,6 @@ class Settings:
     @property
     def reports_path(self) -> Path:
         return self._resolve_project_path(self.config['paths']['reports'], "REPORTS_PATH")
-
-    @property
-    def legacy_bronze_path(self) -> Path:
-        bronze_path = Path(self.config['paths']['bronze'])
-        if bronze_path.is_absolute():
-            return bronze_path
-        return self.project_root / bronze_path
 
     @property
     def audit_path(self) -> Path:

@@ -1,3 +1,4 @@
+import hashlib
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -25,10 +26,23 @@ class BronzeTransformService:
         self.profiling_generator = profiling_generator
         self.logger = StructuredLogger(self.__class__.__name__)
 
-    def transform(self, dataset: str, asset: Dict[str, Any], landing_result: Dict[str, Any]) -> Dict[str, Any]:
+    def transform(
+        self,
+        dataset: str,
+        asset: Dict[str, Any],
+        landing_result: Dict[str, Any],
+        execution_id: Optional[str] = None,
+    ) -> Dict[str, Any]:
         raw_path = Path(landing_result["raw_path"])
         df = read_csv_as_bronze_dataframe(self.spark, raw_path, asset["read_options"])
-        df = self._add_bronze_metadata(df, dataset, asset, raw_path)
+        df = self._add_bronze_metadata(
+            df,
+            dataset,
+            asset,
+            raw_path,
+            source_url=landing_result.get("source_url", ""),
+            execution_id=execution_id,
+        )
 
         partition_columns: List[str] = []
         year_column = asset.get("year_column")
@@ -93,7 +107,10 @@ class BronzeTransformService:
         dataset: str,
         asset: Dict[str, Any],
         raw_path: Path,
+        source_url: str,
+        execution_id: Optional[str],
     ) -> DataFrame:
+        source_checksum = self._sha256(raw_path)
         return (
             df.withColumn("_bronze_dataset", F.lit(dataset))
             .withColumn("_bronze_asset_name", F.lit(asset["name"]))
@@ -101,8 +118,19 @@ class BronzeTransformService:
             .withColumn("_bronze_asset_role", F.lit(asset["asset_role"]))
             .withColumn("_bronze_source_type", F.lit(asset["source_type"]))
             .withColumn("_bronze_source_path", F.lit(str(raw_path)))
+            .withColumn("_bronze_source_url", F.lit(source_url))
+            .withColumn("_bronze_source_checksum", F.lit(source_checksum))
+            .withColumn("_bronze_execution_id", F.lit(execution_id))
             .withColumn("_bronze_ingestion_ts", F.current_timestamp())
+            .withColumn("_bronze_ingestion_date", F.current_date())
         )
+
+    def _sha256(self, file_path: Path) -> str:
+        digest = hashlib.sha256()
+        with open(file_path, "rb") as file_handle:
+            for chunk in iter(lambda: file_handle.read(1024 * 1024), b""):
+                digest.update(chunk)
+        return digest.hexdigest()
 
     def _add_year_partition(
         self,

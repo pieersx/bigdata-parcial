@@ -57,9 +57,9 @@ class ControlManager:
             self.current_execution.start_time
         ).total_seconds()
         
-        processed_assets = output_summary.get('total_assets', output_summary.get('total_series', 0))
-        successful_assets = output_summary.get('successful', 0) + output_summary.get('skipped_existing', 0)
-        failed_assets = output_summary.get('failed', 0)
+        processed_assets = output_summary.get('total_assets', output_summary.get('total_tables', output_summary.get('total_series', 0)))
+        successful_assets = output_summary.get('successful', output_summary.get('published_tables', 0)) + output_summary.get('skipped_existing', 0)
+        failed_assets = output_summary.get('failed', output_summary.get('blocked_tables', 0))
 
         # Crear audit log
         audit_log = AuditLog(

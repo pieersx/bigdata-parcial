@@ -46,6 +46,11 @@ class BronzeIngestionPipeline(ABC):
                         dataset=self.dataset_name,
                         asset=asset,
                         landing_result=landing_result,
+                        execution_id=(
+                            self.control_manager.current_execution.execution_id
+                            if self.control_manager and self.control_manager.current_execution
+                            else None
+                        ),
                     )
                 )
             except Exception as error:

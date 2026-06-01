@@ -11,15 +11,15 @@ class DataLake:
         raw_path: Path,
         bronze_path: Path,
         reports_path: Path,
-        legacy_bronze_path: Optional[Path] = None,
+        silver_path: Optional[Path] = None,
     ):
         self.raw_path = raw_path
         self.bronze_path = bronze_path
         self.reports_path = reports_path
-        self.legacy_bronze_path = legacy_bronze_path or bronze_path
+        self.silver_path = silver_path or bronze_path.parent / "silver"
         self.logger = StructuredLogger(self.__class__.__name__)
 
-        for path in (self.raw_path, self.bronze_path, self.reports_path):
+        for path in (self.raw_path, self.bronze_path, self.silver_path, self.reports_path):
             path.mkdir(parents=True, exist_ok=True)
 
     def resolve_raw_file_path(self, dataset: str, filename: str) -> Path:
@@ -27,17 +27,28 @@ class DataLake:
         output_dir.mkdir(parents=True, exist_ok=True)
         return output_dir / filename
 
-    def resolve_legacy_file_path(self, dataset: str, filename: str) -> Optional[Path]:
-        candidate = self.legacy_bronze_path / dataset / filename
-        if candidate.exists():
-            return candidate
-        return None
-
-    def resolve_existing_input_path(self, dataset: str, filename: str) -> Optional[Path]:
+    def resolve_existing_raw_path(self, dataset: str, filename: str) -> Optional[Path]:
         raw_candidate = self.resolve_raw_file_path(dataset, filename)
         if raw_candidate.exists() and raw_candidate.stat().st_size > 0:
             return raw_candidate
-        return self.resolve_legacy_file_path(dataset, filename)
+        return None
+
+    def validate_bronze_contract(self) -> None:
+        source_extensions = {".csv", ".json", ".pdf", ".zip"}
+        unexpected_files = sorted(
+            path.relative_to(self.bronze_path)
+            for path in self.bronze_path.rglob("*")
+            if path.is_file() and path.suffix.lower() in source_extensions
+        )
+        if unexpected_files:
+            formatted_paths = ", ".join(str(path) for path in unexpected_files[:10])
+            remaining_count = len(unexpected_files) - 10
+            if remaining_count > 0:
+                formatted_paths += f", ... and {remaining_count} more"
+            raise ValueError(
+                "Bronze contract violation: source files must live under raw, "
+                f"not bronze. Unexpected files: {formatted_paths}"
+            )
 
     def resolve_bronze_table_path(
         self,
@@ -62,6 +73,16 @@ class DataLake:
         output_dir = self.reports_path / dataset
         if table_name and table_name not in (dataset, ""):
             output_dir = output_dir / table_name
+        output_dir.mkdir(parents=True, exist_ok=True)
+        return output_dir
+
+    def resolve_silver_table_path(self, table_name: str) -> Path:
+        output_dir = self.silver_path / table_name
+        output_dir.mkdir(parents=True, exist_ok=True)
+        return output_dir
+
+    def resolve_quarantine_path(self, table_name: str) -> Path:
+        output_dir = self.silver_path / "_quarantine" / table_name
         output_dir.mkdir(parents=True, exist_ok=True)
         return output_dir
 

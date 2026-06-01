@@ -128,6 +128,12 @@ quality:
   pass_threshold: 0.98
   warning_threshold: 0.9
 
+silver:
+  partition_column: "year"
+  required_government_level: "M"
+  write_mode: "overwrite"
+  quarantine_enabled: true
+
 paths:
   raw: "data/raw"
   bronze: "data/bronze"
