@@ -16,9 +16,10 @@ class HiveAssetsTest(unittest.TestCase):
             "sql/hive/03_dashboard_views.sql",
             "sql/hive/04_lab_queries.sql",
             "sql/hive/05_powerbi_tables.sql",
+            "sql/hive/06_drop_dashboard_views_for_powerbi.sql",
             "reports/hive_lab_municipal.md",
             "reports/dashboard_spec_hive_municipal.md",
-            "notebooks/07_Hive_Lab_Municipal.ipynb",
+            "notebooks/hive/01_Hive_Lab_Municipal.ipynb",
         ]:
             self.assertTrue((ROOT / relative).exists(), relative)
 

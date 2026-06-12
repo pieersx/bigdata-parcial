@@ -6,19 +6,32 @@ from pyspark.sql import functions as F
 
 ROOT = Path("/home/jovyan/work")
 LAYERS = {
+    "bronze": ROOT / "data" / "bronze",
     "silver": ROOT / "data" / "silver",
     "gold": ROOT / "data" / "gold",
 }
-REPORTS = ROOT / "reports"
+REPORTS = ROOT / "reports" / "profiling"
 SAMPLE_ROWS = 8
 
 
 def parquet_tables(layer_path: Path):
-    return sorted(
-        path
-        for path in layer_path.iterdir()
-        if path.is_dir() and path.name != "_quarantine" and any(path.rglob("*.parquet"))
-    )
+    tables = []
+    for path in sorted(layer_path.iterdir()):
+        if not path.is_dir() or path.name == "_quarantine":
+            continue
+        if any(path.glob("*.parquet")):
+            tables.append(path)
+            continue
+        children = [child for child in path.iterdir() if child.is_dir() and not child.name.startswith("_")]
+        if children and all("=" in child.name for child in children) and any(path.rglob("*.parquet")):
+            tables.append(path)
+            continue
+        for child in sorted(children):
+            if child.name == "_quarantine" or child.name.startswith("_"):
+                continue
+            if any(child.rglob("*.parquet")):
+                tables.append(child)
+    return tables
 
 
 def html_table(headers, rows):
@@ -31,8 +44,8 @@ def html_table(headers, rows):
 
 
 def profile_table(spark: SparkSession, layer: str, table_path: Path):
-    table_name = table_path.name
-    df = spark.read.parquet(str(table_path))
+    table_name = "__".join(table_path.relative_to(LAYERS[layer]).parts)
+    df = spark.read.option("basePath", str(table_path)).parquet(str(table_path))
     total = df.count()
     null_counts = {}
     if df.columns:

@@ -270,12 +270,14 @@ Ultima ejecucion Silver validada: `20260612_060020`.
 
 | Notebook | Proposito |
 |---|---|
-| [`01_Bronze_Pipeline_Parcial.ipynb`](notebooks/01_Bronze_Pipeline_Parcial.ipynb) | Evidencia del pipeline Bronze. |
-| [`02_Profiling_Ingresos.ipynb`](notebooks/02_Profiling_Ingresos.ipynb) | Perfilado y calidad de Ingresos. |
-| [`03_Profiling_SISMEPRE.ipynb`](notebooks/03_Profiling_SISMEPRE.ipynb) | Perfilado y calidad de SISMEPRE. |
-| [`04_Profiling_RENAMU.ipynb`](notebooks/04_Profiling_RENAMU.ipynb) | Perfilado y calidad de RENAMU. |
-| [`05_Silver_Pipeline_Parcial.ipynb`](notebooks/05_Silver_Pipeline_Parcial.ipynb) | Evidencia Silver: inventario, esquemas, calidad, cuarentena y proteccion ante ausencia de datos municipales. |
-| [`06_Gold_Pipeline_Parcial.ipynb`](notebooks/06_Gold_Pipeline_Parcial.ipynb) | Evidencia Gold: constelacion de hechos, dimensiones normalizadas, cobertura municipal, KPIs y mapeo de dashboards. |
+| [`notebooks/bronze/01_Bronze_Pipeline_Parcial.ipynb`](notebooks/bronze/01_Bronze_Pipeline_Parcial.ipynb) | Evidencia del pipeline Bronze. |
+| [`notebooks/bronze/05_Bronze_Data_Profiling.ipynb`](notebooks/bronze/05_Bronze_Data_Profiling.ipynb) | Profiling detallado de Bronze: registros, esquemas, nulos, trazabilidad y muestras. |
+| [`notebooks/silver/01_Silver_Pipeline_Parcial.ipynb`](notebooks/silver/01_Silver_Pipeline_Parcial.ipynb) | Evidencia Silver: limpieza, estandarizacion, calidad, cuarentena y datasets curados. |
+| [`notebooks/silver/02_Silver_Data_Profiling.ipynb`](notebooks/silver/02_Silver_Data_Profiling.ipynb) | Profiling detallado de Silver: tipos, duplicados, nulos, cuarentena y trazabilidad. |
+| [`notebooks/gold/01_Gold_Pipeline_Parcial.ipynb`](notebooks/gold/01_Gold_Pipeline_Parcial.ipynb) | Evidencia Gold: constelacion de hechos, dimensiones normalizadas, cobertura municipal, KPIs y mapeo de dashboards. |
+| [`notebooks/hive/01_Hive_Lab_Municipal.ipynb`](notebooks/hive/01_Hive_Lab_Municipal.ipynb) | Evidencia Hive/HDFS/Metastore, SQL analitico y conexion Power BI por ODBC. |
+
+La estructura completa esta documentada en [`notebooks/README.md`](notebooks/README.md).
 
 ## Pruebas
 

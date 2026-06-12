@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 
 from pyspark.sql import SparkSession
 
@@ -112,6 +113,28 @@ POWERBI_TABLES = {
     """,
 }
 
+SQL_DIR = Path(__file__).resolve().parents[1] / "sql" / "hive"
+TEMP_DASHBOARD_VIEWS = [
+    "vw_dashboard_01_recaudacion_capacidad",
+    "vw_dashboard_02_clasificador_ingreso",
+    "vw_dashboard_03_predial_vs_efectividad",
+    "vw_dashboard_04_distribucion_efectividad",
+    "vw_dashboard_05_software_tributario",
+    "vw_dashboard_06_priorizacion_municipal",
+]
+
+
+def execute_sql_file(spark: SparkSession, path: Path) -> None:
+    for statement in path.read_text(encoding="utf-8").split(";"):
+        statement = statement.strip()
+        if statement and not statement.startswith("--"):
+            spark.sql(statement)
+
+
+def drop_temp_views(spark: SparkSession) -> None:
+    for view_name in TEMP_DASHBOARD_VIEWS:
+        spark.sql(f"DROP VIEW IF EXISTS municipal_gold.{view_name}")
+
 
 def main() -> int:
     builder = (
@@ -129,6 +152,7 @@ def main() -> int:
     spark = builder.enableHiveSupport().getOrCreate()
     spark.sql("CREATE DATABASE IF NOT EXISTS municipal_gold")
     spark.sql("USE municipal_gold")
+    execute_sql_file(spark, SQL_DIR / "03_dashboard_views.sql")
 
     for table_name, query in POWERBI_TABLES.items():
         full_name = f"municipal_gold.{table_name}"
@@ -145,6 +169,7 @@ def main() -> int:
         spark.sql(f"CREATE TABLE {full_name} USING PARQUET LOCATION '{location}'")
         print(f"{full_name}: {df.count()} rows")
 
+    drop_temp_views(spark)
     spark.stop()
     return 0
 

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Profiling gold - mart_dashboard_municipal</title>
+  <style>
+    body { font-family: Segoe UI, Arial, sans-serif; margin: 32px; color: #222; }
+    h1 { color: #16892d; }
+    table { border-collapse: collapse; width: 100%; margin: 16px 0 28px; font-size: 13px; }
+    th { background: #18a837; color: white; text-align: left; padding: 8px; }
+    td { border: 1px solid #ddd; padding: 6px; vertical-align: top; }
+    .kpi { display: inline-block; margin-right: 24px; padding: 12px 18px; background: #e2ffd8; }
+  </style>
+</head>
+<body>
+  <h1>Profiling Gold - mart_dashboard_municipal</h1>
+  <div class="kpi"><strong>Registros:</strong> 28,628</div>
+  <div class="kpi"><strong>Columnas:</strong> 44</div>
+  <h2>Esquema y nulos</h2>
+  <table><thead><tr><th>Columna</th><th>Tipo</th><th>Nulos</th><th>% Nulos</th></tr></thead><tbody><tr><td>SEC_EJEC</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>ANO_DOC</td><td>int</td><td>0</td><td>0.0</td></tr>
+<tr><td>MONTO_PIA</td><td>decimal(24,2)</td><td>0</td><td>0.0</td></tr>
+<tr><td>MONTO_PIM</td><td>decimal(24,2)</td><td>0</td><td>0.0</td></tr>
+<tr><td>MONTO_RECAUDADO</td><td>decimal(24,2)</td><td>0</td><td>0.0</td></tr>
+<tr><td>MON_RECAUDACION_TOTAL</td><td>decimal(38,2)</td><td>17580</td><td>61.4084</td></tr>
+<tr><td>MON_SALDO_PREDIAL_TOTAL</td><td>decimal(38,2)</td><td>17580</td><td>61.4084</td></tr>
+<tr><td>MON_BASEIMPONIBLE_AFECTO</td><td>decimal(38,2)</td><td>17580</td><td>61.4084</td></tr>
+<tr><td>ESTADO_SISMEPRE</td><td>string</td><td>18610</td><td>65.0063</td></tr>
+<tr><td>CLASIFICACION_SISMEPRE</td><td>string</td><td>18610</td><td>65.0063</td></tr>
+<tr><td>TIPO_META_SISMEPRE</td><td>string</td><td>18610</td><td>65.0063</td></tr>
+<tr><td>ANO_RENAMU</td><td>int</td><td>646</td><td>2.2565</td></tr>
+<tr><td>idmunici</td><td>string</td><td>646</td><td>2.2565</td></tr>
+<tr><td>tipo_municipalidad_renamu</td><td>string</td><td>646</td><td>2.2565</td></tr>
+<tr><td>personal_municipal_total</td><td>int</td><td>646</td><td>2.2565</td></tr>
+<tr><td>requiere_asistencia_at</td><td>boolean</td><td>646</td><td>2.2565</td></tr>
+<tr><td>requiere_asistencia_catastro</td><td>boolean</td><td>646</td><td>2.2565</td></tr>
+<tr><td>requiere_capacitacion_at</td><td>boolean</td><td>646</td><td>2.2565</td></tr>
+<tr><td>requiere_capacitacion_catastro</td><td>boolean</td><td>646</td><td>2.2565</td></tr>
+<tr><td>P19M_T_raw</td><td>string</td><td>646</td><td>2.2565</td></tr>
+<tr><td>P22_AT2_raw</td><td>string</td><td>646</td><td>2.2565</td></tr>
+<tr><td>P22_AT3_raw</td><td>string</td><td>646</td><td>2.2565</td></tr>
+<tr><td>P22_C2_raw</td><td>string</td><td>646</td><td>2.2565</td></tr>
+<tr><td>P22_C3_raw</td><td>string</td><td>646</td><td>2.2565</td></tr>
+<tr><td>usa_srtm_estado</td><td>boolean</td><td>646</td><td>2.2565</td></tr>
+<tr><td>usa_software_rentas_at</td><td>boolean</td><td>646</td><td>2.2565</td></tr>
+<tr><td>usa_software_catastro</td><td>boolean</td><td>646</td><td>2.2565</td></tr>
+<tr><td>P16_5_raw</td><td>string</td><td>646</td><td>2.2565</td></tr>
+<tr><td>P17_2_raw</td><td>string</td><td>646</td><td>2.2565</td></tr>
+<tr><td>P17_3_raw</td><td>string</td><td>646</td><td>2.2565</td></tr>
+<tr><td>usa_al_menos_un_software_at</td><td>boolean</td><td>646</td><td>2.2565</td></tr>
+<tr><td>UBIGEO</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>MUNICIPALIDAD_NOMBRE</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>DEPARTAMENTO_NOMBRE</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>PROVINCIA_NOMBRE</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>DISTRITO_NOMBRE</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>categoria_municipalidad</td><td>string</td><td>6161</td><td>21.5209</td></tr>
+<tr><td>categoria_match_status</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>in_scope_presentacion</td><td>boolean</td><td>0</td><td>0.0</td></tr>
+<tr><td>PCT_EJECUCION</td><td>decimal(20,4)</td><td>85</td><td>0.2969</td></tr>
+<tr><td>PCT_RECUPERACION_PREDIAL</td><td>decimal(20,4)</td><td>18934</td><td>66.138</td></tr>
+<tr><td>_gold_execution_id</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>_gold_ingestion_ts</td><td>timestamp</td><td>0</td><td>0.0</td></tr>
+<tr><td>year</td><td>int</td><td>0</td><td>0.0</td></tr></tbody></table>
+  <h2>Muestra</h2>
+  <table><thead><tr><th>SEC_EJEC</th><th>ANO_DOC</th><th>MONTO_PIA</th><th>MONTO_PIM</th><th>MONTO_RECAUDADO</th><th>MON_RECAUDACION_TOTAL</th><th>MON_SALDO_PREDIAL_TOTAL</th><th>MON_BASEIMPONIBLE_AFECTO</th><th>ESTADO_SISMEPRE</th><th>CLASIFICACION_SISMEPRE</th><th>TIPO_META_SISMEPRE</th><th>ANO_RENAMU</th><th>idmunici</th><th>tipo_municipalidad_renamu</th><th>personal_municipal_total</th><th>requiere_asistencia_at</th><th>requiere_asistencia_catastro</th><th>requiere_capacitacion_at</th><th>requiere_capacitacion_catastro</th><th>P19M_T_raw</th><th>P22_AT2_raw</th><th>P22_AT3_raw</th><th>P22_C2_raw</th><th>P22_C3_raw</th><th>usa_srtm_estado</th><th>usa_software_rentas_at</th><th>usa_software_catastro</th><th>P16_5_raw</th><th>P17_2_raw</th><th>P17_3_raw</th><th>usa_al_menos_un_software_at</th><th>UBIGEO</th><th>MUNICIPALIDAD_NOMBRE</th><th>DEPARTAMENTO_NOMBRE</th><th>PROVINCIA_NOMBRE</th><th>DISTRITO_NOMBRE</th><th>categoria_municipalidad</th><th>categoria_match_status</th><th>in_scope_presentacion</th><th>PCT_EJECUCION</th><th>PCT_RECUPERACION_PREDIAL</th><th>_gold_execution_id</th><th>_gold_ingestion_ts</th><th>year</th></tr></thead><tbody><tr><td>300038</td><td>2024</td><td>792797.00</td><td>1104944.00</td><td>943750.19</td><td>None</td><td>None</td><td>None</td><td>None</td><td>None</td><td>None</td><td>2022</td><td>010311</td><td>2</td><td>1</td><td>False</td><td>True</td><td>False</td><td>True</td><td>1</td><td>0</td><td>3</td><td>0</td><td>3</td><td>False</td><td>False</td><td>False</td><td>0</td><td>0</td><td>0</td><td>False</td><td>010311</td><td>MUNICIPALIDAD DISTRITAL DE VALERA</td><td>AMAZONAS</td><td>BONGARA</td><td>VALERA</td><td>G</td><td>matched</td><td>True</td><td>85.4116</td><td>None</td><td>20260612_061046</td><td>2026-06-12 06:31:05.171296</td><td>2024</td></tr>
+<tr><td>300110</td><td>2024</td><td>7128649.00</td><td>5411490.00</td><td>5318338.02</td><td>188245.00</td><td>155579.65</td><td>0.00</td><td>A</td><td>B</td><td>2</td><td>2022</td><td>020501</td><td>1</td><td>16</td><td>False</td><td>False</td><td>True</td><td>True</td><td>16</td><td>0</td><td>0</td><td>2</td><td>3</td><td>True</td><td>True</td><td>True</td><td>5</td><td>2</td><td>3</td><td>True</td><td>020501</td><td>MUNICIPALIDAD PROVINCIAL DE BOLOGNESI - CHIQUIAN</td><td>ANCASH</td><td>BOLOGNESI</td><td>CHIQUIAN</td><td>B</td><td>matched</td><td>True</td><td>98.2786</td><td>54.7503</td><td>20260612_061046</td><td>2026-06-12 06:31:05.171296</td><td>2024</td></tr>
+<tr><td>300113</td><td>2024</td><td>2803901.00</td><td>4671577.00</td><td>3875267.35</td><td>None</td><td>None</td><td>None</td><td>None</td><td>None</td><td>None</td><td>2022</td><td>020504</td><td>2</td><td>6</td><td>False</td><td>False</td><td>False</td><td>False</td><td>6</td><td>0</td><td>0</td><td>0</td><td>0</td><td>False</td><td>True</td><td>False</td><td>0</td><td>2</td><td>0</td><td>True</td><td>020504</td><td>MUNICIPALIDAD DISTRITAL DE AQUIA</td><td>ANCASH</td><td>BOLOGNESI</td><td>AQUIA</td><td>F</td><td>matched</td><td>True</td><td>82.9542</td><td>None</td><td>20260612_061046</td><td>2026-06-12 06:31:05.171296</td><td>2024</td></tr>
+<tr><td>300129</td><td>2024</td><td>1127297.00</td><td>2165975.00</td><td>1995617.77</td><td>None</td><td>None</td><td>None</td><td>None</td><td>None</td><td>None</td><td>2022</td><td>020605</td><td>2</td><td>4</td><td>True</td><td>True</td><td>True</td><td>True</td><td>4</td><td>2</td><td>3</td><td>2</td><td>3</td><td>False</td><td>False</td><td>False</td><td>0</td><td>0</td><td>0</td><td>False</td><td>020605</td><td>MUNICIPALIDAD DISTRITAL DE ATAQUERO</td><td>ANCASH</td><td>CARHUAZ</td><td>ATAQUERO</td><td>G</td><td>matched</td><td>True</td><td>92.1348</td><td>None</td><td>20260612_061046</td><td>2026-06-12 06:31:05.171296</td><td>2024</td></tr>
+<tr><td>300133</td><td>2024</td><td>3709511.00</td><td>4227956.00</td><td>4351113.07</td><td>None</td><td>None</td><td>None</td><td>None</td><td>None</td><td>None</td><td>2022</td><td>020609</td><td>2</td><td>8</td><td>False</td><td>False</td><td>False</td><td>True</td><td>8</td><td>0</td><td>0</td><td>0</td><td>3</td><td>False</td><td>False</td><td>False</td><td>0</td><td>0</td><td>0</td><td>False</td><td>020609</td><td>MUNICIPALIDAD DISTRITAL DE SHILLA</td><td>ANCASH</td><td>CARHUAZ</td><td>SHILLA</td><td>G</td><td>matched</td><td>True</td><td>102.9129</td><td>None</td><td>20260612_061046</td><td>2026-06-12 06:31:05.171296</td><td>2024</td></tr>
+<tr><td>300153</td><td>2024</td><td>102121920.00</td><td>188691563.00</td><td>191282198.90</td><td>None</td><td>None</td><td>None</td><td>A</td><td>G</td><td>2</td><td>2022</td><td>021004</td><td>2</td><td>26</td><td>True</td><td>True</td><td>False</td><td>False</td><td>26</td><td>2</td><td>3</td><td>0</td><td>0</td><td>False</td><td>False</td><td>False</td><td>0</td><td>0</td><td>0</td><td>False</td><td>021004</td><td>MUNICIPALIDAD DISTRITAL DE CHAVIN DE HUANTAR</td><td>ANCASH</td><td>HUARI</td><td>CHAVIN DE HUANTAR</td><td>None</td><td>unmatched</td><td>True</td><td>101.3729</td><td>None</td><td>20260612_061046</td><td>2026-06-12 06:31:05.171296</td><td>2024</td></tr>
+<tr><td>300187</td><td>2024</td><td>4469034.00</td><td>12443699.00</td><td>11672150.94</td><td>None</td><td>None</td><td>None</td><td>None</td><td>None</td><td>None</td><td>2022</td><td>021307</td><td>2</td><td>14</td><td>False</td><td>True</td><td>False</td><td>False</td><td>14</td><td>0</td><td>3</td><td>0</td><td>0</td><td>False</td><td>True</td><td>True</td><td>0</td><td>2</td><td>3</td><td>True</td><td>021307</td><td>MUNICIPALIDAD DISTRITAL DE LUCMA</td><td>ANCASH</td><td>MARISCAL LUZURIAGA</td><td>LUCMA</td><td>None</td><td>ambiguous</td><td>True</td><td>93.7997</td><td>None</td><td>20260612_061046</td><td>2026-06-12 06:31:05.171296</td><td>2024</td></tr>
+<tr><td>300202</td><td>2024</td><td>1358973.00</td><td>1929056.00</td><td>1817428.72</td><td>None</td><td>None</td><td>None</td><td>None</td><td>None</td><td>None</td><td>2022</td><td>021504</td><td>2</td><td>6</td><td>True</td><td>False</td><td>True</td><td>False</td><td>6</td><td>2</td><td>0</td><td>2</td><td>0</td><td>False</td><td>True</td><td>True</td><td>0</td><td>2</td><td>3</td><td>True</td><td>021504</td><td>MUNICIPALIDAD DISTRITAL DE HUACASCHUQUE</td><td>ANCASH</td><td>PALLASCA</td><td>HUACASCHUQUE</td><td>F</td><td>matched</td><td>True</td><td>94.2134</td><td>None</td><td>20260612_061046</td><td>2026-06-12 06:31:05.171296</td><td>2024</td></tr></tbody></table>
+</body>
+</html>

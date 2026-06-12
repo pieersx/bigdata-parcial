@@ -109,6 +109,14 @@ Para regenerar las tablas finales para Power BI:
 docker compose exec -T transformers-networks python scripts/materialize_powerbi_hive_tables.py
 ```
 
+Si Power BI todavia muestra vistas `vw_dashboard_*`, cerrar el navegador de
+Power BI y refrescar la conexion. El catalogo activo debe quedar solo con
+`pbi_dashboard_*` para dashboards:
+
+```powershell
+docker compose exec -T hive-server beeline -u "jdbc:hive2://localhost:10000/municipal_gold" -n root -e "DROP VIEW IF EXISTS vw_dashboard_01_recaudacion_capacidad; DROP VIEW IF EXISTS vw_dashboard_02_clasificador_ingreso; DROP VIEW IF EXISTS vw_dashboard_03_predial_vs_efectividad; DROP VIEW IF EXISTS vw_dashboard_04_distribucion_efectividad; DROP VIEW IF EXISTS vw_dashboard_05_software_tributario; DROP VIEW IF EXISTS vw_dashboard_06_priorizacion_municipal;"
+```
+
 ## Nota
 
 El archivo Excel queda solo como respaldo de demostracion. La ruta defendible

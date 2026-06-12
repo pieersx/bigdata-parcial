@@ -38,7 +38,7 @@ def replace_in_cells(notebook, old: str, new: str):
 
 
 def update_pipeline_notebook():
-    path, notebook = load_notebook("01_Bronze_Pipeline_Parcial.ipynb")
+    path, notebook = load_notebook("bronze/01_Bronze_Pipeline_Parcial.ipynb")
     set_cell(
         notebook,
         0,
