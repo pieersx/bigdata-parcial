@@ -43,30 +43,46 @@ class SilverPipeline:
             required_government_level=silver_config.get("required_government_level", "M"),
             quarantine_enabled=bool(silver_config.get("quarantine_enabled", True)),
         )
+        # Clean up obsolete Silver outputs from the earlier dimensional version.
+        # Silver now publishes only curated datasets; fact/dim tables belong to Gold.
+        legacy_modeled_outputs = [
+            "dim_municipalidad",
+            "fact_ingresos_municipales",
+            "fact_predial_esat",
+            "fact_sismepre_respuestas",
+            "dim_sismepre_entidad_estado",
+            "dim_sismepre_pregunta",
+            "dim_sismepre_formulario",
+            "dim_categoria_municipalidad",
+        ]
+        for legacy_table in legacy_modeled_outputs:
+            storage.clear_table(legacy_table)
+            storage.clear_quarantine(legacy_table)
+
         builders = [
-            ("dim_municipalidad", service.build_dim_municipalidad),
-            ("fact_ingresos_municipales", service.build_fact_ingresos_municipales),
-            ("fact_predial_esat", service.build_fact_predial_esat),
-            ("fact_sismepre_respuestas", service.build_fact_sismepre_respuestas),
-            ("dim_sismepre_entidad_estado", lambda: service.build_simple_dimension(
-                "dim_sismepre_entidad_estado",
+            ("municipalidades_curated", service.build_municipalidades_curated),
+            ("ingresos_municipales_curated", service.build_ingresos_municipales_curated),
+            ("predial_esat_curated", service.build_predial_esat_curated),
+            ("sismepre_respuestas_curated", service.build_sismepre_respuestas_curated),
+            ("sismepre_entidad_estado_curated", lambda: service.build_curated_dataset(
+                "sismepre_entidad_estado_curated",
                 "sismepre/rentas_entidad_estado",
                 ["SEC_EJEC", "ANO_APLICACION", "PERIODO", "ESTADO", "CLASIFICACION"],
                 ["SEC_EJEC", "ANO_APLICACION", "PERIODO"],
             )),
-            ("dim_sismepre_pregunta", lambda: service.build_simple_dimension(
-                "dim_sismepre_pregunta",
+            ("sismepre_preguntas_curated", lambda: service.build_curated_dataset(
+                "sismepre_preguntas_curated",
                 "sismepre/rentas_preguntas",
                 ["ANO_APLICACION", "PERIODO", "FORMULARIO_ID", "PREGUNTA_ID", "DESCRIPCION"],
                 ["ANO_APLICACION", "PERIODO", "FORMULARIO_ID", "PREGUNTA_ID"],
             )),
-            ("dim_sismepre_formulario", lambda: service.build_simple_dimension(
-                "dim_sismepre_formulario",
+            ("sismepre_formularios_curated", lambda: service.build_curated_dataset(
+                "sismepre_formularios_curated",
                 "sismepre/rentas_formulario",
                 ["ANO_APLICACION", "PERIODO", "FORMULARIO_ID", "TITULO"],
                 ["ANO_APLICACION", "PERIODO", "FORMULARIO_ID"],
             )),
-            ("dim_categoria_municipalidad", service.build_dim_categoria_municipalidad),
+            ("categorias_municipalidades_curated", service.build_categorias_municipalidades_curated),
         ]
         results: List[Dict[str, Any]] = []
         errors: List[Dict[str, Any]] = []

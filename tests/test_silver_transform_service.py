@@ -63,10 +63,10 @@ class SilverTransformServiceTest(unittest.TestCase):
     def test_regional_income_is_blocked_and_not_published_as_municipal(self):
         self.write_bronze("ingresos", [{"NIVEL_GOBIERNO": "R"}])
 
-        result = self.service.build_fact_ingresos_municipales()
+        result = self.service.build_ingresos_municipales_curated()
 
         self.assertEqual("blocked", result["status"])
-        self.assertFalse((self.data_lake.silver_path / "fact_ingresos_municipales").exists())
+        self.assertFalse((self.data_lake.silver_path / "ingresos_municipales_curated").exists())
 
     def test_municipal_income_movements_are_aggregated_by_budget_key(self):
         common = {
@@ -81,14 +81,14 @@ class SilverTransformServiceTest(unittest.TestCase):
             [{**common, "MONTO_RECAUDADO": "-803.50"}, {**common, "MONTO_RECAUDADO": "-120.00"}],
         )
 
-        result = self.service.build_fact_ingresos_municipales()
+        result = self.service.build_ingresos_municipales_curated()
         published = self.spark.read.parquet(result["storage"]["path"])
 
         self.assertEqual(1, result["records_published"])
         self.assertEqual("-923.50", str(published.first()["MONTO_RECAUDADO"]))
         self.assertEqual(2, published.first()["_silver_source_row_count"])
 
-    def test_dim_municipalidad_keeps_unmatched_renamu_rows(self):
+    def test_municipalidades_curated_keeps_unmatched_renamu_rows(self):
         self.write_bronze(
             "sismepre/rentas_esat_estadistica_atm",
             [
@@ -101,7 +101,7 @@ class SilverTransformServiceTest(unittest.TestCase):
             [{"Ubigeo": "010101", "idmunici": "1", "Tipomuni": "Provincial", "Departamento": "Amazonas", "Provincia": "Chachapoyas", "Distrito": "A"}],
         )
 
-        result = self.service.build_dim_municipalidad()
+        result = self.service.build_municipalidades_curated()
         published = self.spark.read.parquet(result["storage"]["path"])
 
         self.assertEqual(2, result["records_published"])
@@ -120,7 +120,7 @@ class SilverTransformServiceTest(unittest.TestCase):
             [{**common, "MON_RECAUDACION": "12.50"}, {**common, "MES_ESTADISTICA": "2", "MON_RECAUDACION": "abc"}],
         )
 
-        result = self.service.build_fact_predial_esat()
+        result = self.service.build_predial_esat_curated()
         quarantined = self.spark.read.parquet(result["quarantine"]["path"])
 
         self.assertEqual(1, result["records_published"])
@@ -139,7 +139,7 @@ class SilverTransformServiceTest(unittest.TestCase):
             ],
         )
 
-        result = self.service.build_fact_sismepre_respuestas()
+        result = self.service.build_sismepre_respuestas_curated()
         published = self.spark.read.parquet(result["storage"]["path"])
         quarantined = self.spark.read.parquet(result["quarantine"]["path"])
 
@@ -155,10 +155,10 @@ class SilverTransformServiceTest(unittest.TestCase):
             "sismepre/rentas_respuestas",
             [{**common, "RESPUESTA_ID": "5", "RESPUESTA_TEXTO": "si", "RESPUESTA_DECIMAL": "0", "RESPUESTA_ENTERO": "0", "RESPUESTA_FECHA": ""}],
         )
-        clean_result = self.service.build_fact_sismepre_respuestas()
+        clean_result = self.service.build_sismepre_respuestas_curated()
 
         self.assertEqual(0, clean_result["records_quarantined"])
-        self.assertFalse((self.data_lake.silver_path / "_quarantine" / "fact_sismepre_respuestas").exists())
+        self.assertFalse((self.data_lake.silver_path / "_quarantine" / "sismepre_respuestas_curated").exists())
 
     def test_category_dimension_normalizes_and_quarantines_conflicts(self):
         self.write_bronze(
@@ -174,7 +174,7 @@ class SilverTransformServiceTest(unittest.TestCase):
             ],
         )
 
-        result = self.service.build_dim_categoria_municipalidad()
+        result = self.service.build_categorias_municipalidades_curated()
         published = self.spark.read.parquet(result["storage"]["path"])
         quarantined = self.spark.read.parquet(result["quarantine"]["path"])
 
@@ -187,3 +187,4 @@ class SilverTransformServiceTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

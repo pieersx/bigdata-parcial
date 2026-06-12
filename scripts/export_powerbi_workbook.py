@@ -22,6 +22,17 @@ def read_gold(spark, table_name):
     return spark.read.parquet(str(GOLD / table_name))
 
 
+def save_workbook_with_fallback(workbook, output_path):
+    try:
+        workbook.save(output_path)
+        return output_path
+    except PermissionError:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        fallback = output_path.with_name(f"{output_path.stem}_{timestamp}{output_path.suffix}")
+        workbook.save(fallback)
+        return fallback
+
+
 def add_sheet(workbook, title, dataframe):
     worksheet = workbook.create_sheet(title)
     columns = dataframe.columns
@@ -277,6 +288,12 @@ def main():
     )
     municipios_scope = municipios.filter("in_scope_presentacion")
     ingresos = read_gold(spark, "fact_ingresos_mensuales")
+    tiempo = read_gold(spark, "dim_tiempo")
+    ubigeo = read_gold(spark, "dim_ubigeo")
+    clasificador_dim = read_gold(spark, "dim_clasificador_ingreso")
+    estado_sismepre = read_gold(spark, "dim_estado_sismepre")
+    formulario_sismepre = read_gold(spark, "dim_formulario_sismepre")
+    pregunta_sismepre = read_gold(spark, "dim_pregunta_sismepre")
     predial = read_gold(spark, "fact_predial_mensual")
     cumplimiento = read_gold(spark, "fact_sismepre_cumplimiento")
     calidad = read_gold(spark, "fact_calidad_datos")
@@ -329,7 +346,6 @@ def main():
         .orderBy(F.desc("ANO_DOC"), F.desc("MONTO_RECAUDADO"))
     )
     clasificador_fact = read_gold(spark, "fact_ingresos_clasificador")
-    clasificador_dim = read_gold(spark, "dim_clasificador_ingreso")
     clasificador_view = (
         clasificador_fact.join(
             municipios_scope.select(
@@ -459,20 +475,43 @@ def main():
         ],
     ]
     dax_measures = [
-        ["Recaudacion", "SUM('d1_evolucion'[MONTO_RECAUDADO])"],
-        ["PIM", "SUM('d1_evolucion'[MONTO_PIM])"],
-        ["PIA", "SUM('d1_evolucion'[MONTO_PIA])"],
-        ["Variacion PIM PIA", "SUM('d1_evolucion'[VARIACION_PIM_PIA])"],
+        ["Recaudacion", "SUM('fact_ingresos_mensuales'[MONTO_RECAUDADO])"],
+        ["PIM", "SUM('fact_ingresos_mensuales'[MONTO_PIM])"],
+        ["PIA", "SUM('fact_ingresos_mensuales'[MONTO_PIA])"],
+        ["Variacion PIM PIA", "SUM('fact_ingresos_mensuales'[variacion_pim_pia])"],
         ["Pct Ejecucion", "DIVIDE([Recaudacion], [PIM])"],
-        ["Recaudacion Predial", "SUM('d5_predial'[MON_RECAUDACION_TOTAL])"],
-        ["Saldo Predial", "SUM('d5_predial'[MON_SALDO_PREDIAL_TOTAL])"],
+        ["Recaudacion Clasificador", "SUM('fact_ingresos_clasificador'[MONTO_RECAUDADO])"],
+        ["Recaudacion Predial", "SUM('fact_predial_mensual'[MON_RECAUDACION_TOTAL])"],
+        ["Predial Ordinario", "SUM('fact_predial_mensual'[MON_RECAUDACTUAL_ORDIN])"],
+        ["Predial Coactivo", "SUM('fact_predial_mensual'[MON_RECAUDACTUAL_COAC])"],
+        ["Saldo Predial", "SUM('fact_predial_mensual'[MON_SALDO_PREDIAL_TOTAL])"],
         ["Pct Recuperacion Predial", "DIVIDE([Recaudacion Predial], [Recaudacion Predial] + [Saldo Predial])"],
         ["Municipalidades", "DISTINCTCOUNT('municipios'[SEC_EJEC])"],
         ["Municipalidades SISMEPRE", "CALCULATE([Municipalidades], 'municipios'[has_sismepre] = TRUE())"],
-        ["Personal Municipal", "SUM('d_renamu_gestion'[personal_municipal_total])"],
-        ["Municipalidades con SRTM", "CALCULATE(DISTINCTCOUNT('d_renamu_software'[SEC_EJEC]), 'd_renamu_software'[usa_srtm_estado] = TRUE())"],
-        ["Municipalidades con Software Rentas", "CALCULATE(DISTINCTCOUNT('d_renamu_software'[SEC_EJEC]), 'd_renamu_software'[usa_software_rentas_at] = TRUE())"],
-        ["Municipalidades con Software Catastro", "CALCULATE(DISTINCTCOUNT('d_renamu_software'[SEC_EJEC]), 'd_renamu_software'[usa_software_catastro] = TRUE())"],
+        ["Municipalidades con Categoria", "CALCULATE([Municipalidades], NOT ISBLANK('municipios'[categoria_municipalidad]))"],
+        ["Personal Municipal", "SUM('fact_renamu_gestion_tributaria'[personal_municipal_total])"],
+        ["Recaudacion por Personal", "DIVIDE([Recaudacion], [Personal Municipal])"],
+        ["Municipalidades con SRTM", "CALCULATE(DISTINCTCOUNT('fact_renamu_software_at'[SEC_EJEC]), 'fact_renamu_software_at'[usa_srtm_estado] = TRUE())"],
+        ["Municipalidades con Software Rentas", "CALCULATE(DISTINCTCOUNT('fact_renamu_software_at'[SEC_EJEC]), 'fact_renamu_software_at'[usa_software_rentas_at] = TRUE())"],
+        ["Municipalidades con Software Catastro", "CALCULATE(DISTINCTCOUNT('fact_renamu_software_at'[SEC_EJEC]), 'fact_renamu_software_at'[usa_software_catastro] = TRUE())"],
+        ["Municipalidades con algun software AT", "CALCULATE(DISTINCTCOUNT('fact_renamu_software_at'[SEC_EJEC]), 'fact_renamu_software_at'[usa_al_menos_un_software_at] = TRUE())"],
+        ["Brecha Predial", "[Saldo Predial]"],
+    ]
+    model_relationships = [
+        ["dim_municipalidad_gold", "SEC_EJEC", "fact_ingresos_mensuales", "SEC_EJEC", "1:*"],
+        ["dim_municipalidad_gold", "SEC_EJEC", "fact_ingresos_clasificador", "SEC_EJEC", "1:*"],
+        ["dim_municipalidad_gold", "SEC_EJEC", "fact_predial_mensual", "SEC_EJEC", "1:*"],
+        ["dim_municipalidad_gold", "SEC_EJEC", "fact_sismepre_cumplimiento", "SEC_EJEC", "1:*"],
+        ["dim_municipalidad_gold", "SEC_EJEC", "fact_renamu_gestion_tributaria", "SEC_EJEC", "1:*"],
+        ["dim_municipalidad_gold", "SEC_EJEC", "fact_renamu_software_at", "SEC_EJEC", "1:*"],
+        ["dim_ubigeo", "ubigeo_id", "dim_municipalidad_gold", "UBIGEO", "1:*"],
+        ["dim_tiempo", "periodo_id", "fact_ingresos_mensuales", "periodo_id", "1:*"],
+        ["dim_tiempo", "periodo_id", "fact_ingresos_clasificador", "periodo_id", "1:*"],
+        ["dim_tiempo", "periodo_id", "fact_predial_mensual", "periodo_id", "1:*"],
+        ["dim_clasificador_ingreso", "clasificador_id", "fact_ingresos_clasificador", "clasificador_id", "1:*"],
+        ["dim_estado_sismepre", "estado_sismepre_id", "fact_sismepre_cumplimiento", "estado_sismepre_id", "1:*"],
+        ["dim_formulario_sismepre", "FORMULARIO_ID", "fact_sismepre_respuestas_resumen", "FORMULARIO_ID", "1:* compuesto con año/periodo"],
+        ["dim_pregunta_sismepre", "PREGUNTA_ID", "fact_sismepre_respuestas_resumen", "PREGUNTA_ID", "1:* compuesto con formulario/año/periodo"],
     ]
 
     workbook = Workbook()
@@ -503,6 +542,17 @@ def main():
     readme.column_dimensions["B"].width = 62
 
     add_sheet(workbook, "municipios", municipios_scope.orderBy("SEC_EJEC"))
+    add_sheet(workbook, "dim_tiempo", tiempo.orderBy("periodo_id"))
+    add_sheet(workbook, "dim_ubigeo", ubigeo.orderBy("ubigeo_id"))
+    add_sheet(workbook, "dim_clasificador_ingreso", clasificador_dim.orderBy("clasificador_id"))
+    add_sheet(workbook, "dim_estado_sismepre", estado_sismepre.orderBy("estado_sismepre_id"))
+    add_sheet(workbook, "dim_formulario_sismepre", formulario_sismepre)
+    add_sheet(workbook, "dim_pregunta_sismepre", pregunta_sismepre)
+    add_sheet(workbook, "fact_ingresos_mensuales", ingresos)
+    add_sheet(workbook, "fact_predial_mensual", predial)
+    add_sheet(workbook, "fact_sismepre_cumplimiento", cumplimiento)
+    add_sheet(workbook, "fact_renamu_gestion_tributaria", gestion)
+    add_sheet(workbook, "fact_renamu_software_at", software)
     add_sheet(workbook, "d1_evolucion", evolucion)
     add_sheet(workbook, "d2_avance_municipal", avance)
     add_sheet(workbook, "d3_ranking_territorial", ranking)
@@ -519,8 +569,12 @@ def main():
         ["pagina", "pregunta_decision", "kpis", "visuales", "hojas_fuente", "filtros"],
     ))
     add_sheet(workbook, "medidas_dax", spark.createDataFrame(dax_measures, ["medida", "formula_dax"]))
+    add_sheet(workbook, "modelo_relaciones", spark.createDataFrame(
+        model_relationships,
+        ["tabla_origen", "columna_origen", "tabla_destino", "columna_destino", "cardinalidad"],
+    ))
 
-    workbook.save(OUTPUT)
+    saved_output = save_workbook_with_fallback(workbook, OUTPUT)
     write_dashboard_html({
         "colors": {"green2": "#45b80f"},
         "d1": collect_rows(evolucion, 2000),
@@ -531,9 +585,9 @@ def main():
         "software": collect_rows(software_view, 6000),
         "mart": collect_rows(mart_view, 8000),
     })
-    print(f"Workbook created: {OUTPUT}")
+    print(f"Workbook created: {saved_output}")
     print(f"Dashboard HTML created: {HTML_OUTPUT}")
-    print(f"Size bytes: {OUTPUT.stat().st_size}")
+    print(f"Size bytes: {saved_output.stat().st_size}")
     spark.stop()
 
 

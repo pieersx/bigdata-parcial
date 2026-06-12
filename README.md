@@ -33,8 +33,8 @@ flowchart LR
 |---|---|---|---|
 | `raw` | Conservar la fuente original sin transformarla. | Descarga CSV, ZIP y PDF desde MEF e INEI y los guarda bajo `data/raw`. | Implementada |
 | `bronze` | Estandarizar el almacenamiento sin alterar el significado del dato. | Lee Raw, genera Parquet Snappy, agrega trazabilidad y ejecuta profiling y calidad. | Implementada |
-| `silver` | Limpiar, tipar, normalizar y validar datos listos para analisis. | Construye dimensiones y hechos municipales, separa rechazos en cuarentena y registra auditoria. | Implementada |
-| `gold` | Crear indicadores y modelos para consumo analitico. | Publica dimensiones, facts y KPIs optimizados para los seis dashboards. | Implementada |
+| `silver` | Limpiar, tipar, normalizar y validar datos listos para analisis. | Publica datasets curados en Parquet, separa rechazos en cuarentena y registra auditoria. No crea facts ni dimensiones. | Implementada |
+| `gold` | Crear indicadores y modelos para consumo analitico. | Publica dimensiones, facts, marts y KPIs optimizados para los seis dashboards. | Implementada |
 
 ## Capa Raw
 
@@ -109,26 +109,36 @@ Para ejecutar Silver:
 docker compose run --rm --no-deps transformers-networks python main_silver.py
 ```
 
-### Tablas Silver Publicadas
+### Datasets Silver Publicados
 
-| Tabla | Filas actuales | Uso |
+Silver no aplica modelado dimensional. Por eso no publica tablas `fact_*` ni
+`dim_*`: solo deja datasets limpios, tipados, deduplicados y trazables para que
+Gold construya el modelo analitico.
+
+| Dataset | Filas actuales | Uso |
 |---|---:|---|
-| `dim_municipalidad` | 1,112 | Catalogo municipal canonico para filtros y cruces geograficos. |
-| `fact_ingresos_municipales` | 8,950,779 | Presupuesto y ejecucion de ingresos municipales SIAF, consolidados por clave presupuestaria y particionados por anio. |
-| `fact_predial_esat` | 133,810 | Indicadores prediales SISMEPRE tipados y deduplicados. |
-| `fact_sismepre_respuestas` | 205,823 | Respuestas SISMEPRE normalizadas a formato largo. |
-| `dim_sismepre_entidad_estado` | 19,037 | Estado y clasificacion por municipalidad y periodo. |
-| `dim_sismepre_pregunta` | 836 | Catalogo de preguntas SISMEPRE. |
-| `dim_sismepre_formulario` | 98 | Catalogo de formularios SISMEPRE. |
-| `dim_categoria_municipalidad` | Segun archivo | Categoria municipal `A-G` normalizada desde el archivo del profesor. |
+| `municipalidades_curated` | 1,113 | Relacion municipal limpia `SEC_EJEC -> UBIGEO`, nombres geograficos normalizados y enriquecimiento basico RENAMU. |
+| `ingresos_municipales_curated` | 8,950,779 | Movimientos SIAF municipales tipados, filtrados por `NIVEL_GOBIERNO = M` y consolidados por clave presupuestaria. |
+| `predial_esat_curated` | 133,938 | Indicadores prediales SISMEPRE tipados, deduplicados y con granularidad corregida. |
+| `sismepre_respuestas_curated` | 205,823 | Respuestas SISMEPRE normalizadas a formato largo, con tipos `texto`, `decimal`, `entero` y `fecha`. |
+| `sismepre_entidad_estado_curated` | 19,037 | Estado, clasificacion y tipo de meta SISMEPRE limpios por municipalidad y periodo. |
+| `sismepre_preguntas_curated` | 836 | Preguntas SISMEPRE limpias para posterior dimensionamiento en Gold. |
+| `sismepre_formularios_curated` | 98 | Formularios SISMEPRE limpios para posterior dimensionamiento en Gold. |
+| `categorias_municipalidades_curated` | 1,707 | Categoria municipal `A-G` normalizada desde el archivo del profesor. |
 
-### Dimension Municipal
+La logica que antes estaba mal ubicada en Silver fue movida a Gold:
+`dim_municipalidad_gold`, `dim_tiempo`, `dim_clasificador_ingreso`,
+`dim_formulario_sismepre`, `dim_pregunta_sismepre`,
+`fact_ingresos_mensuales`, `fact_ingresos_clasificador`,
+`fact_predial_mensual`, `fact_sismepre_cumplimiento` y los facts RENAMU.
 
-`dim_municipalidad` se construye desde la relacion estable SISMEPRE
+### Municipalidades Curadas
+
+`municipalidades_curated` se construye desde la relacion estable SISMEPRE
 `SEC_EJEC -> UBIGEO` y se enriquece mediante `left join` con RENAMU 2022.
 
-- Se conservan las `1,112` municipalidades de SISMEPRE.
-- `1,109` tienen coincidencia RENAMU.
+- Se conservan las `1,113` municipalidades de SISMEPRE.
+- `1,110` tienen coincidencia RENAMU.
 - `3` se conservan con `renamu_match=false`.
 
 RENAMU es un enriquecimiento parcial, no un filtro excluyente.
@@ -207,12 +217,12 @@ CSV quedo incompleto, se reemplaza automaticamente en la siguiente ingesta.
 Para las fuentes vivas 2025-2026 tambien se conserva metadata remota
 `Content-Length` y `Last-Modified` en archivos `.metadata.json`.
 
-`fact_ingresos_municipales` se publica con las filas `NIVEL_GOBIERNO = 'M'`,
-consolidadas por clave presupuestaria y particionadas por `year`. El pipeline
-conserva `_silver_source_row_count` para rastrear movimientos agrupados y una
-proteccion: si una futura
-descarga no contiene filas municipales, bloquea solo este fact y nunca publica
-datos regionales como sustituto.
+`ingresos_municipales_curated` se publica con las filas
+`NIVEL_GOBIERNO = 'M'`, consolidadas por clave presupuestaria y particionadas
+por `year`. El pipeline conserva `_silver_source_row_count` para rastrear
+movimientos agrupados y una proteccion: si una futura descarga no contiene filas
+municipales, bloquea solo este dataset y nunca publica datos regionales como
+sustituto.
 
 ## Auditoria Y Calidad
 
@@ -221,12 +231,23 @@ Ubicaciones principales:
 | Ruta | Contenido |
 |---|---|
 | `data/audit/executions` | Resultado y estado de cada ejecucion. |
-| `data/audit/quality_checks` | Checks de calidad Bronze y Silver. |
+| `data/audit/quality_checks` | Checks de calidad Bronze, Silver y Gold. |
 | `data/audit/metrics` | Snapshots de metricas e inventario de tablas. |
 | `data/silver/_quarantine` | Registros rechazados con motivo y trazabilidad. |
 | `data/gold` | Modelo analitico Gold en Parquet Snappy para Power BI. |
 
-Ultima reconstruccion Bronze validada: `2026-06-05`, documentada en
+Para regenerar perfiles HTML de Silver y Gold:
+
+```powershell
+docker compose run --rm --no-deps transformers-networks python scripts/profile_medallion_layers.py
+```
+
+Los indices generados quedan en:
+
+- `reports/silver/index.html`
+- `reports/gold/index.html`
+
+Ultima reconstruccion Bronze validada: `2026-06-12`, documentada en
 [`reports/rebuild_bronze_silver_gold_20260607.md`](reports/rebuild_bronze_silver_gold_20260607.md).
 
 Bronze finaliza con estado `partial` porque conserva `10` alertas de calidad de
@@ -234,14 +255,14 @@ origen SISMEPRE: seis checks de unicidad predial con granularidad cruda y cuatro
 checks de consistencia por respuestas multivalor. Silver corrige ambos casos al
 usar la clave predial completa y normalizar respuestas a formato largo.
 
-Ultima ejecucion Silver validada: `20260605_190709`.
+Ultima ejecucion Silver validada: `20260612_060020`.
 
 | Indicador | Resultado |
 |---|---:|
-| Tablas publicadas | 7 |
+| Datasets publicados | 8 |
 | Tablas bloqueadas | 0 |
-| Registros publicados | 9,311,495 |
-| Registros en cuarentena | 2 |
+| Registros publicados | 9,313,331 |
+| Registros en cuarentena | 162 |
 | Checks fallidos | 0 |
 | Errores del pipeline | 0 |
 
@@ -254,7 +275,7 @@ Ultima ejecucion Silver validada: `20260605_190709`.
 | [`03_Profiling_SISMEPRE.ipynb`](notebooks/03_Profiling_SISMEPRE.ipynb) | Perfilado y calidad de SISMEPRE. |
 | [`04_Profiling_RENAMU.ipynb`](notebooks/04_Profiling_RENAMU.ipynb) | Perfilado y calidad de RENAMU. |
 | [`05_Silver_Pipeline_Parcial.ipynb`](notebooks/05_Silver_Pipeline_Parcial.ipynb) | Evidencia Silver: inventario, esquemas, calidad, cuarentena y proteccion ante ausencia de datos municipales. |
-| [`06_Gold_Pipeline_Parcial.ipynb`](notebooks/06_Gold_Pipeline_Parcial.ipynb) | Evidencia Gold: modelo estrella, cobertura municipal, KPIs y mapeo de dashboards. |
+| [`06_Gold_Pipeline_Parcial.ipynb`](notebooks/06_Gold_Pipeline_Parcial.ipynb) | Evidencia Gold: constelacion de hechos, dimensiones normalizadas, cobertura municipal, KPIs y mapeo de dashboards. |
 
 ## Pruebas
 
@@ -287,11 +308,20 @@ docker compose run --rm --no-deps transformers-networks python main_gold.py
 
 Ultima actualizacion Gold para dashboards: `2026-06-12`.
 
+El modelo Gold queda como una **constelacion de hechos con copo de nieve
+parcial**. Es decir: hay varias tablas `fact_*` para distintos procesos de
+negocio, comparten dimensiones conformadas como municipalidad, tiempo, UBIGEO y
+categoria, y algunas dimensiones se normalizan en tablas propias para evitar
+duplicacion innecesaria. Este enfoque es equivalente al criterio del caso MEF:
+las tablas analiticas finales recien aparecen en Gold.
+
 | Tabla | Filas actuales | Uso |
 |---|---:|---|
 | `dim_municipalidad_gold` | 1,964 | Maestro municipal SIAF enriquecido con SISMEPRE y RENAMU. |
+| `dim_ubigeo` | 1,964 | Dimension geografica normalizada: UBIGEO, departamento, provincia y distrito. |
 | `dim_tiempo` | 173 | Calendario mensual continuo. |
 | `dim_clasificador_ingreso` | 2,791 | Jerarquia presupuestaria SIAF. |
+| `dim_estado_sismepre` | 15 | Estados, clasificaciones y tipos de meta SISMEPRE normalizados. |
 | `dim_formulario_sismepre` | 98 | Catalogo analitico de formularios. |
 | `dim_pregunta_sismepre` | 836 | Catalogo analitico de preguntas. |
 | `fact_ingresos_mensuales` | 325,090 | PIA, PIM, recaudado, ejecucion y variacion por municipalidad y mes. |
@@ -302,13 +332,27 @@ Ultima actualizacion Gold para dashboards: `2026-06-12`.
 | `fact_renamu_gestion_tributaria` | 1,874 | Capacidad municipal RENAMU: personal municipal total y necesidades AT/catastro. |
 | `fact_renamu_software_at` | 1,874 | Software tributario RENAMU: SRTM, rentas, catastro y flag de al menos un software. |
 | `mart_dashboard_municipal` | 28,628 | Vista integrada SIAF, SISMEPRE, RENAMU y categorias para los seis dashboards. |
-| `fact_calidad_datos` | 4,167 | Historial auditable de calidad Bronze, Silver y Gold. |
+| `fact_calidad_datos` | 5,583 | Historial auditable de calidad Bronze, Silver y Gold. |
 
-El maestro conserva las `1,964` entidades municipales SIAF: `1,112` tienen
-cobertura SISMEPRE y `852` siguen disponibles con geografia SIAF. RENAMU
-enriquece `1,109` coincidencias sin excluir ninguna municipalidad.
+El maestro conserva las `1,964` entidades municipales SIAF: `1,113` tienen
+cobertura SISMEPRE y `851` siguen disponibles con geografia SIAF. RENAMU
+enriquece `1,110` coincidencias sin excluir ninguna municipalidad.
 La dimension tambien expone `categoria_municipalidad` y
 `categoria_match_status` cuando existe el archivo de categorias.
+
+### Relaciones Principales
+
+| Desde | Hacia | Tipo |
+|---|---|---|
+| `dim_municipalidad_gold.SEC_EJEC` | `fact_ingresos_mensuales.SEC_EJEC` | 1 a muchos |
+| `dim_municipalidad_gold.SEC_EJEC` | `fact_ingresos_clasificador.SEC_EJEC` | 1 a muchos |
+| `dim_municipalidad_gold.SEC_EJEC` | `fact_predial_mensual.SEC_EJEC` | 1 a muchos |
+| `dim_municipalidad_gold.SEC_EJEC` | `fact_sismepre_cumplimiento.SEC_EJEC` | 1 a muchos |
+| `dim_municipalidad_gold.SEC_EJEC` | `fact_renamu_gestion_tributaria.SEC_EJEC` | 1 a muchos |
+| `dim_ubigeo.ubigeo_id` | `dim_municipalidad_gold.UBIGEO` | 1 a muchos |
+| `dim_tiempo.periodo_id` | facts mensuales `periodo_id` | 1 a muchos |
+| `dim_clasificador_ingreso.clasificador_id` | `fact_ingresos_clasificador.clasificador_id` | 1 a muchos |
+| `dim_estado_sismepre.estado_sismepre_id` | `fact_sismepre_cumplimiento.estado_sismepre_id` | 1 a muchos |
 
 ### Dashboards Habilitados
 
@@ -334,6 +378,78 @@ evidencia tecnica auditable, pero no ocupan una pagina de toma de decisiones.
 La capa visual de Power BI queda separada del procesamiento: puede conectarse
 directamente a estos Parquet o a una exportacion posterior sin reprocesar Bronze.
 
+## Hive, HDFS Y Spark SQL
+
+El proyecto ahora incluye una capa de consulta analitica con HDFS, Hive,
+Metastore y Spark. Esta capa no crea una cuarta medalla; registra los Parquet
+Silver y Gold como tablas externas para demostrar SQL analitico y conectar
+Power BI por HiveServer2.
+
+```mermaid
+flowchart LR
+    S["Silver Parquet"] --> HDFS["HDFS"]
+    G["Gold Parquet"] --> HDFS
+    HDFS --> Hive["Hive external tables"]
+    Hive --> MS["Hive Metastore PostgreSQL"]
+    Spark["Spark SQL"] --> Hive
+    PBI["Power BI Desktop"] --> Hive
+```
+
+Servicios principales en Docker:
+
+| Servicio | Rol | Puerto |
+|---|---|---:|
+| `namenode` | HDFS NameNode | `9870`, `8020` |
+| `datanode` | HDFS DataNode | `9864` |
+| `hive-metastore-db` | PostgreSQL del metastore | interno |
+| `hive-metastore` | Catalogo Hive | `9083` |
+| `hive-server` | HiveServer2 para Power BI | `10000` |
+
+Para levantar el cluster:
+
+```powershell
+docker compose up -d namenode datanode hive-metastore-db hive-metastore hive-server transformers-networks
+```
+
+Para publicar las tablas externas desde Parquet:
+
+```powershell
+docker compose exec transformers-networks python scripts/hive_bootstrap.py --layer all
+```
+
+Para ejecutar el laboratorio Hive:
+
+```powershell
+docker compose exec transformers-networks python scripts/hive_lab_queries.py --create-views
+```
+
+El laboratorio cubre lectura de Parquet, agregaciones, filtros, ordenamiento,
+tratamiento de nulos, window functions, CTEs y joins complejos. La explicacion
+esta en:
+
+```text
+reports/hive_lab_municipal.md
+```
+
+Las vistas Hive para los seis dashboards estan en:
+
+```text
+sql/hive/03_dashboard_views.sql
+reports/dashboard_spec_hive_municipal.md
+```
+
+Para generar un workbook desde Hive e importarlo en Power BI:
+
+```powershell
+docker compose exec transformers-networks python scripts/export_powerbi_from_hive.py
+```
+
+Salida:
+
+```text
+data/powerbi/powerbi_municipal_hive.xlsx
+```
+
 ## Power BI Desktop
 
 El reporte Power BI implementado se encuentra en:
@@ -348,12 +464,20 @@ El archivo importa un workbook de presentacion generado desde Gold:
 data/powerbi/powerbi_municipal_gold.xlsx
 ```
 
-Tambien se genera un dashboard HTML interactivo con el mismo estilo visual verde
-y blanco del ejemplo:
+Tambien existe un HTML interactivo con el mismo estilo visual verde y blanco del
+ejemplo, pero debe tratarse como vista previa tecnica, no como sustituto del
+Power BI nativo:
 
 ```text
 data/powerbi/dashboard_municipal_gold.html
 ```
+
+Para el entregable principal, Power BI debe consumir:
+
+- Directo desde HiveServer2: `localhost:10000`, base `municipal_gold`, vistas
+  `vw_dashboard_01_*` a `vw_dashboard_06_*`.
+- O desde el workbook exportado por Hive:
+  `data/powerbi/powerbi_municipal_hive.xlsx`.
 
 Para regenerar las vistas de consumo despues de una nueva ejecucion Gold:
 

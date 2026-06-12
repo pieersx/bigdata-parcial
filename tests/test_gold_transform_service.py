@@ -66,14 +66,14 @@ class GoldTransformServiceTest(unittest.TestCase):
 
     def test_master_keeps_siaf_only_municipality(self):
         self.write_silver(
-            "fact_ingresos_municipales",
+            "ingresos_municipales_curated",
             [
                 self.income_row("300001", "010101", "MUNI SISMEPRE", "10.00", "20.00", "5.00"),
                 self.income_row("300002", "010102", "MUNI SOLO SIAF", "10.00", "20.00", "5.00"),
             ],
         )
         self.write_silver(
-            "dim_municipalidad",
+            "municipalidades_curated",
             [{
                 "SEC_EJEC": "300001", "UBIGEO": "010101", "MUNICIPALIDAD_NOMBRE": "MUNI SISMEPRE",
                 "DEPARTAMENTO_NOMBRE": "AMAZONAS", "PROVINCIA_NOMBRE": "CHACHAPOYAS",
@@ -105,14 +105,14 @@ class GoldTransformServiceTest(unittest.TestCase):
             encoding="utf-8",
         )
         self.write_silver(
-            "fact_ingresos_municipales",
+            "ingresos_municipales_curated",
             [
                 self.income_row("300001", "010101", "MUNI SISMEPRE", "10.00", "20.00", "5.00"),
                 self.income_row("300002", "010102", "MUNI SOLO SIAF", "10.00", "20.00", "5.00"),
             ],
         )
         self.write_silver(
-            "dim_municipalidad",
+            "municipalidades_curated",
             [{
                 "SEC_EJEC": "300001", "UBIGEO": "010101", "MUNICIPALIDAD_NOMBRE": "MUNI SISMEPRE",
                 "DEPARTAMENTO_NOMBRE": "AMAZONAS", "PROVINCIA_NOMBRE": "CHACHAPOYAS",
@@ -143,7 +143,7 @@ class GoldTransformServiceTest(unittest.TestCase):
 
     def test_category_enrichment_is_conservative(self):
         self.write_silver(
-            "fact_ingresos_municipales",
+            "ingresos_municipales_curated",
             [
                 self.income_row("300001", "010101", "MUNICIPALIDAD DISTRITAL DE CHETO", "10.00", "20.00", "5.00"),
                 self.income_row("300002", "010102", "MUNICIPALIDAD DISTRITAL DE ACO", "10.00", "20.00", "5.00"),
@@ -152,7 +152,7 @@ class GoldTransformServiceTest(unittest.TestCase):
             ],
         )
         self.write_silver(
-            "dim_municipalidad",
+            "municipalidades_curated",
             [{
                 "SEC_EJEC": "300001", "UBIGEO": "010101", "MUNICIPALIDAD_NOMBRE": "MUNICIPALIDAD DISTRITAL DE CHETO",
                 "DEPARTAMENTO_NOMBRE": "AMAZONAS", "PROVINCIA_NOMBRE": "CHACHAPOYAS",
@@ -162,7 +162,7 @@ class GoldTransformServiceTest(unittest.TestCase):
             }],
         )
         self.write_silver(
-            "dim_categoria_municipalidad",
+            "categorias_municipalidades_curated",
             [
                 {"municipalidad_categoria_raw": "M. D. DE CHETO", "categoria_municipalidad": "F", "municipalidad_categoria_norm": "M D DE CHETO"},
                 {"municipalidad_categoria_raw": "M. D. DE ACO", "categoria_municipalidad": "B", "municipalidad_categoria_norm": "M D DE ACO"},
@@ -182,11 +182,11 @@ class GoldTransformServiceTest(unittest.TestCase):
 
     def test_missing_category_source_does_not_break_gold_master(self):
         self.write_silver(
-            "fact_ingresos_municipales",
+            "ingresos_municipales_curated",
             [self.income_row("300001", "010101", "MUNICIPALIDAD DISTRITAL DE CHETO", "10.00", "20.00", "5.00")],
         )
         self.write_silver(
-            "dim_municipalidad",
+            "municipalidades_curated",
             [{
                 "SEC_EJEC": "999999", "UBIGEO": "999999", "MUNICIPALIDAD_NOMBRE": "NO MATCH",
                 "DEPARTAMENTO_NOMBRE": "SIN", "PROVINCIA_NOMBRE": "SIN",
@@ -205,7 +205,7 @@ class GoldTransformServiceTest(unittest.TestCase):
 
     def test_monthly_income_reconciles_negative_adjustments_and_null_execution(self):
         self.write_silver(
-            "fact_ingresos_municipales",
+            "ingresos_municipales_curated",
             [
                 self.income_row("300001", "010101", "MUNI", "10.00", "20.00", "5.00"),
                 self.income_row("300001", "010101", "MUNI", "0.00", "0.00", "-2.00", rubro="09"),
@@ -270,3 +270,5 @@ class GoldTransformServiceTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+

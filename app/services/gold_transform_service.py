@@ -43,8 +43,8 @@ class GoldTransformService:
         self.scope_metrics: Dict[str, Any] | None = None
 
     def build_dim_municipalidad_gold(self) -> Dict[str, Any]:
-        income = self._read("fact_ingresos_municipales")
-        sismepre = self._read("dim_municipalidad")
+        income = self._read("ingresos_municipales_curated")
+        sismepre = self._read("municipalidades_curated")
         siaf = (
             income.select(
                 "SEC_EJEC",
@@ -104,13 +104,13 @@ class GoldTransformService:
         )
 
     def build_dim_tiempo(self) -> Dict[str, Any]:
-        income = self._read("fact_ingresos_municipales")
+        income = self._read("ingresos_municipales_curated")
         bounds = income.select(
             F.min(F.make_date("ANO_DOC", "MES_DOC", F.lit(1))).alias("min_date"),
             F.max(F.make_date("ANO_DOC", "MES_DOC", F.lit(1))).alias("max_date"),
         ).first()
         if not bounds or not bounds["min_date"] or not bounds["max_date"]:
-            raise ValueError("Silver fact_ingresos_municipales has no valid monthly dates")
+            raise ValueError("Silver ingresos_municipales_curated has no valid monthly dates")
         curated = (
             self.spark.sql(
                 f"SELECT explode(sequence(to_date('{bounds['min_date']}'), "
@@ -129,7 +129,7 @@ class GoldTransformService:
         )
 
     def build_dim_clasificador_ingreso(self) -> Dict[str, Any]:
-        income = self._read("fact_ingresos_municipales")
+        income = self._read("ingresos_municipales_curated")
         curated = (
             income.select(*CLASSIFIER_COLUMNS, *CLASSIFIER_NAME_COLUMNS)
             .dropDuplicates(CLASSIFIER_COLUMNS)
@@ -141,8 +141,39 @@ class GoldTransformService:
             unique_keys=["clasificador_id"],
         )
 
+    def build_dim_ubigeo(self) -> Dict[str, Any]:
+        master = self.spark.read.parquet(str(self.storage.data_lake.gold_path / "dim_municipalidad_gold"))
+        curated = (
+            master.select(
+                F.col("UBIGEO").alias("ubigeo_id"),
+                "DEPARTAMENTO_NOMBRE",
+                "PROVINCIA_NOMBRE",
+                "DISTRITO_NOMBRE",
+            )
+            .where("ubigeo_id IS NOT NULL")
+            .dropDuplicates(["ubigeo_id"])
+        )
+        return self._publish(
+            "dim_ubigeo", curated,
+            required_columns=["ubigeo_id", "DEPARTAMENTO_NOMBRE", "PROVINCIA_NOMBRE", "DISTRITO_NOMBRE"],
+            unique_keys=["ubigeo_id"],
+        )
+
+    def build_dim_estado_sismepre(self) -> Dict[str, Any]:
+        source = self._read("sismepre_entidad_estado_curated")
+        curated = (
+            source.select("ESTADO", "CLASIFICACION", "TIPO_META")
+            .dropDuplicates(["ESTADO", "CLASIFICACION", "TIPO_META"])
+            .withColumn("estado_sismepre_id", self._estado_sismepre_id())
+        )
+        return self._publish(
+            "dim_estado_sismepre", curated,
+            required_columns=["estado_sismepre_id", "ESTADO", "CLASIFICACION"],
+            unique_keys=["estado_sismepre_id"],
+        )
+
     def build_dim_formulario_sismepre(self) -> Dict[str, Any]:
-        source = self._read("dim_sismepre_formulario")
+        source = self._read("sismepre_formularios_curated")
         curated = source.select(
             "ANO_APLICACION", "PERIODO", "FORMULARIO_ID", "TITULO", "SUB_TITULO",
             "TIPO_FORMULARIO", "CLASIFICACION", "ABREVIATURA", "ESTADO_REGISTRO",
@@ -156,7 +187,7 @@ class GoldTransformService:
         )
 
     def build_dim_pregunta_sismepre(self) -> Dict[str, Any]:
-        source = self._read("dim_sismepre_pregunta")
+        source = self._read("sismepre_preguntas_curated")
         curated = source.select(
             "ANO_APLICACION", "PERIODO", "FORMULARIO_ID", "PREGUNTA_ID",
             "PREGUNTA_PADRE_ID", "ORDEN_PREGUNTA", "DESCRIPCION", "RESPUESTA",
@@ -170,7 +201,7 @@ class GoldTransformService:
         )
 
     def build_fact_ingresos_mensuales(self) -> Dict[str, Any]:
-        income = self._filter_scope(self._read("fact_ingresos_municipales"))
+        income = self._filter_scope(self._read("ingresos_municipales_curated"))
         curated = (
             income.repartition(96, "ANO_DOC", "MES_DOC", "SEC_EJEC")
             .groupBy("SEC_EJEC", "ANO_DOC", "MES_DOC")
@@ -195,7 +226,7 @@ class GoldTransformService:
         )
 
     def build_fact_ingresos_clasificador(self) -> Dict[str, Any]:
-        income = self._filter_scope(self._read("fact_ingresos_municipales"))
+        income = self._filter_scope(self._read("ingresos_municipales_curated"))
         keys = ["SEC_EJEC", "ANO_DOC", "MES_DOC", *CLASSIFIER_COLUMNS]
         curated = (
             income.repartition(96, *keys)
@@ -217,7 +248,7 @@ class GoldTransformService:
         )
 
     def build_fact_predial_mensual(self) -> Dict[str, Any]:
-        predial = self._filter_scope(self._read("fact_predial_esat"))
+        predial = self._filter_scope(self._read("predial_esat_curated"))
         metrics = [column for column in predial.columns if column.startswith("MON_") or column.startswith("NUM_")]
         keys = ["SEC_EJEC", "ANO_ESTADISTICA", "MES_ESTADISTICA"]
         curated = (
@@ -241,25 +272,26 @@ class GoldTransformService:
         )
 
     def build_fact_sismepre_cumplimiento(self) -> Dict[str, Any]:
-        source = self._filter_scope(self._read("dim_sismepre_entidad_estado"))
+        source = self._filter_scope(self._read("sismepre_entidad_estado_curated"))
         curated = (
             source.select(
                 "SEC_EJEC", "ANO_APLICACION", "PERIODO", "ESTADO", "CLASIFICACION",
                 "TIPO_META", "ORIGEN_INFORMACION", "IND_RESOL_ALCAL_ADJUNTO",
                 "FECHA_RESOL_ALCAL_ADJUNTO", *self._lineage_columns(source),
             )
+            .withColumn("estado_sismepre_id", self._estado_sismepre_id())
             .withColumn("has_sismepre", F.lit(True))
             .withColumn("year", F.col("ANO_APLICACION").cast("string"))
         )
         return self._publish(
             "fact_sismepre_cumplimiento", curated,
-            required_columns=["SEC_EJEC", "ANO_APLICACION", "PERIODO", "ESTADO", "CLASIFICACION"],
+            required_columns=["SEC_EJEC", "ANO_APLICACION", "PERIODO", "estado_sismepre_id"],
             unique_keys=["SEC_EJEC", "ANO_APLICACION", "PERIODO"],
             partition_columns=["year"],
         )
 
     def build_fact_sismepre_respuestas_resumen(self) -> Dict[str, Any]:
-        source = self._filter_scope(self._read("fact_sismepre_respuestas"))
+        source = self._filter_scope(self._read("sismepre_respuestas_curated"))
         keys = ["SEC_EJEC", "ANO_APLICACION", "PERIODO", "FORMULARIO_ID", "PREGUNTA_ID", "response_type"]
         curated = (
             source.groupBy(*keys)
@@ -533,7 +565,7 @@ class GoldTransformService:
             json.dump(payload, file_handle, indent=2, ensure_ascii=False)
 
     def _enrich_with_category(self, municipalities: DataFrame) -> DataFrame:
-        category_path = Path(self.silver_path) / "dim_categoria_municipalidad"
+        category_path = Path(self.silver_path) / "categorias_municipalidades_curated"
         if not category_path.exists() or not any(category_path.rglob("*.parquet")):
             result = (
                 municipalities
@@ -672,6 +704,17 @@ class GoldTransformService:
 
     def _classifier_id(self):
         return F.sha2(F.concat_ws("|", *[F.col(column).cast("string") for column in CLASSIFIER_COLUMNS]), 256)
+
+    def _estado_sismepre_id(self):
+        return F.sha2(
+            F.concat_ws(
+                "|",
+                F.coalesce(F.col("ESTADO").cast("string"), F.lit("")),
+                F.coalesce(F.col("CLASIFICACION").cast("string"), F.lit("")),
+                F.coalesce(F.col("TIPO_META").cast("string"), F.lit("")),
+            ),
+            256,
+        )
 
     def _source_row_count(self, df: DataFrame):
         if "_silver_source_row_count" in df.columns:

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Profiling gold - fact_ingresos_clasificador</title>
+  <style>
+    body { font-family: Segoe UI, Arial, sans-serif; margin: 32px; color: #222; }
+    h1 { color: #16892d; }
+    table { border-collapse: collapse; width: 100%; margin: 16px 0 28px; font-size: 13px; }
+    th { background: #18a837; color: white; text-align: left; padding: 8px; }
+    td { border: 1px solid #ddd; padding: 6px; vertical-align: top; }
+    .kpi { display: inline-block; margin-right: 24px; padding: 12px 18px; background: #e2ffd8; }
+  </style>
+</head>
+<body>
+  <h1>Profiling Gold - fact_ingresos_clasificador</h1>
+  <div class="kpi"><strong>Registros:</strong> 8,950,758</div>
+  <div class="kpi"><strong>Columnas:</strong> 34</div>
+  <h2>Esquema y nulos</h2>
+  <table><thead><tr><th>Columna</th><th>Tipo</th><th>Nulos</th><th>% Nulos</th></tr></thead><tbody><tr><td>SEC_EJEC</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>ANO_DOC</td><td>int</td><td>0</td><td>0.0</td></tr>
+<tr><td>MES_DOC</td><td>int</td><td>0</td><td>0.0</td></tr>
+<tr><td>FUENTE_FINANCIAMIENTO</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>RUBRO</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>TIPO_RECURSO</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>GENERICA</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>SUBGENERICA</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>SUBGENERICA_DET</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>ESPECIFICA</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>ESPECIFICA_DET</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>MONTO_PIA</td><td>decimal(24,2)</td><td>0</td><td>0.0</td></tr>
+<tr><td>MONTO_PIM</td><td>decimal(24,2)</td><td>0</td><td>0.0</td></tr>
+<tr><td>MONTO_RECAUDADO</td><td>decimal(24,2)</td><td>0</td><td>0.0</td></tr>
+<tr><td>_gold_source_row_count</td><td>bigint</td><td>0</td><td>0.0</td></tr>
+<tr><td>_bronze_dataset</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>_bronze_asset_name</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>_bronze_table_name</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>_bronze_asset_role</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>_bronze_source_type</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>_bronze_source_path</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>_bronze_source_url</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>_bronze_source_checksum</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>_bronze_execution_id</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>_bronze_ingestion_ts</td><td>timestamp</td><td>0</td><td>0.0</td></tr>
+<tr><td>_bronze_ingestion_date</td><td>date</td><td>0</td><td>0.0</td></tr>
+<tr><td>_silver_source_row_count</td><td>bigint</td><td>0</td><td>0.0</td></tr>
+<tr><td>_silver_execution_id</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>_silver_ingestion_ts</td><td>timestamp</td><td>0</td><td>0.0</td></tr>
+<tr><td>clasificador_id</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>periodo_id</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>_gold_execution_id</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>_gold_ingestion_ts</td><td>timestamp</td><td>0</td><td>0.0</td></tr>
+<tr><td>year</td><td>int</td><td>0</td><td>0.0</td></tr></tbody></table>
+  <h2>Muestra</h2>
+  <table><thead><tr><th>SEC_EJEC</th><th>ANO_DOC</th><th>MES_DOC</th><th>FUENTE_FINANCIAMIENTO</th><th>RUBRO</th><th>TIPO_RECURSO</th><th>GENERICA</th><th>SUBGENERICA</th><th>SUBGENERICA_DET</th><th>ESPECIFICA</th><th>ESPECIFICA_DET</th><th>MONTO_PIA</th><th>MONTO_PIM</th><th>MONTO_RECAUDADO</th><th>_gold_source_row_count</th><th>_bronze_dataset</th><th>_bronze_asset_name</th><th>_bronze_table_name</th><th>_bronze_asset_role</th><th>_bronze_source_type</th><th>_bronze_source_path</th><th>_bronze_source_url</th><th>_bronze_source_checksum</th><th>_bronze_execution_id</th><th>_bronze_ingestion_ts</th><th>_bronze_ingestion_date</th><th>_silver_source_row_count</th><th>_silver_execution_id</th><th>_silver_ingestion_ts</th><th>clasificador_id</th><th>periodo_id</th><th>_gold_execution_id</th><th>_gold_ingestion_ts</th><th>year</th></tr></thead><tbody><tr><td>300998</td><td>2025</td><td>1</td><td>2</td><td>09</td><td>0</td><td>3</td><td>2</td><td>10</td><td>1</td><td>5</td><td>384.00</td><td>384.00</td><td>0.00</td><td>1</td><td>ingresos</td><td>ingresos_2025</td><td>ingresos</td><td>table</td><td>direct_download</td><td>/home/jovyan/work/data/raw/ingresos/2025-Ingreso-Mensual.csv</td><td>https://fs.datosabiertos.mef.gob.pe/datastorefiles/2025-Ingreso-Mensual.csv</td><td>128b91f8fda86f658f0f05c0c26d05851f831018ee0c97bc5ac26b2fc0e7d786</td><td>20260612_054026</td><td>2026-06-12 05:48:17.632251</td><td>2026-06-12</td><td>1</td><td>20260612_060020</td><td>2026-06-12 06:01:03.368648</td><td>4766ecea4ed4f0f930b0de0faba41fe02a66eee12c9c6e9d0a216314d6643545</td><td>202501</td><td>20260612_061046</td><td>2026-06-12 06:24:11.273950</td><td>2025</td></tr>
+<tr><td>300001</td><td>2025</td><td>1</td><td>2</td><td>09</td><td>7</td><td>3</td><td>2</td><td>5</td><td>2</td><td>99</td><td>0.00</td><td>0.00</td><td>3645.50</td><td>1</td><td>ingresos</td><td>ingresos_2025</td><td>ingresos</td><td>table</td><td>direct_download</td><td>/home/jovyan/work/data/raw/ingresos/2025-Ingreso-Mensual.csv</td><td>https://fs.datosabiertos.mef.gob.pe/datastorefiles/2025-Ingreso-Mensual.csv</td><td>128b91f8fda86f658f0f05c0c26d05851f831018ee0c97bc5ac26b2fc0e7d786</td><td>20260612_054026</td><td>2026-06-12 05:48:17.632251</td><td>2026-06-12</td><td>1</td><td>20260612_060020</td><td>2026-06-12 06:01:03.368648</td><td>f5e0699c650187a96180991529befdfd39648752af1eca6b740ab21b5330700a</td><td>202501</td><td>20260612_061046</td><td>2026-06-12 06:24:11.273950</td><td>2025</td></tr>
+<tr><td>300998</td><td>2025</td><td>1</td><td>5</td><td>08</td><td>0</td><td>1</td><td>2</td><td>1</td><td>2</td><td>1</td><td>50000.00</td><td>50000.00</td><td>0.00</td><td>1</td><td>ingresos</td><td>ingresos_2025</td><td>ingresos</td><td>table</td><td>direct_download</td><td>/home/jovyan/work/data/raw/ingresos/2025-Ingreso-Mensual.csv</td><td>https://fs.datosabiertos.mef.gob.pe/datastorefiles/2025-Ingreso-Mensual.csv</td><td>128b91f8fda86f658f0f05c0c26d05851f831018ee0c97bc5ac26b2fc0e7d786</td><td>20260612_054026</td><td>2026-06-12 05:48:17.632251</td><td>2026-06-12</td><td>1</td><td>20260612_060020</td><td>2026-06-12 06:01:03.368648</td><td>1e4fac4cc2d0e4b99eb48eefd249e5b0173a3b4025967c5f5b9482a83d28348a</td><td>202501</td><td>20260612_061046</td><td>2026-06-12 06:24:11.273950</td><td>2025</td></tr>
+<tr><td>300001</td><td>2025</td><td>1</td><td>4</td><td>13</td><td>A</td><td>9</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0.00</td><td>0.00</td><td>2877.19</td><td>1</td><td>ingresos</td><td>ingresos_2025</td><td>ingresos</td><td>table</td><td>direct_download</td><td>/home/jovyan/work/data/raw/ingresos/2025-Ingreso-Mensual.csv</td><td>https://fs.datosabiertos.mef.gob.pe/datastorefiles/2025-Ingreso-Mensual.csv</td><td>128b91f8fda86f658f0f05c0c26d05851f831018ee0c97bc5ac26b2fc0e7d786</td><td>20260612_054026</td><td>2026-06-12 05:48:17.632251</td><td>2026-06-12</td><td>1</td><td>20260612_060020</td><td>2026-06-12 06:01:03.368648</td><td>97bd591e0d2ce64b60f00bd481692337b34bd09df5e3f9dfd0b27a628e96c178</td><td>202501</td><td>20260612_061046</td><td>2026-06-12 06:24:11.273950</td><td>2025</td></tr>
+<tr><td>300998</td><td>2025</td><td>1</td><td>5</td><td>18</td><td>13</td><td>9</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0.00</td><td>0.00</td><td>264088.03</td><td>1</td><td>ingresos</td><td>ingresos_2025</td><td>ingresos</td><td>table</td><td>direct_download</td><td>/home/jovyan/work/data/raw/ingresos/2025-Ingreso-Mensual.csv</td><td>https://fs.datosabiertos.mef.gob.pe/datastorefiles/2025-Ingreso-Mensual.csv</td><td>128b91f8fda86f658f0f05c0c26d05851f831018ee0c97bc5ac26b2fc0e7d786</td><td>20260612_054026</td><td>2026-06-12 05:48:17.632251</td><td>2026-06-12</td><td>1</td><td>20260612_060020</td><td>2026-06-12 06:01:03.368648</td><td>334f015a3197f49a39f17f8e8dc072517b3e4418b8c008b52672c8b0a08043ed</td><td>202501</td><td>20260612_061046</td><td>2026-06-12 06:24:11.273950</td><td>2025</td></tr>
+<tr><td>300001</td><td>2025</td><td>3</td><td>2</td><td>09</td><td>7</td><td>3</td><td>3</td><td>9</td><td>2</td><td>9</td><td>0.00</td><td>0.00</td><td>0.00</td><td>1</td><td>ingresos</td><td>ingresos_2025</td><td>ingresos</td><td>table</td><td>direct_download</td><td>/home/jovyan/work/data/raw/ingresos/2025-Ingreso-Mensual.csv</td><td>https://fs.datosabiertos.mef.gob.pe/datastorefiles/2025-Ingreso-Mensual.csv</td><td>128b91f8fda86f658f0f05c0c26d05851f831018ee0c97bc5ac26b2fc0e7d786</td><td>20260612_054026</td><td>2026-06-12 05:48:17.632251</td><td>2026-06-12</td><td>1</td><td>20260612_060020</td><td>2026-06-12 06:01:03.368648</td><td>af911ec5ab189527fd991cabee09b81a52ecc92f33b28223d1e8933e0c35f026</td><td>202503</td><td>20260612_061046</td><td>2026-06-12 06:24:11.273950</td><td>2025</td></tr>
+<tr><td>300998</td><td>2025</td><td>1</td><td>5</td><td>18</td><td>R</td><td>9</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0.00</td><td>0.00</td><td>2218007.49</td><td>1</td><td>ingresos</td><td>ingresos_2025</td><td>ingresos</td><td>table</td><td>direct_download</td><td>/home/jovyan/work/data/raw/ingresos/2025-Ingreso-Mensual.csv</td><td>https://fs.datosabiertos.mef.gob.pe/datastorefiles/2025-Ingreso-Mensual.csv</td><td>128b91f8fda86f658f0f05c0c26d05851f831018ee0c97bc5ac26b2fc0e7d786</td><td>20260612_054026</td><td>2026-06-12 05:48:17.632251</td><td>2026-06-12</td><td>1</td><td>20260612_060020</td><td>2026-06-12 06:01:03.368648</td><td>edc75b98b9e9d2f9e1e8c06bf94cfae31cbe3d4c3b7ba465b3444d438c1a8925</td><td>202501</td><td>20260612_061046</td><td>2026-06-12 06:24:11.273950</td><td>2025</td></tr>
+<tr><td>300001</td><td>2025</td><td>3</td><td>2</td><td>09</td><td>7</td><td>5</td><td>5</td><td>1</td><td>4</td><td>13</td><td>0.00</td><td>0.00</td><td>-10358.18</td><td>1</td><td>ingresos</td><td>ingresos_2025</td><td>ingresos</td><td>table</td><td>direct_download</td><td>/home/jovyan/work/data/raw/ingresos/2025-Ingreso-Mensual.csv</td><td>https://fs.datosabiertos.mef.gob.pe/datastorefiles/2025-Ingreso-Mensual.csv</td><td>128b91f8fda86f658f0f05c0c26d05851f831018ee0c97bc5ac26b2fc0e7d786</td><td>20260612_054026</td><td>2026-06-12 05:48:17.632251</td><td>2026-06-12</td><td>1</td><td>20260612_060020</td><td>2026-06-12 06:01:03.368648</td><td>db091f69199d0a7c206fafe5267a1f34c9ae5354d0b6bc51164151a5b3edd3e6</td><td>202503</td><td>20260612_061046</td><td>2026-06-12 06:24:11.273950</td><td>2025</td></tr></tbody></table>
+</body>
+</html>

@@ -37,7 +37,7 @@ class SilverTransformService:
         self.required_government_level = required_government_level
         self.quarantine_enabled = quarantine_enabled
 
-    def build_dim_municipalidad(self) -> Dict[str, Any]:
+    def build_municipalidades_curated(self) -> Dict[str, Any]:
         esat = self._read("sismepre/rentas_esat_estadistica_atm")
         renamu = self._read("renamu")
         mappings = (
@@ -69,23 +69,23 @@ class SilverTransformService:
             .withColumn("renamu_match", F.col("idmunici").isNotNull())
         )
         return self._publish(
-            "dim_municipalidad",
+            "municipalidades_curated",
             curated,
             required_columns=["SEC_EJEC", "UBIGEO", "MUNICIPALIDAD_NOMBRE"],
             unique_keys=["SEC_EJEC", "UBIGEO"],
             details={"renamu_match_count": curated.filter("renamu_match").count()},
         )
 
-    def build_fact_ingresos_municipales(self) -> Dict[str, Any]:
+    def build_ingresos_municipales_curated(self) -> Dict[str, Any]:
         source = self._read("ingresos")
         municipal = source.filter(F.col("NIVEL_GOBIERNO") == self.required_government_level)
         source_count = source.count()
         municipal_count = municipal.count()
         if municipal_count == 0:
-            self.storage.clear_table("fact_ingresos_municipales")
-            self.storage.clear_quarantine("fact_ingresos_municipales")
+            self.storage.clear_table("ingresos_municipales_curated")
+            self.storage.clear_quarantine("ingresos_municipales_curated")
             return {
-                "table_name": "fact_ingresos_municipales",
+                "table_name": "ingresos_municipales_curated",
                 "status": "blocked",
                 "reason": (
                     f"Bronze ingresos contains {source_count} rows but no rows with "
@@ -134,9 +134,9 @@ class SilverTransformService:
             .withColumn("year", F.col("ANO_DOC").cast("string"))
             .repartition(96, "year", "SEC_EJEC")
         )
-        self.storage.clear_table("fact_ingresos_municipales")
+        self.storage.clear_table("ingresos_municipales_curated")
         return self._publish(
-            "fact_ingresos_municipales",
+            "ingresos_municipales_curated",
             conformed,
             required_columns=key_columns + decimal_columns,
             unique_keys=key_columns,
@@ -144,7 +144,7 @@ class SilverTransformService:
             partition_columns=["year"],
         )
 
-    def build_fact_predial_esat(self) -> Dict[str, Any]:
+    def build_predial_esat_curated(self) -> Dict[str, Any]:
         source = self._read("sismepre/rentas_esat_estadistica_atm")
         integer_columns = ["ANO_APLICACION", "PERIODO", "ANO_ESTADISTICA", "MES_ESTADISTICA", "FORMULARIO_ID"]
         monetary_columns = [name for name in source.columns if name.startswith("MON_")]
@@ -185,7 +185,7 @@ class SilverTransformService:
             "_invalid_metric", *[f"_raw_{column}" for column, _ in typed_columns]
         ).dropDuplicates(keys)
         return self._publish(
-            "fact_predial_esat",
+            "predial_esat_curated",
             conformed,
             required_columns=keys + ["UBIGEO"],
             unique_keys=keys,
@@ -193,7 +193,7 @@ class SilverTransformService:
             partition_columns=["year"],
         )
 
-    def build_fact_sismepre_respuestas(self) -> Dict[str, Any]:
+    def build_sismepre_respuestas_curated(self) -> Dict[str, Any]:
         source = self._read("sismepre/rentas_respuestas")
         base = source.withColumn("SEC_EJEC", self._code("SEC_EJEC", 6))
         entries = [
@@ -259,7 +259,7 @@ class SilverTransformService:
         conformed = exploded.filter(~invalid_typed).drop("_responses", "_active_responses", "_response")
         keys = ["SEC_EJEC", "ANO_APLICACION", "PERIODO", "FORMULARIO_ID", "PREGUNTA_ID", "RESPUESTA_ID", "response_type"]
         return self._publish(
-            "fact_sismepre_respuestas",
+            "sismepre_respuestas_curated",
             conformed,
             required_columns=keys + ["response_raw_value"],
             unique_keys=keys,
@@ -268,7 +268,7 @@ class SilverTransformService:
             details={"source_multivalue_rows": base.filter("source_multivalue").count()},
         )
 
-    def build_dim_categoria_municipalidad(self) -> Dict[str, Any]:
+    def build_categorias_municipalidades_curated(self) -> Dict[str, Any]:
         source = self._read("categorias_municipalidades")
         curated = (
             source.select(
@@ -306,7 +306,7 @@ class SilverTransformService:
         )
         quarantine = invalid_quarantine.unionByName(conflict_quarantine, allowMissingColumns=True)
         return self._publish(
-            "dim_categoria_municipalidad",
+            "categorias_municipalidades_curated",
             conformed,
             required_columns=["municipalidad_categoria_raw", "categoria_municipalidad", "municipalidad_categoria_norm"],
             unique_keys=["municipalidad_categoria_norm"],
@@ -317,7 +317,7 @@ class SilverTransformService:
             },
         )
 
-    def build_simple_dimension(
+    def build_curated_dataset(
         self,
         table_name: str,
         bronze_relative_path: str,

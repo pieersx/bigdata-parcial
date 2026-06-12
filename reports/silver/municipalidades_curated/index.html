@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Profiling silver - municipalidades_curated</title>
+  <style>
+    body { font-family: Segoe UI, Arial, sans-serif; margin: 32px; color: #222; }
+    h1 { color: #16892d; }
+    table { border-collapse: collapse; width: 100%; margin: 16px 0 28px; font-size: 13px; }
+    th { background: #18a837; color: white; text-align: left; padding: 8px; }
+    td { border: 1px solid #ddd; padding: 6px; vertical-align: top; }
+    .kpi { display: inline-block; margin-right: 24px; padding: 12px 18px; background: #e2ffd8; }
+  </style>
+</head>
+<body>
+  <h1>Profiling Silver - municipalidades_curated</h1>
+  <div class="kpi"><strong>Registros:</strong> 1,113</div>
+  <div class="kpi"><strong>Columnas:</strong> 20</div>
+  <h2>Esquema y nulos</h2>
+  <table><thead><tr><th>Columna</th><th>Tipo</th><th>Nulos</th><th>% Nulos</th></tr></thead><tbody><tr><td>UBIGEO</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>SEC_EJEC</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>DEPARTAMENTO_NOMBRE</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>PROVINCIA_NOMBRE</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>DISTRITO_NOMBRE</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>MUNICIPALIDAD_NOMBRE</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>_bronze_source_path</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>_bronze_source_url</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>_bronze_source_checksum</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>_bronze_execution_id</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>_bronze_ingestion_ts</td><td>timestamp</td><td>0</td><td>0.0</td></tr>
+<tr><td>_bronze_ingestion_date</td><td>date</td><td>0</td><td>0.0</td></tr>
+<tr><td>idmunici</td><td>string</td><td>3</td><td>0.2695</td></tr>
+<tr><td>Tipomuni</td><td>string</td><td>3</td><td>0.2695</td></tr>
+<tr><td>RENAMU_DEPARTAMENTO</td><td>string</td><td>3</td><td>0.2695</td></tr>
+<tr><td>RENAMU_PROVINCIA</td><td>string</td><td>3</td><td>0.2695</td></tr>
+<tr><td>RENAMU_DISTRITO</td><td>string</td><td>3</td><td>0.2695</td></tr>
+<tr><td>renamu_match</td><td>boolean</td><td>0</td><td>0.0</td></tr>
+<tr><td>_silver_execution_id</td><td>string</td><td>0</td><td>0.0</td></tr>
+<tr><td>_silver_ingestion_ts</td><td>timestamp</td><td>0</td><td>0.0</td></tr></tbody></table>
+  <h2>Muestra</h2>
+  <table><thead><tr><th>UBIGEO</th><th>SEC_EJEC</th><th>DEPARTAMENTO_NOMBRE</th><th>PROVINCIA_NOMBRE</th><th>DISTRITO_NOMBRE</th><th>MUNICIPALIDAD_NOMBRE</th><th>_bronze_source_path</th><th>_bronze_source_url</th><th>_bronze_source_checksum</th><th>_bronze_execution_id</th><th>_bronze_ingestion_ts</th><th>_bronze_ingestion_date</th><th>idmunici</th><th>Tipomuni</th><th>RENAMU_DEPARTAMENTO</th><th>RENAMU_PROVINCIA</th><th>RENAMU_DISTRITO</th><th>renamu_match</th><th>_silver_execution_id</th><th>_silver_ingestion_ts</th></tr></thead><tbody><tr><td>010101</td><td>300001</td><td>AMAZONAS</td><td>CHACHAPOYAS</td><td>CHACHAPOYAS</td><td>MUNICIPALIDAD PROVINCIAL DE CHACHAPOYAS</td><td>/home/jovyan/work/data/raw/sismepre/rentas_esat_estadistica_atm.csv</td><td>https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search?resource_id=52f97ee4-6a52-465a-98e8-7e5ba8328b30</td><td>a6d915d24caaa36dbcfeed43fb60f82e3c7da3bb9e90d9bdbafe5264a4efcd41</td><td>20260612_054026</td><td>2026-06-12 05:51:46.001255</td><td>2026-06-12</td><td>010101</td><td>1</td><td>AMAZONAS</td><td>CHACHAPOYAS</td><td>CHACHAPOYAS</td><td>True</td><td>20260612_060020</td><td>2026-06-12 06:00:37.689351</td></tr>
+<tr><td>010108</td><td>300008</td><td>AMAZONAS</td><td>CHACHAPOYAS</td><td>HUANCAS</td><td>MUNICIPALIDAD DISTRITAL DE HUANCAS</td><td>/home/jovyan/work/data/raw/sismepre/rentas_esat_estadistica_atm.csv</td><td>https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search?resource_id=52f97ee4-6a52-465a-98e8-7e5ba8328b30</td><td>a6d915d24caaa36dbcfeed43fb60f82e3c7da3bb9e90d9bdbafe5264a4efcd41</td><td>20260612_054026</td><td>2026-06-12 05:51:46.001255</td><td>2026-06-12</td><td>010108</td><td>2</td><td>AMAZONAS</td><td>CHACHAPOYAS</td><td>HUANCAS</td><td>True</td><td>20260612_060020</td><td>2026-06-12 06:00:37.689351</td></tr>
+<tr><td>010110</td><td>300010</td><td>AMAZONAS</td><td>CHACHAPOYAS</td><td>LEIMEBAMBA</td><td>MUNICIPALIDAD DISTRITAL DE LEIMEBAMBA</td><td>/home/jovyan/work/data/raw/sismepre/rentas_esat_estadistica_atm.csv</td><td>https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search?resource_id=52f97ee4-6a52-465a-98e8-7e5ba8328b30</td><td>a6d915d24caaa36dbcfeed43fb60f82e3c7da3bb9e90d9bdbafe5264a4efcd41</td><td>20260612_054026</td><td>2026-06-12 05:51:46.001255</td><td>2026-06-12</td><td>010110</td><td>2</td><td>AMAZONAS</td><td>CHACHAPOYAS</td><td>LEIMEBAMBA</td><td>True</td><td>20260612_060020</td><td>2026-06-12 06:00:37.689351</td></tr>
+<tr><td>010112</td><td>300012</td><td>AMAZONAS</td><td>CHACHAPOYAS</td><td>MAGDALENA</td><td>MUNICIPALIDAD DISTRITAL DE MAGDALENA</td><td>/home/jovyan/work/data/raw/sismepre/rentas_esat_estadistica_atm.csv</td><td>https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search?resource_id=52f97ee4-6a52-465a-98e8-7e5ba8328b30</td><td>a6d915d24caaa36dbcfeed43fb60f82e3c7da3bb9e90d9bdbafe5264a4efcd41</td><td>20260612_054026</td><td>2026-06-12 05:51:46.001255</td><td>2026-06-12</td><td>010112</td><td>2</td><td>AMAZONAS</td><td>CHACHAPOYAS</td><td>MAGDALENA</td><td>True</td><td>20260612_060020</td><td>2026-06-12 06:00:37.689351</td></tr>
+<tr><td>010113</td><td>300013</td><td>AMAZONAS</td><td>CHACHAPOYAS</td><td>MARISCAL CASTILLA</td><td>MUNICIPALIDAD DISTRITAL DE MARISCAL CASTILLA</td><td>/home/jovyan/work/data/raw/sismepre/rentas_esat_estadistica_atm.csv</td><td>https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search?resource_id=52f97ee4-6a52-465a-98e8-7e5ba8328b30</td><td>a6d915d24caaa36dbcfeed43fb60f82e3c7da3bb9e90d9bdbafe5264a4efcd41</td><td>20260612_054026</td><td>2026-06-12 05:51:46.001255</td><td>2026-06-12</td><td>010113</td><td>2</td><td>AMAZONAS</td><td>CHACHAPOYAS</td><td>MARISCAL CASTILLA</td><td>True</td><td>20260612_060020</td><td>2026-06-12 06:00:37.689351</td></tr>
+<tr><td>010115</td><td>300015</td><td>AMAZONAS</td><td>CHACHAPOYAS</td><td>MONTEVIDEO</td><td>MUNICIPALIDAD DISTRITAL DE MONTEVIDEO</td><td>/home/jovyan/work/data/raw/sismepre/rentas_esat_estadistica_atm.csv</td><td>https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search?resource_id=52f97ee4-6a52-465a-98e8-7e5ba8328b30</td><td>a6d915d24caaa36dbcfeed43fb60f82e3c7da3bb9e90d9bdbafe5264a4efcd41</td><td>20260612_054026</td><td>2026-06-12 05:51:46.001255</td><td>2026-06-12</td><td>010115</td><td>2</td><td>AMAZONAS</td><td>CHACHAPOYAS</td><td>MONTEVIDEO</td><td>True</td><td>20260612_060020</td><td>2026-06-12 06:00:37.689351</td></tr>
+<tr><td>010118</td><td>300018</td><td>AMAZONAS</td><td>CHACHAPOYAS</td><td>SAN FRANCISCO DE DAGUAS</td><td>MUNICIPALIDAD DISTRITAL DE SAN FRANCISCO DE DAGUAS</td><td>/home/jovyan/work/data/raw/sismepre/rentas_esat_estadistica_atm.csv</td><td>https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search?resource_id=52f97ee4-6a52-465a-98e8-7e5ba8328b30</td><td>a6d915d24caaa36dbcfeed43fb60f82e3c7da3bb9e90d9bdbafe5264a4efcd41</td><td>20260612_054026</td><td>2026-06-12 05:51:46.001255</td><td>2026-06-12</td><td>010118</td><td>2</td><td>AMAZONAS</td><td>CHACHAPOYAS</td><td>SAN FRANCISCO DE DAGUAS</td><td>True</td><td>20260612_060020</td><td>2026-06-12 06:00:37.689351</td></tr>
+<tr><td>010119</td><td>300019</td><td>AMAZONAS</td><td>CHACHAPOYAS</td><td>SAN ISIDRO DE MAINO</td><td>MUNICIPALIDAD DISTRITAL DE SAN ISIDRO DE MAINO</td><td>/home/jovyan/work/data/raw/sismepre/rentas_esat_estadistica_atm.csv</td><td>https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search?resource_id=52f97ee4-6a52-465a-98e8-7e5ba8328b30</td><td>a6d915d24caaa36dbcfeed43fb60f82e3c7da3bb9e90d9bdbafe5264a4efcd41</td><td>20260612_054026</td><td>2026-06-12 05:51:46.001255</td><td>2026-06-12</td><td>010119</td><td>2</td><td>AMAZONAS</td><td>CHACHAPOYAS</td><td>SAN ISIDRO DE MAINO</td><td>True</td><td>20260612_060020</td><td>2026-06-12 06:00:37.689351</td></tr></tbody></table>
+</body>
+</html>

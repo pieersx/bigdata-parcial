@@ -45,8 +45,10 @@ class GoldPipeline:
         )
         builders = [
             ("dim_municipalidad_gold", service.build_dim_municipalidad_gold),
+            ("dim_ubigeo", service.build_dim_ubigeo),
             ("dim_tiempo", service.build_dim_tiempo),
             ("dim_clasificador_ingreso", service.build_dim_clasificador_ingreso),
+            ("dim_estado_sismepre", service.build_dim_estado_sismepre),
             ("dim_formulario_sismepre", service.build_dim_formulario_sismepre),
             ("dim_pregunta_sismepre", service.build_dim_pregunta_sismepre),
             ("fact_ingresos_mensuales", service.build_fact_ingresos_mensuales),
