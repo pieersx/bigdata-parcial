@@ -12,14 +12,16 @@ class DataLake:
         bronze_path: Path,
         reports_path: Path,
         silver_path: Optional[Path] = None,
+        gold_path: Optional[Path] = None,
     ):
         self.raw_path = raw_path
         self.bronze_path = bronze_path
         self.reports_path = reports_path
         self.silver_path = silver_path or bronze_path.parent / "silver"
+        self.gold_path = gold_path or bronze_path.parent / "gold"
         self.logger = StructuredLogger(self.__class__.__name__)
 
-        for path in (self.raw_path, self.bronze_path, self.silver_path, self.reports_path):
+        for path in (self.raw_path, self.bronze_path, self.silver_path, self.gold_path, self.reports_path):
             path.mkdir(parents=True, exist_ok=True)
 
     def resolve_raw_file_path(self, dataset: str, filename: str) -> Path:
@@ -83,6 +85,11 @@ class DataLake:
 
     def resolve_quarantine_path(self, table_name: str) -> Path:
         output_dir = self.silver_path / "_quarantine" / table_name
+        output_dir.mkdir(parents=True, exist_ok=True)
+        return output_dir
+
+    def resolve_gold_table_path(self, table_name: str) -> Path:
+        output_dir = self.gold_path / table_name
         output_dir.mkdir(parents=True, exist_ok=True)
         return output_dir
 

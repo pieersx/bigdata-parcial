@@ -68,6 +68,26 @@ class SilverTransformServiceTest(unittest.TestCase):
         self.assertEqual("blocked", result["status"])
         self.assertFalse((self.data_lake.silver_path / "fact_ingresos_municipales").exists())
 
+    def test_municipal_income_movements_are_aggregated_by_budget_key(self):
+        common = {
+            "ANO_DOC": "2025", "MES_DOC": "7", "NIVEL_GOBIERNO": "M",
+            "SEC_EJEC": "300939", "EJECUTORA": "100803", "FUENTE_FINANCIAMIENTO": "4",
+            "RUBRO": "13", "TIPO_RECURSO": "18", "GENERICA": "9", "SUBGENERICA": "1",
+            "SUBGENERICA_DET": "1", "ESPECIFICA": "1", "ESPECIFICA_DET": "1",
+            "MONTO_PIA": "0", "MONTO_PIM": "0",
+        }
+        self.write_bronze(
+            "ingresos",
+            [{**common, "MONTO_RECAUDADO": "-803.50"}, {**common, "MONTO_RECAUDADO": "-120.00"}],
+        )
+
+        result = self.service.build_fact_ingresos_municipales()
+        published = self.spark.read.parquet(result["storage"]["path"])
+
+        self.assertEqual(1, result["records_published"])
+        self.assertEqual("-923.50", str(published.first()["MONTO_RECAUDADO"]))
+        self.assertEqual(2, published.first()["_silver_source_row_count"])
+
     def test_dim_municipalidad_keeps_unmatched_renamu_rows(self):
         self.write_bronze(
             "sismepre/rentas_esat_estadistica_atm",
@@ -139,6 +159,30 @@ class SilverTransformServiceTest(unittest.TestCase):
 
         self.assertEqual(0, clean_result["records_quarantined"])
         self.assertFalse((self.data_lake.silver_path / "_quarantine" / "fact_sismepre_respuestas").exists())
+
+    def test_category_dimension_normalizes_and_quarantines_conflicts(self):
+        self.write_bronze(
+            "categorias_municipalidades",
+            [
+                {"Municipalidad": "M. D. DE CHETO", "Categoria": "F"},
+                {"Municipalidad": "Municipalidad Distrital de Cheto", "Categoria": "F"},
+                {"Municipalidad": "M. P. DE CHACHAPOYAS", "Categoria": "A"},
+                {"Municipalidad": "M. D. DE CONFLICTO", "Categoria": "B"},
+                {"Municipalidad": "M. D. DE CONFLICTO", "Categoria": "C"},
+                {"Municipalidad": "", "Categoria": "A"},
+                {"Municipalidad": "M. D. DE INVALIDA", "Categoria": "Z"},
+            ],
+        )
+
+        result = self.service.build_dim_categoria_municipalidad()
+        published = self.spark.read.parquet(result["storage"]["path"])
+        quarantined = self.spark.read.parquet(result["quarantine"]["path"])
+
+        self.assertEqual(2, result["records_published"])
+        self.assertEqual(4, result["records_quarantined"])
+        self.assertEqual("M D DE CHETO", published.filter("categoria_municipalidad = 'F'").first()["municipalidad_categoria_norm"])
+        reasons = {row["_quarantine_reason"] for row in quarantined.select("_quarantine_reason").collect()}
+        self.assertEqual({"invalid_category_or_name", "conflicting_duplicate_category"}, reasons)
 
 
 if __name__ == "__main__":

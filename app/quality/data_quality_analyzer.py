@@ -10,6 +10,7 @@ from app.models.audit_schemas import DataQualityCheck, DataQualityStatus
 from app.quality.rules_ingresos import DATASET_RULES as INGRESOS_RULES
 from app.quality.rules_renamu import DATASET_RULES as RENAMU_RULES
 from app.quality.rules_sismepre import DATASET_RULES as SISMEPRE_RULES
+from app.quality.rules_categorias import DATASET_RULES as CATEGORIAS_RULES
 from app.utils.logger import StructuredLogger
 
 
@@ -17,6 +18,7 @@ ALL_RULES = {
     "ingresos": INGRESOS_RULES,
     "sismepre": SISMEPRE_RULES,
     "renamu": RENAMU_RULES,
+    "categorias_municipalidades": CATEGORIAS_RULES,
 }
 
 

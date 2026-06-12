@@ -10,7 +10,7 @@ def parse_args():
         "datasets",
         nargs="*",
         default=None,
-        help="Datasets to process: ingresos sismepre renamu",
+        help="Datasets to process: ingresos sismepre renamu categorias_municipalidades",
     )
     return parser.parse_args()
 

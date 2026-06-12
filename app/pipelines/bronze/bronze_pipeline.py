@@ -6,6 +6,7 @@ from app.clients.download_client import DownloadClient
 from app.clients.mef_client import MEFClient
 from app.config.settings import settings
 from app.models.audit_schemas import ExecutionStatus
+from app.pipelines.bronze.categorias_pipeline import CategoriasMunicipalidadesPipeline
 from app.pipelines.bronze.ingresos_pipeline import IngresosPipeline
 from app.pipelines.bronze.renamu_pipeline import RenamuPipeline
 from app.pipelines.bronze.sismepre_pipeline import SismeprePipeline
@@ -83,6 +84,12 @@ class BronzePipeline:
                 self.landing_service,
                 self.bronze_transform_service,
                 datasets["renamu"],
+                control_manager=self.control_manager,
+            ),
+            "categorias_municipalidades": CategoriasMunicipalidadesPipeline(
+                self.landing_service,
+                self.bronze_transform_service,
+                datasets["categorias_municipalidades"],
                 control_manager=self.control_manager,
             ),
         }

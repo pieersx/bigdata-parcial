@@ -51,6 +51,10 @@ class Settings:
         return self.config.get('silver', {})
 
     @property
+    def gold(self) -> Dict[str, Any]:
+        return self.config.get('gold', {})
+
+    @property
     def timeout(self) -> int:
         return int(os.getenv("HTTP_TIMEOUT", "30"))
 

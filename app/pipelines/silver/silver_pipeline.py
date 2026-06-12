@@ -66,6 +66,7 @@ class SilverPipeline:
                 ["ANO_APLICACION", "PERIODO", "FORMULARIO_ID", "TITULO"],
                 ["ANO_APLICACION", "PERIODO", "FORMULARIO_ID"],
             )),
+            ("dim_categoria_municipalidad", service.build_dim_categoria_municipalidad),
         ]
         results: List[Dict[str, Any]] = []
         errors: List[Dict[str, Any]] = []

@@ -42,22 +42,23 @@ datasets:
       - anio: 2021
         url: "https://fs.datosabiertos.mef.gob.pe/datastorefiles/2021-Ingreso.csv"
         filename: "2021-Ingreso.csv"
-    api:
       - anio: 2022
-        url: "https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search?resource_id=031bc35d-f6e6-48ef-8aed-8df6c23b7a7a"
-        filename: "2022-Ingreso_api.csv"
+        url: "https://fs.datosabiertos.mef.gob.pe/datastorefiles/2022-Ingreso.csv"
+        filename: "2022-Ingreso.csv"
       - anio: 2023
-        url: "https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search?resource_id=aee29919-51e9-4aad-b3fa-a474ea1a7292"
-        filename: "2023-Ingreso_api.csv"
+        url: "https://fs.datosabiertos.mef.gob.pe/datastorefiles/2023-Ingreso.csv"
+        filename: "2023-Ingreso.csv"
       - anio: 2024
-        url: "https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search?resource_id=228c2d8b-f58f-435c-bf96-c7556e8c537d"
-        filename: "2024-Ingreso_api.csv"
+        url: "https://fs.datosabiertos.mef.gob.pe/datastorefiles/2024-Ingreso.csv"
+        filename: "2024-Ingreso.csv"
       - anio: 2025
-        url: "https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search?resource_id=989f451f-1a3d-4161-b498-7f1fa81cecad"
-        filename: "2025-Ingreso_api.csv"
+        url: "https://fs.datosabiertos.mef.gob.pe/datastorefiles/2025-Ingreso-Mensual.csv"
+        filename: "2025-Ingreso-Mensual.csv"
+        live_update: true
       - anio: 2026
-        url: "https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search?resource_id=4723b94f-6b96-4b76-b990-d596c8da4cce"
-        filename: "2026-Ingreso_api.csv"
+        url: "https://fs.datosabiertos.mef.gob.pe/datastorefiles/2026-Ingreso-Mensual.csv"
+        filename: "2026-Ingreso-Mensual.csv"
+        live_update: true
 
   sismepre:
     year_column: "ANO_APLICACION"
@@ -107,12 +108,23 @@ datasets:
         header: true
         delimiter: ";"
         encoding: "utf-8-sig"
+        multiLine: true
       diccionario:
         url: "https://www.inei.gob.pe/media/DATOS_ABIERTOS/RENAMU/DICCIONARIO/2022/Diccionario.pdf"
         filename: "renamu_diccionario_2022.pdf"
       data_completa:
         url: "https://www.inei.gob.pe/media/DATOS_ABIERTOS/RENAMU/DATA/2022.zip"
         filename: "renamu_2022.zip"
+
+  categorias_municipalidades:
+    table_name: "categorias_municipalidades"
+    filename: "CategoriasMunicipalidades.csv"
+    url: "data/raw/CategoriasMunicipalidades.csv"
+    read_options:
+      format: "csv"
+      header: true
+      delimiter: ";"
+      encoding: "utf-8-sig"
 
 spark:
   app_name: "bronze-parcial"
@@ -133,6 +145,11 @@ silver:
   required_government_level: "M"
   write_mode: "overwrite"
   quarantine_enabled: true
+
+gold:
+  partition_column: "year"
+  write_mode: "overwrite"
+  export_format: "parquet"
 
 paths:
   raw: "data/raw"

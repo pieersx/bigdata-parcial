@@ -55,6 +55,12 @@ class DataLakeTest(unittest.TestCase):
 
         self.data_lake.validate_bronze_contract()
 
+    def test_gold_table_path_is_resolved_under_gold_root(self):
+        table_path = self.data_lake.resolve_gold_table_path("fact_ingresos_mensuales")
+
+        self.assertEqual(self.root / "gold" / "fact_ingresos_mensuales", table_path)
+        self.assertTrue(table_path.exists())
+
 
 if __name__ == "__main__":
     unittest.main()

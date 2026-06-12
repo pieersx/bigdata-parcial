@@ -94,6 +94,7 @@ class BronzeIngestionPipeline(ABC):
         required: bool = True,
         profiling_enabled: bool = False,
         quality_enabled: bool = True,
+        validate_last_modified: bool = False,
     ) -> Dict[str, Any]:
         return {
             "name": name,
@@ -109,4 +110,5 @@ class BronzeIngestionPipeline(ABC):
             "profiling_enabled": profiling_enabled,
             "quality_enabled": quality_enabled,
             "bronze_enabled": True,
+            "validate_last_modified": validate_last_modified,
         }

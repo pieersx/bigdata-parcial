@@ -35,7 +35,8 @@ class IngresosPipeline(BronzeIngestionPipeline):
                     source_type="direct_download",
                     year_column=year_column,
                     default_year=resource.get("anio"),
-                    profiling_enabled=True,
+                    validate_last_modified=resource.get("live_update", False),
+                    profiling_enabled=False,
                     quality_enabled=True,
                 )
             )
@@ -51,7 +52,7 @@ class IngresosPipeline(BronzeIngestionPipeline):
                     source_type="mef_api",
                     year_column=year_column,
                     default_year=resource.get("anio"),
-                    profiling_enabled=True,
+                    profiling_enabled=False,
                     quality_enabled=True,
                 )
             )

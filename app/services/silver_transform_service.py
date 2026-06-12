@@ -2,6 +2,7 @@ from typing import Any, Dict, List
 
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
+from pyspark import StorageLevel
 
 from app.quality.silver_quality_analyzer import SilverQualityAnalyzer
 from app.storage.silver_storage import SilverStorage
@@ -112,7 +113,28 @@ class SilverTransformService:
         quarantine = curated.filter(invalid).withColumn(
             "_quarantine_reason", F.lit("invalid_key_month_or_amount")
         )
-        conformed = curated.filter(~invalid).drop(*[f"_raw_{column}" for column in decimal_columns])
+        valid = curated.filter(~invalid).drop(*[f"_raw_{column}" for column in decimal_columns])
+        lineage_columns = [column for column in valid.columns if column.startswith("_bronze_")]
+        attribute_columns = [
+            column for column in valid.columns
+            if column not in set(key_columns + decimal_columns + lineage_columns + ["year"])
+        ]
+        aggregations = [
+            F.sum(column).cast("decimal(20,2)").alias(column) for column in decimal_columns
+        ] + [
+            F.first(column, ignorenulls=True).alias(column)
+            for column in attribute_columns + lineage_columns
+        ] + [
+            F.count("*").alias("_silver_source_row_count")
+        ]
+        conformed = (
+            valid.repartition(96, *key_columns)
+            .groupBy(*key_columns)
+            .agg(*aggregations)
+            .withColumn("year", F.col("ANO_DOC").cast("string"))
+            .repartition(96, "year", "SEC_EJEC")
+        )
+        self.storage.clear_table("fact_ingresos_municipales")
         return self._publish(
             "fact_ingresos_municipales",
             conformed,
@@ -246,6 +268,55 @@ class SilverTransformService:
             details={"source_multivalue_rows": base.filter("source_multivalue").count()},
         )
 
+    def build_dim_categoria_municipalidad(self) -> Dict[str, Any]:
+        source = self._read("categorias_municipalidades")
+        curated = (
+            source.select(
+                F.trim(F.col("Municipalidad")).alias("municipalidad_categoria_raw"),
+                F.upper(F.trim(F.col("Categoria"))).alias("categoria_municipalidad"),
+                *self._existing_trace_columns(source),
+            )
+            .withColumn(
+                "municipalidad_categoria_norm",
+                self._normalize_municipality_name(F.col("municipalidad_categoria_raw")),
+            )
+        )
+        invalid = (
+            F.col("municipalidad_categoria_raw").isNull()
+            | (F.col("municipalidad_categoria_raw") == "")
+            | F.col("categoria_municipalidad").isNull()
+            | ~F.col("categoria_municipalidad").isin("A", "B", "C", "D", "E", "F", "G")
+        )
+        invalid_quarantine = curated.filter(invalid).withColumn(
+            "_quarantine_reason", F.lit("invalid_category_or_name")
+        )
+        valid = curated.filter(~invalid)
+        conflicts = (
+            valid.groupBy("municipalidad_categoria_norm")
+            .agg(F.countDistinct("categoria_municipalidad").alias("_category_count"))
+            .filter(F.col("_category_count") > 1)
+            .select("municipalidad_categoria_norm")
+        )
+        conflict_quarantine = valid.join(conflicts, "municipalidad_categoria_norm", "inner").withColumn(
+            "_quarantine_reason", F.lit("conflicting_duplicate_category")
+        )
+        conformed = (
+            valid.join(conflicts, "municipalidad_categoria_norm", "left_anti")
+            .dropDuplicates(["municipalidad_categoria_norm", "categoria_municipalidad"])
+        )
+        quarantine = invalid_quarantine.unionByName(conflict_quarantine, allowMissingColumns=True)
+        return self._publish(
+            "dim_categoria_municipalidad",
+            conformed,
+            required_columns=["municipalidad_categoria_raw", "categoria_municipalidad", "municipalidad_categoria_norm"],
+            unique_keys=["municipalidad_categoria_norm"],
+            quarantine=quarantine,
+            details={
+                "conflicting_duplicate_keys": conflicts.count(),
+                "valid_categories": conformed.count(),
+            },
+        )
+
     def build_simple_dimension(
         self,
         table_name: str,
@@ -280,13 +351,13 @@ class SilverTransformService:
         partition_columns: List[str] | None = None,
         details: Dict[str, Any] | None = None,
     ) -> Dict[str, Any]:
-        curated = self._add_silver_metadata(df).cache()
+        curated = self._add_silver_metadata(df).persist(StorageLevel.DISK_ONLY)
         records_published = curated.count()
         storage_result = self.storage.write_table(curated, table_name, partition_columns)
         quarantine_count = 0
         quarantine_result = None
         if quarantine is not None and self.quarantine_enabled:
-            quarantine = self._add_silver_metadata(quarantine).cache()
+            quarantine = self._add_silver_metadata(quarantine).persist(StorageLevel.DISK_ONLY)
             quarantine_count = quarantine.count()
             if quarantine_count:
                 self.storage.clear_quarantine(table_name)
@@ -353,3 +424,15 @@ class SilverTransformService:
             F.to_date(value, "d/M/yyyy HH:mm:ss"),
             F.to_date(value, "d/M/yyyy"),
         )
+
+    def _normalize_municipality_name(self, value):
+        normalized = F.upper(F.trim(value))
+        normalized = F.translate(normalized, "ÁÉÍÓÚÜÑáéíóúüñ", "AEIOUUNAEIOUUN")
+        normalized = F.regexp_replace(normalized, r"\bM\s*\.\s*D\s*\.\s*DE\b", "M D DE")
+        normalized = F.regexp_replace(normalized, r"\bM\s*\.\s*P\s*\.\s*DE\b", "M P DE")
+        normalized = F.regexp_replace(normalized, r"\bMUNICIPALIDAD\b", "M")
+        normalized = F.regexp_replace(normalized, r"\bDISTRITAL\b", "D")
+        normalized = F.regexp_replace(normalized, r"\bPROVINCIAL\b", "P")
+        normalized = F.regexp_replace(normalized, r"[^A-Z0-9]+", " ")
+        normalized = F.regexp_replace(normalized, r"\s+", " ")
+        return F.trim(normalized)
