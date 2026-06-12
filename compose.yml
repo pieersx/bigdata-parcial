@@ -40,6 +40,10 @@ services:
     environment:
       CLUSTER_NAME: municipal-datalake
       CORE_CONF_fs_defaultFS: hdfs://namenode:8020
+      CORE_CONF_hadoop_proxyuser_root_hosts: "*"
+      CORE_CONF_hadoop_proxyuser_root_groups: "*"
+      CORE_CONF_hadoop_proxyuser_hive_hosts: "*"
+      CORE_CONF_hadoop_proxyuser_hive_groups: "*"
     volumes:
       - hdfs_namenode:/hadoop/dfs/name
 
@@ -51,6 +55,10 @@ services:
     environment:
       SERVICE_PRECONDITION: namenode:9870
       CORE_CONF_fs_defaultFS: hdfs://namenode:8020
+      CORE_CONF_hadoop_proxyuser_root_hosts: "*"
+      CORE_CONF_hadoop_proxyuser_root_groups: "*"
+      CORE_CONF_hadoop_proxyuser_hive_hosts: "*"
+      CORE_CONF_hadoop_proxyuser_hive_groups: "*"
     volumes:
       - hdfs_datanode:/hadoop/dfs/data
 
@@ -73,6 +81,10 @@ services:
     environment:
       SERVICE_PRECONDITION: namenode:9870 datanode:9864 hive-metastore-db:5432
       CORE_CONF_fs_defaultFS: hdfs://namenode:8020
+      CORE_CONF_hadoop_proxyuser_root_hosts: "*"
+      CORE_CONF_hadoop_proxyuser_root_groups: "*"
+      CORE_CONF_hadoop_proxyuser_hive_hosts: "*"
+      CORE_CONF_hadoop_proxyuser_hive_groups: "*"
       HIVE_CORE_CONF_javax_jdo_option_ConnectionURL: jdbc:postgresql://hive-metastore-db:5432/metastore
       HIVE_CORE_CONF_javax_jdo_option_ConnectionDriverName: org.postgresql.Driver
       HIVE_CORE_CONF_javax_jdo_option_ConnectionUserName: hive
@@ -94,6 +106,10 @@ services:
     environment:
       SERVICE_PRECONDITION: namenode:9870 datanode:9864 hive-metastore:9083
       CORE_CONF_fs_defaultFS: hdfs://namenode:8020
+      CORE_CONF_hadoop_proxyuser_root_hosts: "*"
+      CORE_CONF_hadoop_proxyuser_root_groups: "*"
+      CORE_CONF_hadoop_proxyuser_hive_hosts: "*"
+      CORE_CONF_hadoop_proxyuser_hive_groups: "*"
       HIVE_SITE_CONF_hive_metastore_uris: thrift://hive-metastore:9083
       HIVE_CORE_CONF_javax_jdo_option_ConnectionURL: jdbc:postgresql://hive-metastore-db:5432/metastore
       HIVE_CORE_CONF_javax_jdo_option_ConnectionDriverName: org.postgresql.Driver

@@ -79,20 +79,28 @@ docker compose exec transformers-networks python scripts/export_powerbi_from_hiv
 | Window functions | consulta 05 |
 | Consultas complejas con CTEs y joins | consulta 06 |
 
-## Uso En Power BI
+## Uso En Power BI Sin Excel
 
-Opcion directa:
+Opcion recomendada para usar todos los registros:
 
-- Conector: Hive LLAP o Hive ODBC/JDBC, segun disponibilidad local.
+- Conector: ODBC con driver Hive.
 - Servidor: `localhost`.
 - Puerto: `10000`.
 - Base: `municipal_gold`.
 - Tablas/vistas: `vw_dashboard_01_*` a `vw_dashboard_06_*`.
+- DSN sugerido: `MunicipalHive`.
+- Usuario sugerido: `root`.
+- Password: vacio.
 
-Opcion fallback:
+Esta opcion consulta los Parquet Gold publicados en HDFS como tablas externas
+Hive, por lo que no depende de muestras ni de limites de Excel.
+
+Opcion fallback solo para demo rapida:
 
 - Archivo: `data/powerbi/powerbi_municipal_hive.xlsx`.
-- Uso: importar hojas a Power BI Desktop y crear las seis paginas nativas.
+- Uso: importar hojas a Power BI Desktop si el equipo no tiene driver ODBC.
+- Limitacion: no es la ruta principal porque Excel no es ideal para millones de
+  registros.
 
 ## Nota Sobre HTML
 
