@@ -2,9 +2,10 @@
 
 ## Fuente De Datos
 
-Power BI debe consumir la base Hive `municipal_gold`, ya sea conectandose a
-HiveServer2 (`localhost:10000`) o importando el workbook generado desde las
-vistas Hive.
+Power BI debe consumir la base Hive `municipal_gold`, conectandose a
+HiveServer2 (`localhost:10000`) por ODBC. Para evitar errores de metadata del
+driver, importar las tablas materializadas `pbi_dashboard_01` a
+`pbi_dashboard_06`.
 
 Todas las paginas usan `categoria_municipalidad` como segmentador principal,
 derivado de `CategoriasMunicipalidades.csv`.
@@ -31,7 +32,7 @@ El modelo analitico final es una constelacion de hechos en Gold:
 
 ## Pagina 1: Recaudacion Municipal Vs Capacidad Tributaria
 
-Vista Hive: `vw_dashboard_01_recaudacion_capacidad`
+Tabla Power BI: `pbi_dashboard_01`
 
 Objetivo: comparar la recaudacion SIAF con la capacidad administrativa RENAMU.
 
@@ -51,7 +52,7 @@ Filtros:
 
 ## Pagina 2: Recaudacion Por Clasificador De Ingreso
 
-Vista Hive: `vw_dashboard_02_clasificador_ingreso`
+Tabla Power BI: `pbi_dashboard_02`
 
 Objetivo: identificar de donde provienen los ingresos municipales.
 
@@ -71,7 +72,7 @@ Filtros:
 
 ## Pagina 3: Predial Vs Efectividad
 
-Vista Hive: `vw_dashboard_03_predial_vs_efectividad`
+Tabla Power BI: `pbi_dashboard_03`
 
 Objetivo: ver si mayor emision predial se traduce en recaudacion efectiva.
 
@@ -91,7 +92,7 @@ Filtros:
 
 ## Pagina 4: Distribucion De Efectividad Predial
 
-Vista Hive: `vw_dashboard_04_distribucion_efectividad`
+Tabla Power BI: `pbi_dashboard_04`
 
 Objetivo: clasificar municipios por desempeno predial.
 
@@ -109,7 +110,7 @@ Filtros:
 
 ## Pagina 5: Software Tributario Municipal
 
-Vista Hive: `vw_dashboard_05_software_tributario`
+Tabla Power BI: `pbi_dashboard_05`
 
 Objetivo: evaluar capacidades tecnologicas de administracion tributaria.
 
@@ -129,7 +130,7 @@ Filtros:
 
 ## Pagina 6: Priorizacion De Municipalidades
 
-Vista Hive: `vw_dashboard_06_priorizacion_municipal`
+Tabla Power BI: `pbi_dashboard_06`
 
 Objetivo: decidir que municipalidades requieren apoyo o fiscalizacion primero.
 

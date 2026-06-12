@@ -31,18 +31,22 @@ Conteos verificados por Beeline:
 | `mart_dashboard_municipal` | `28,628` |
 | `vw_dashboard_01_recaudacion_capacidad` | `28,628` |
 
-## Vistas Para Los 6 Dashboards
+## Tablas Recomendadas Para Los 6 Dashboards
 
-Conectar Power BI a estas vistas:
+Conectar Power BI a estas tablas materializadas. Son mas estables para ODBC
+que las vistas porque tienen nombres cortos y tipos simples:
 
-| Dashboard | Vista Hive |
+| Dashboard | Tabla Hive |
 |---|---|
-| Recaudacion Municipal Vs Capacidad Tributaria | `vw_dashboard_01_recaudacion_capacidad` |
-| Recaudacion Por Clasificador De Ingreso | `vw_dashboard_02_clasificador_ingreso` |
-| Predial Vs Efectividad | `vw_dashboard_03_predial_vs_efectividad` |
-| Distribucion De Efectividad Predial | `vw_dashboard_04_distribucion_efectividad` |
-| Software Tributario Municipal | `vw_dashboard_05_software_tributario` |
-| Priorizacion De Municipalidades | `vw_dashboard_06_priorizacion_municipal` |
+| Recaudacion Municipal Vs Capacidad Tributaria | `pbi_dashboard_01` |
+| Recaudacion Por Clasificador De Ingreso | `pbi_dashboard_02` |
+| Predial Vs Efectividad | `pbi_dashboard_03` |
+| Distribucion De Efectividad Predial | `pbi_dashboard_04` |
+| Software Tributario Municipal | `pbi_dashboard_05` |
+| Priorizacion De Municipalidades | `pbi_dashboard_06` |
+
+Las vistas `vw_dashboard_*` quedan como SQL analitico auditable, pero Power BI
+debe importar preferentemente las tablas `pbi_dashboard_*`.
 
 ## Driver Descargado
 
@@ -82,7 +86,7 @@ Crear un System DSN:
 2. Ir a `Obtener datos`.
 3. Elegir `ODBC`.
 4. Seleccionar DSN `MunicipalHive`.
-5. Importar las vistas `vw_dashboard_01_*` a `vw_dashboard_06_*`.
+5. Importar las tablas `pbi_dashboard_01` a `pbi_dashboard_06`.
 6. Crear cada pagina con su vista correspondiente.
 
 ## Validacion Desde Consola
@@ -97,6 +101,12 @@ Para verificar que se estan leyendo millones de registros:
 
 ```powershell
 docker compose exec -T hive-server beeline -u "jdbc:hive2://localhost:10000/municipal_gold" -n root -e "SELECT COUNT(*) FROM fact_ingresos_clasificador;"
+```
+
+Para regenerar las tablas finales para Power BI:
+
+```powershell
+docker compose exec -T transformers-networks python scripts/materialize_powerbi_hive_tables.py
 ```
 
 ## Nota

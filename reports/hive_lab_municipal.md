@@ -87,13 +87,20 @@ Opcion recomendada para usar todos los registros:
 - Servidor: `localhost`.
 - Puerto: `10000`.
 - Base: `municipal_gold`.
-- Tablas/vistas: `vw_dashboard_01_*` a `vw_dashboard_06_*`.
+- Tablas recomendadas: `pbi_dashboard_01` a `pbi_dashboard_06`.
+- Vistas auditables: `vw_dashboard_01_*` a `vw_dashboard_06_*`.
 - DSN sugerido: `MunicipalHive`.
 - Usuario sugerido: `root`.
 - Password: vacio.
 
 Esta opcion consulta los Parquet Gold publicados en HDFS como tablas externas
 Hive, por lo que no depende de muestras ni de limites de Excel.
+
+Antes de conectar Power BI, materializar las tablas finales:
+
+```powershell
+docker compose exec -T transformers-networks python scripts/materialize_powerbi_hive_tables.py
+```
 
 Opcion fallback solo para demo rapida:
 
