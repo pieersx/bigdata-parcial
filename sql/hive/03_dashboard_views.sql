@@ -13,7 +13,11 @@ SELECT
     SUM(i.MONTO_RECAUDADO) AS recaudacion_total,
     SUM(i.MONTO_PIM) AS pim_total,
     MAX(r.personal_municipal_total) AS personal_municipal_total,
-    MAX(r.requiere_asistencia_at) AS requiere_asistencia_at,
+    CASE
+        WHEN MAX(CASE WHEN r.requiere_asistencia_at THEN 1 ELSE 0 END) = 1 THEN 'SI'
+        WHEN COUNT(r.SEC_EJEC) = 0 THEN NULL
+        ELSE 'NO'
+    END AS requiere_asistencia_at,
     CASE
         WHEN MAX(r.personal_municipal_total) IS NULL OR MAX(r.personal_municipal_total) = 0 THEN NULL
         ELSE SUM(i.MONTO_RECAUDADO) / MAX(r.personal_municipal_total)
@@ -179,7 +183,11 @@ SELECT
     mart.MON_BASEIMPONIBLE_AFECTO AS base_imponible_predial,
     mart.MON_SALDO_PREDIAL_TOTAL AS saldo_predial_total,
     mart.PCT_RECUPERACION_PREDIAL AS efectividad_predial_pct,
-    mart.usa_al_menos_un_software_at,
+    CASE
+        WHEN mart.usa_al_menos_un_software_at THEN 'SI'
+        WHEN mart.usa_al_menos_un_software_at IS NULL THEN NULL
+        ELSE 'NO'
+    END AS usa_al_menos_un_software_at,
     mart.ESTADO_SISMEPRE,
     mart.CLASIFICACION_SISMEPRE,
     mart.TIPO_META_SISMEPRE,
