@@ -124,7 +124,7 @@ Gold construya el modelo analitico.
 | `sismepre_entidad_estado_curated` | 19,037 | Estado, clasificacion y tipo de meta SISMEPRE limpios por municipalidad y periodo. |
 | `sismepre_preguntas_curated` | 836 | Preguntas SISMEPRE limpias para posterior dimensionamiento en Gold. |
 | `sismepre_formularios_curated` | 98 | Formularios SISMEPRE limpios para posterior dimensionamiento en Gold. |
-| `categorias_municipalidades_curated` | 1,707 | Categoria municipal `A-G` normalizada desde el archivo del profesor. |
+| `categorias_municipalidades_curated` | Segun ejecucion | Categoria municipal `A-G` resuelta desde el archivo del profesor, con estado de match, regla aplicada y flag de exclusion para Gold. |
 
 La logica que antes estaba mal ubicada en Silver fue movida a Gold:
 `dim_municipalidad_gold`, `dim_tiempo`, `dim_clasificador_ingreso`,
@@ -169,17 +169,19 @@ Los snapshots del alcance se guardan en `data/audit/metrics` con nombre
 ## Categorias Municipales
 
 El archivo `data/raw/CategoriasMunicipalidades.csv` tiene las columnas
-`Municipalidad` y `Categoria`. Como no trae `SEC_EJEC` ni `UBIGEO`, el cruce se
-hace por nombre normalizado y de forma conservadora:
+`Municipalidad` y `Categoria`. Como no trae `SEC_EJEC` ni `UBIGEO`, Silver cruza
+por nombre normalizado contra el maestro municipal y aplica la regla acordada:
 
-- `matched`: categoria asignada por nombre normalizado unico.
-- `ambiguous`: el nombre normalizado corresponde a mas de una municipalidad; no
-  se asigna categoria silenciosamente.
-- `unmatched`: no hay categoria para la municipalidad.
-- `missing_category_source`: la tabla Silver de categorias no existe.
+- Si la municipalidad tiene una categoria unica en el maestro, se usa esa
+  categoria.
+- Si tiene multiples categorias y corresponde a Lima, se asigna `C`.
+- Si tiene multiples categorias y no corresponde a Lima, se asigna `G`.
+- Si no existe en el maestro, queda con `exclude_from_gold_scope=true` para que
+  Gold y Power BI puedan excluirla sin perder evidencia.
 
-Gold agrega `categoria_municipalidad` y `categoria_match_status` en
-`dim_municipalidad_gold`. La evidencia queda en
+Silver publica `categoria_municipalidad`, `categoria_match_status`,
+`categoria_rule_applied` y `exclude_from_gold_scope`. Gold hereda esos campos en
+`dim_municipalidad_gold`; no inventa categorias nuevas. La evidencia queda en
 `data/audit/metrics/category_match_<execution_id>.json`.
 
 ## Tratamiento Temporal
@@ -270,10 +272,9 @@ Ultima ejecucion Silver validada: `20260612_060020`.
 
 | Notebook | Proposito |
 |---|---|
-| [`notebooks/bronze/01_Bronze_Pipeline_Parcial.ipynb`](notebooks/bronze/01_Bronze_Pipeline_Parcial.ipynb) | Evidencia del pipeline Bronze. |
-| [`notebooks/bronze/05_Bronze_Data_Profiling.ipynb`](notebooks/bronze/05_Bronze_Data_Profiling.ipynb) | Profiling detallado de Bronze: registros, esquemas, nulos, trazabilidad y muestras. |
+| [`notebooks/bronze/01_Bronze_Data_Profiling_Calidad.ipynb`](notebooks/bronze/01_Bronze_Data_Profiling_Calidad.ipynb) | Notebook Bronze oficial: inventario Raw/Bronze, SIAF, SISMEPRE, RENAMU, categorias, conteos, esquemas, particiones, trazabilidad y ocho dimensiones de calidad. |
 | [`notebooks/silver/01_Silver_Pipeline_Parcial.ipynb`](notebooks/silver/01_Silver_Pipeline_Parcial.ipynb) | Evidencia Silver: limpieza, estandarizacion, calidad, cuarentena y datasets curados. |
-| [`notebooks/silver/02_Silver_Data_Profiling.ipynb`](notebooks/silver/02_Silver_Data_Profiling.ipynb) | Profiling detallado de Silver: tipos, duplicados, nulos, cuarentena y trazabilidad. |
+| [`notebooks/silver/02_Silver_Data_Profiling.ipynb`](notebooks/silver/02_Silver_Data_Profiling.ipynb) | Profiling Silver profesional: duplicados, claves de negocio, nulos, dominios, cardinalidad, joins, cobertura de categorias, cuarentena, trazabilidad y reglas de negocio. |
 | [`notebooks/gold/01_Gold_Pipeline_Parcial.ipynb`](notebooks/gold/01_Gold_Pipeline_Parcial.ipynb) | Evidencia Gold: constelacion de hechos, dimensiones normalizadas, cobertura municipal, KPIs y mapeo de dashboards. |
 | [`notebooks/hive/01_Hive_Lab_Municipal.ipynb`](notebooks/hive/01_Hive_Lab_Municipal.ipynb) | Evidencia Hive/HDFS/Metastore, SQL analitico y conexion Power BI por ODBC. |
 

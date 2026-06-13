@@ -98,7 +98,9 @@ class GoldTransformService:
                 "sismepre_count": curated.filter("has_sismepre").count(),
                 "renamu_match_count": curated.filter("renamu_match").count(),
                 "category_matched_count": curated.filter("categoria_match_status = 'matched'").count(),
-                "category_ambiguous_count": curated.filter("categoria_match_status = 'ambiguous'").count(),
+                "category_resolved_lima_count": curated.filter("categoria_match_status = 'resolved_multiple_lima'").count(),
+                "category_resolved_non_lima_count": curated.filter("categoria_match_status = 'resolved_multiple_non_lima'").count(),
+                "category_excluded_count": curated.filter("exclude_from_gold_scope").count(),
                 **scope_result.metrics,
             },
         )
@@ -428,7 +430,8 @@ class GoldTransformService:
                 municipalities.select(
                     "SEC_EJEC", "UBIGEO", "MUNICIPALIDAD_NOMBRE", "DEPARTAMENTO_NOMBRE",
                     "PROVINCIA_NOMBRE", "DISTRITO_NOMBRE", "categoria_municipalidad",
-                    "categoria_match_status", "in_scope_presentacion",
+                    "categoria_match_status", "categoria_rule_applied",
+                    "exclude_from_gold_scope", "in_scope_presentacion",
                 ),
                 "SEC_EJEC",
                 "left",
@@ -535,6 +538,8 @@ class GoldTransformService:
         master = self.spark.read.parquet(str(master_path))
         if "in_scope_presentacion" in master.columns and (self.scope_metrics or {}).get("scope_status") == "aplicado":
             master = master.filter("in_scope_presentacion")
+        if "exclude_from_gold_scope" in master.columns:
+            master = master.filter(~F.col("exclude_from_gold_scope"))
         return master.select("SEC_EJEC", "UBIGEO").where("SEC_EJEC IS NOT NULL AND UBIGEO IS NOT NULL").dropDuplicates(["SEC_EJEC"])
 
     def _filter_scope(self, df: DataFrame) -> DataFrame:
@@ -546,10 +551,15 @@ class GoldTransformService:
         master_source = self.spark.read.parquet(str(master_path))
         if "in_scope_presentacion" not in master_source.columns:
             return df
-        master = master_source.select("SEC_EJEC", "in_scope_presentacion")
+        select_columns = ["SEC_EJEC", "in_scope_presentacion"]
+        if "exclude_from_gold_scope" in master_source.columns:
+            select_columns.append("exclude_from_gold_scope")
+        master = master_source.select(*select_columns)
+        if "exclude_from_gold_scope" in master.columns:
+            master = master.filter(~F.col("exclude_from_gold_scope"))
         scope_state = self.scope_metrics or {}
         if scope_state.get("scope_status") != "aplicado":
-            return df
+            return df.join(master.select("SEC_EJEC"), "SEC_EJEC", "inner")
         return df.join(master.filter("in_scope_presentacion").select("SEC_EJEC"), "SEC_EJEC", "inner")
 
     def _write_scope_metrics(self, metrics: Dict[str, Any]) -> None:
@@ -571,6 +581,8 @@ class GoldTransformService:
                 municipalities
                 .withColumn("categoria_municipalidad", F.lit(None).cast("string"))
                 .withColumn("categoria_match_status", F.lit("missing_category_source"))
+                .withColumn("categoria_rule_applied", F.lit("missing_category_source"))
+                .withColumn("exclude_from_gold_scope", F.lit(False))
             )
             self._write_category_metrics({
                 "category_status": "missing_category_source",
@@ -578,62 +590,53 @@ class GoldTransformService:
                 "category_source_count": 0,
                 "matched_count": 0,
                 "unmatched_count": 0,
-                "ambiguous_count": 0,
+                "resolved_multiple_lima_count": 0,
+                "resolved_multiple_non_lima_count": 0,
+                "excluded_count": 0,
             })
             return result
 
-        categories = (
-            self.spark.read.parquet(str(category_path))
-            .select("municipalidad_categoria_norm", "categoria_municipalidad")
-            .dropDuplicates(["municipalidad_categoria_norm"])
-        )
-        keyed = municipalities.withColumn(
-            "_municipalidad_categoria_norm",
-            self._normalize_municipality_name(F.col("MUNICIPALIDAD_NOMBRE")),
-        )
-        ambiguous_keys = (
-            keyed.groupBy("_municipalidad_categoria_norm")
-            .agg(F.count("*").alias("_gold_name_count"))
-            .filter(F.col("_gold_name_count") > 1)
-            .select("_municipalidad_categoria_norm")
-        )
+        category_source = self.spark.read.parquet(str(category_path))
+        if "SEC_EJEC" in category_source.columns:
+            category_columns = [
+                "SEC_EJEC", "categoria_municipalidad", "categoria_match_status",
+                "categoria_rule_applied", "exclude_from_gold_scope",
+            ]
+            categories = category_source.select(
+                *[column for column in category_columns if column in category_source.columns]
+            ).dropDuplicates(["SEC_EJEC"])
+            enriched = (
+                municipalities.join(categories, "SEC_EJEC", "left")
+                .withColumn("categoria_match_status", F.coalesce(F.col("categoria_match_status"), F.lit("unmatched")))
+                .withColumn("categoria_rule_applied", F.coalesce(F.col("categoria_rule_applied"), F.lit("no_master_match")))
+                .withColumn("exclude_from_gold_scope", F.coalesce(F.col("exclude_from_gold_scope"), F.lit(True)))
+            )
+            self._write_category_metrics({
+                "category_status": "aplicado_desde_silver",
+                "total_municipalities": enriched.count(),
+                "category_source_count": categories.count(),
+                "matched_count": enriched.filter("categoria_match_status = 'matched'").count(),
+                "resolved_multiple_lima_count": enriched.filter("categoria_match_status = 'resolved_multiple_lima'").count(),
+                "resolved_multiple_non_lima_count": enriched.filter("categoria_match_status = 'resolved_multiple_non_lima'").count(),
+                "unmatched_count": enriched.filter("categoria_match_status = 'unmatched'").count(),
+                "excluded_count": enriched.filter("exclude_from_gold_scope").count(),
+            })
+            return enriched
+
         enriched = (
-            keyed.join(
-                categories,
-                keyed["_municipalidad_categoria_norm"] == categories["municipalidad_categoria_norm"],
-                "left",
-            )
-            .join(
-                ambiguous_keys.withColumn("_is_ambiguous_category_key", F.lit(True)),
-                "_municipalidad_categoria_norm",
-                "left",
-            )
-            .withColumn("_has_category", F.col("municipalidad_categoria_norm").isNotNull())
-            .withColumn("_is_ambiguous_category_key", F.coalesce(F.col("_is_ambiguous_category_key"), F.lit(False)))
-            .withColumn(
-                "categoria_match_status",
-                F.when(F.col("_has_category") & F.col("_is_ambiguous_category_key"), F.lit("ambiguous"))
-                .when(F.col("_has_category"), F.lit("matched"))
-                .otherwise(F.lit("unmatched")),
-            )
-            .withColumn(
-                "categoria_municipalidad",
-                F.when(F.col("categoria_match_status") == "matched", F.col("categoria_municipalidad")),
-            )
-            .drop(
-                "municipalidad_categoria_norm",
-                "_municipalidad_categoria_norm",
-                "_is_ambiguous_category_key",
-                "_has_category",
-            )
+            municipalities
+            .withColumn("categoria_municipalidad", F.lit(None).cast("string"))
+            .withColumn("categoria_match_status", F.lit("category_source_without_sec_ejec"))
+            .withColumn("categoria_rule_applied", F.lit("category_source_without_sec_ejec"))
+            .withColumn("exclude_from_gold_scope", F.lit(True))
         )
         self._write_category_metrics({
-            "category_status": "aplicado",
+            "category_status": "category_source_without_sec_ejec",
             "total_municipalities": enriched.count(),
-            "category_source_count": categories.count(),
-            "matched_count": enriched.filter("categoria_match_status = 'matched'").count(),
-            "unmatched_count": enriched.filter("categoria_match_status = 'unmatched'").count(),
-            "ambiguous_count": enriched.filter("categoria_match_status = 'ambiguous'").count(),
+            "category_source_count": category_source.count(),
+            "matched_count": 0,
+            "unmatched_count": enriched.count(),
+            "excluded_count": enriched.count(),
         })
         return enriched
 

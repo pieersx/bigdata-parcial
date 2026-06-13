@@ -160,13 +160,20 @@ class SilverTransformServiceTest(unittest.TestCase):
         self.assertEqual(0, clean_result["records_quarantined"])
         self.assertFalse((self.data_lake.silver_path / "_quarantine" / "sismepre_respuestas_curated").exists())
 
-    def test_category_dimension_normalizes_and_quarantines_conflicts(self):
+    def test_category_dataset_resolves_multiple_categories_with_business_rules(self):
+        self.spark.createDataFrame(
+            [
+                {"SEC_EJEC": "300001", "UBIGEO": "010101", "MUNICIPALIDAD_NOMBRE": "MUNICIPALIDAD DISTRITAL DE CHETO", "DEPARTAMENTO_NOMBRE": "AMAZONAS", "PROVINCIA_NOMBRE": "CHACHAPOYAS", "DISTRITO_NOMBRE": "CHETO"},
+                {"SEC_EJEC": "300002", "UBIGEO": "150101", "MUNICIPALIDAD_NOMBRE": "MUNICIPALIDAD DISTRITAL DE CONFLICTO", "DEPARTAMENTO_NOMBRE": "LIMA", "PROVINCIA_NOMBRE": "LIMA", "DISTRITO_NOMBRE": "CONFLICTO"},
+                {"SEC_EJEC": "300003", "UBIGEO": "010102", "MUNICIPALIDAD_NOMBRE": "MUNICIPALIDAD DISTRITAL DE CONFLICTO", "DEPARTAMENTO_NOMBRE": "AMAZONAS", "PROVINCIA_NOMBRE": "CHACHAPOYAS", "DISTRITO_NOMBRE": "CONFLICTO"},
+                {"SEC_EJEC": "300004", "UBIGEO": "010103", "MUNICIPALIDAD_NOMBRE": "MUNICIPALIDAD DISTRITAL DE SIN CATEGORIA", "DEPARTAMENTO_NOMBRE": "AMAZONAS", "PROVINCIA_NOMBRE": "CHACHAPOYAS", "DISTRITO_NOMBRE": "SIN CATEGORIA"},
+            ]
+        ).write.mode("overwrite").parquet(str(self.data_lake.silver_path / "municipalidades_curated"))
         self.write_bronze(
             "categorias_municipalidades",
             [
                 {"Municipalidad": "M. D. DE CHETO", "Categoria": "F"},
                 {"Municipalidad": "Municipalidad Distrital de Cheto", "Categoria": "F"},
-                {"Municipalidad": "M. P. DE CHACHAPOYAS", "Categoria": "A"},
                 {"Municipalidad": "M. D. DE CONFLICTO", "Categoria": "B"},
                 {"Municipalidad": "M. D. DE CONFLICTO", "Categoria": "C"},
                 {"Municipalidad": "", "Categoria": "A"},
@@ -178,11 +185,16 @@ class SilverTransformServiceTest(unittest.TestCase):
         published = self.spark.read.parquet(result["storage"]["path"])
         quarantined = self.spark.read.parquet(result["quarantine"]["path"])
 
-        self.assertEqual(2, result["records_published"])
-        self.assertEqual(4, result["records_quarantined"])
-        self.assertEqual("M D DE CHETO", published.filter("categoria_municipalidad = 'F'").first()["municipalidad_categoria_norm"])
+        self.assertEqual(4, result["records_published"])
+        self.assertEqual(2, result["records_quarantined"])
+        self.assertEqual("F", published.filter("SEC_EJEC = '300001'").first()["categoria_municipalidad"])
+        self.assertEqual("C", published.filter("SEC_EJEC = '300002'").first()["categoria_municipalidad"])
+        self.assertEqual("multiple_master_lima_to_c", published.filter("SEC_EJEC = '300002'").first()["categoria_rule_applied"])
+        self.assertEqual("G", published.filter("SEC_EJEC = '300003'").first()["categoria_municipalidad"])
+        self.assertEqual("multiple_master_non_lima_to_g", published.filter("SEC_EJEC = '300003'").first()["categoria_rule_applied"])
+        self.assertTrue(published.filter("SEC_EJEC = '300004'").first()["exclude_from_gold_scope"])
         reasons = {row["_quarantine_reason"] for row in quarantined.select("_quarantine_reason").collect()}
-        self.assertEqual({"invalid_category_or_name", "conflicting_duplicate_category"}, reasons)
+        self.assertEqual({"invalid_category_or_name"}, reasons)
 
 
 if __name__ == "__main__":

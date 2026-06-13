@@ -291,29 +291,97 @@ class SilverTransformService:
             "_quarantine_reason", F.lit("invalid_category_or_name")
         )
         valid = curated.filter(~invalid)
-        conflicts = (
+
+        category_master = (
             valid.groupBy("municipalidad_categoria_norm")
-            .agg(F.countDistinct("categoria_municipalidad").alias("_category_count"))
-            .filter(F.col("_category_count") > 1)
-            .select("municipalidad_categoria_norm")
+            .agg(
+                F.first("municipalidad_categoria_raw", ignorenulls=True).alias("municipalidad_categoria_raw"),
+                F.array_sort(F.collect_set("categoria_municipalidad")).alias("categorias_maestro"),
+                F.countDistinct("categoria_municipalidad").alias("categoria_distinct_count"),
+                *[
+                    F.first(column, ignorenulls=True).alias(column)
+                    for column in TRACE_COLUMNS
+                    if column in valid.columns
+                ],
+            )
         )
-        conflict_quarantine = valid.join(conflicts, "municipalidad_categoria_norm", "inner").withColumn(
-            "_quarantine_reason", F.lit("conflicting_duplicate_category")
-        )
+
+        municipal_path = self.storage.data_lake.silver_path / "municipalidades_curated"
+        if municipal_path.exists() and any(municipal_path.rglob("*.parquet")):
+            municipalities = (
+                self.spark.read.parquet(str(municipal_path))
+                .select(
+                    "SEC_EJEC", "UBIGEO", "MUNICIPALIDAD_NOMBRE",
+                    "DEPARTAMENTO_NOMBRE", "PROVINCIA_NOMBRE", "DISTRITO_NOMBRE",
+                )
+                .dropDuplicates(["SEC_EJEC"])
+                .withColumn(
+                    "municipalidad_categoria_norm",
+                    self._normalize_municipality_name(F.col("MUNICIPALIDAD_NOMBRE")),
+                )
+            )
+            conformed = (
+                municipalities.join(category_master, "municipalidad_categoria_norm", "left")
+                .withColumn("_has_master_category", F.col("categoria_distinct_count").isNotNull())
+                .withColumn("_is_lima", self._is_lima_municipality())
+                .withColumn(
+                    "categoria_municipalidad",
+                    F.when(F.col("categoria_distinct_count") == 1, F.element_at("categorias_maestro", 1))
+                    .when(F.col("categoria_distinct_count") > 1, F.when(F.col("_is_lima"), F.lit("C")).otherwise(F.lit("G"))),
+                )
+                .withColumn(
+                    "categoria_match_status",
+                    F.when(~F.col("_has_master_category"), F.lit("unmatched"))
+                    .when(F.col("categoria_distinct_count") == 1, F.lit("matched"))
+                    .when(F.col("_is_lima"), F.lit("resolved_multiple_lima"))
+                    .otherwise(F.lit("resolved_multiple_non_lima")),
+                )
+                .withColumn(
+                    "categoria_rule_applied",
+                    F.when(~F.col("_has_master_category"), F.lit("no_master_match"))
+                    .when(F.col("categoria_distinct_count") == 1, F.lit("unique_master_category"))
+                    .when(F.col("_is_lima"), F.lit("multiple_master_lima_to_c"))
+                    .otherwise(F.lit("multiple_master_non_lima_to_g")),
+                )
+                .withColumn("exclude_from_gold_scope", ~F.col("_has_master_category"))
+                .drop("_has_master_category", "_is_lima")
+            )
+        else:
+            conformed = (
+                category_master
+                .withColumn(
+                    "categoria_municipalidad",
+                    F.when(F.col("categoria_distinct_count") == 1, F.element_at("categorias_maestro", 1)),
+                )
+                .withColumn(
+                    "categoria_match_status",
+                    F.when(F.col("categoria_distinct_count") == 1, F.lit("matched"))
+                    .otherwise(F.lit("requires_municipal_context")),
+                )
+                .withColumn(
+                    "categoria_rule_applied",
+                    F.when(F.col("categoria_distinct_count") == 1, F.lit("unique_master_category"))
+                    .otherwise(F.lit("multiple_master_requires_municipal_context")),
+                )
+                .withColumn("exclude_from_gold_scope", F.lit(False))
+            )
+
         conformed = (
-            valid.join(conflicts, "municipalidad_categoria_norm", "left_anti")
-            .dropDuplicates(["municipalidad_categoria_norm", "categoria_municipalidad"])
+            conformed
+            .withColumn("categoria_source", F.lit("CategoriasMunicipalidades.csv"))
+            .dropDuplicates(["SEC_EJEC"] if "SEC_EJEC" in conformed.columns else ["municipalidad_categoria_norm"])
         )
-        quarantine = invalid_quarantine.unionByName(conflict_quarantine, allowMissingColumns=True)
         return self._publish(
             "categorias_municipalidades_curated",
             conformed,
-            required_columns=["municipalidad_categoria_raw", "categoria_municipalidad", "municipalidad_categoria_norm"],
-            unique_keys=["municipalidad_categoria_norm"],
-            quarantine=quarantine,
+            required_columns=["municipalidad_categoria_norm", "categoria_match_status", "categoria_rule_applied"],
+            unique_keys=["SEC_EJEC"] if "SEC_EJEC" in conformed.columns else ["municipalidad_categoria_norm"],
+            quarantine=invalid_quarantine,
             details={
-                "conflicting_duplicate_keys": conflicts.count(),
-                "valid_categories": conformed.count(),
+                "category_master_keys": category_master.count(),
+                "resolved_multiple_lima": conformed.filter("categoria_rule_applied = 'multiple_master_lima_to_c'").count(),
+                "resolved_multiple_non_lima": conformed.filter("categoria_rule_applied = 'multiple_master_non_lima_to_g'").count(),
+                "unmatched_municipalities": conformed.filter("categoria_match_status = 'unmatched'").count(),
             },
         )
 
@@ -436,3 +504,11 @@ class SilverTransformService:
         normalized = F.regexp_replace(normalized, r"[^A-Z0-9]+", " ")
         normalized = F.regexp_replace(normalized, r"\s+", " ")
         return F.trim(normalized)
+
+    def _is_lima_municipality(self):
+        geo_columns = ["DEPARTAMENTO_NOMBRE", "PROVINCIA_NOMBRE", "DISTRITO_NOMBRE"]
+        expressions = [
+            F.upper(F.trim(F.coalesce(F.col(column).cast("string"), F.lit("")))) == F.lit("LIMA")
+            for column in geo_columns
+        ]
+        return self._any(expressions)

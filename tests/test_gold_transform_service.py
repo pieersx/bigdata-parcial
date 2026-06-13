@@ -141,7 +141,7 @@ class GoldTransformServiceTest(unittest.TestCase):
         self.assertEqual(1, metrics["duplicate_count"])
         self.assertEqual(1, metrics["not_found_count"])
 
-    def test_category_enrichment_is_conservative(self):
+    def test_category_enrichment_uses_silver_resolved_rules(self):
         self.write_silver(
             "ingresos_municipales_curated",
             [
@@ -164,8 +164,10 @@ class GoldTransformServiceTest(unittest.TestCase):
         self.write_silver(
             "categorias_municipalidades_curated",
             [
-                {"municipalidad_categoria_raw": "M. D. DE CHETO", "categoria_municipalidad": "F", "municipalidad_categoria_norm": "M D DE CHETO"},
-                {"municipalidad_categoria_raw": "M. D. DE ACO", "categoria_municipalidad": "B", "municipalidad_categoria_norm": "M D DE ACO"},
+                {"SEC_EJEC": "300001", "municipalidad_categoria_raw": "M. D. DE CHETO", "categoria_municipalidad": "F", "municipalidad_categoria_norm": "M D DE CHETO", "categoria_match_status": "matched", "categoria_rule_applied": "unique_master_category", "exclude_from_gold_scope": False},
+                {"SEC_EJEC": "300002", "municipalidad_categoria_raw": "M. D. DE ACO", "categoria_municipalidad": "C", "municipalidad_categoria_norm": "M D DE ACO", "categoria_match_status": "resolved_multiple_lima", "categoria_rule_applied": "multiple_master_lima_to_c", "exclude_from_gold_scope": False},
+                {"SEC_EJEC": "300003", "municipalidad_categoria_raw": "M. D. DE ACO", "categoria_municipalidad": "G", "municipalidad_categoria_norm": "M D DE ACO", "categoria_match_status": "resolved_multiple_non_lima", "categoria_rule_applied": "multiple_master_non_lima_to_g", "exclude_from_gold_scope": False},
+                {"SEC_EJEC": "300004", "municipalidad_categoria_raw": None, "categoria_municipalidad": None, "municipalidad_categoria_norm": "M D DE SIN CATEGORIA", "categoria_match_status": "unmatched", "categoria_rule_applied": "no_master_match", "exclude_from_gold_scope": True},
             ],
         )
 
@@ -175,10 +177,12 @@ class GoldTransformServiceTest(unittest.TestCase):
         self.assertEqual(4, result["records_published"])
         self.assertEqual("F", published.filter("SEC_EJEC = '300001'").first()["categoria_municipalidad"])
         self.assertEqual("matched", published.filter("SEC_EJEC = '300001'").first()["categoria_match_status"])
-        self.assertIsNone(published.filter("SEC_EJEC = '300002'").first()["categoria_municipalidad"])
-        self.assertEqual("ambiguous", published.filter("SEC_EJEC = '300002'").first()["categoria_match_status"])
-        self.assertEqual("ambiguous", published.filter("SEC_EJEC = '300003'").first()["categoria_match_status"])
+        self.assertEqual("C", published.filter("SEC_EJEC = '300002'").first()["categoria_municipalidad"])
+        self.assertEqual("resolved_multiple_lima", published.filter("SEC_EJEC = '300002'").first()["categoria_match_status"])
+        self.assertEqual("G", published.filter("SEC_EJEC = '300003'").first()["categoria_municipalidad"])
+        self.assertEqual("resolved_multiple_non_lima", published.filter("SEC_EJEC = '300003'").first()["categoria_match_status"])
         self.assertEqual("unmatched", published.filter("SEC_EJEC = '300004'").first()["categoria_match_status"])
+        self.assertTrue(published.filter("SEC_EJEC = '300004'").first()["exclude_from_gold_scope"])
 
     def test_missing_category_source_does_not_break_gold_master(self):
         self.write_silver(
