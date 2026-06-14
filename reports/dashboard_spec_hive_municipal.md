@@ -10,6 +10,9 @@ driver, importar las tablas materializadas `pbi_dashboard_01` a
 Todas las paginas usan `categoria_municipalidad` como segmentador principal,
 derivado de `CategoriasMunicipalidades.csv`.
 
+Para indicadores ejecutivos generales tambien se puede cargar
+`pbi_kpi_resumen_ejecutivo`, que materializa el mart Gold de KPIs en Parquet.
+
 ## Modelo
 
 El modelo analitico final es una constelacion de hechos en Gold:
@@ -19,6 +22,8 @@ El modelo analitico final es una constelacion de hechos en Gold:
 - Hechos: ingresos, clasificador, predial, cumplimiento SISMEPRE, RENAMU
   gestion tributaria y RENAMU software.
 - Mart: `mart_dashboard_municipal` para priorizacion.
+- Mart KPI: `mart_kpi_resumen_ejecutivo` para tarjetas ejecutivas y validacion
+  de indicadores transversales.
 
 ## Estilo Visual
 
@@ -160,13 +165,30 @@ Recaudacion Por Personal = DIVIDE([Recaudacion Total], [Personal Municipal])
 Recaudacion Predial = SUM('03_predial_vs_efectividad'[recaudacion_predial_total])
 Emision Predial = SUM('03_predial_vs_efectividad'[emision_predial_total])
 Efectividad Predial = DIVIDE([Recaudacion Predial], [Emision Predial])
+KPI Ejecucion Recaudacion = AVERAGE('kpi_resumen_ejecutivo'[kpi_pct_ejecucion_recaudacion])
+KPI Variacion PIM PIA = SUM('kpi_resumen_ejecutivo'[kpi_variacion_pim_pia])
+KPI Capacidad Software = AVERAGE('kpi_resumen_ejecutivo'[kpi_capacidad_software_pct])
 ```
+
+## KPIs Ejecutivos De Apoyo
+
+Tabla opcional: `pbi_kpi_resumen_ejecutivo`
+
+Usala para tarjetas generales, validaciones o una pagina de apoyo tecnica, no
+como reemplazo de las seis paginas principales.
+
+- `% ejecucion de recaudacion`: avance de ingresos contra PIM.
+- `variacion PIM - PIA`: cambios presupuestarios.
+- `efectividad predial`: cobranza predial contra emision.
+- `capacidad software tributario`: cobertura SRTM, rentas y catastro.
 
 ## Entrega Recomendada
 
 1. Ejecutar Bronze, Silver y Gold.
 2. Ejecutar `scripts/hive_bootstrap.py`.
-3. Ejecutar `scripts/export_powerbi_from_hive.py`.
-4. En Power BI Desktop, importar `powerbi_municipal_hive.xlsx` o conectar a
+3. Ejecutar `scripts/materialize_powerbi_hive_tables.py` para crear
+   `pbi_dashboard_01..06` y `pbi_kpi_resumen_ejecutivo`.
+4. Ejecutar `scripts/export_powerbi_from_hive.py` si se desea workbook Excel.
+5. En Power BI Desktop, importar `powerbi_municipal_hive.xlsx` o conectar a
    HiveServer2.
-5. Crear las seis paginas con los visuales anteriores.
+6. Crear las seis paginas con los visuales anteriores.

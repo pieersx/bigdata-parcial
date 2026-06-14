@@ -23,11 +23,13 @@ GOLD_TABLES = [
     "fact_renamu_gestion_tributaria",
     "fact_renamu_software_at",
     "mart_dashboard_municipal",
+    "mart_kpi_resumen_ejecutivo",
     "fact_calidad_datos",
 ]
 
 SILVER_TABLES = [
     "municipalidades_curated",
+    "renamu_curated",
     "ingresos_municipales_curated",
     "predial_esat_curated",
     "sismepre_respuestas_curated",

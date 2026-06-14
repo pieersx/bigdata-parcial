@@ -36,6 +36,8 @@ class HiveAssetsTest(unittest.TestCase):
         for index in range(1, 7):
             self.assertIn(f"pbi_dashboard_0{index}", sql)
             self.assertIn(f"pbi_dashboard_0{index}", materializer)
+        self.assertIn("pbi_kpi_resumen_ejecutivo", sql)
+        self.assertIn("pbi_kpi_resumen_ejecutivo", materializer)
 
     def test_hive_lab_covers_required_topics(self):
         sql = (ROOT / "sql/hive/04_lab_queries.sql").read_text(encoding="utf-8").lower()

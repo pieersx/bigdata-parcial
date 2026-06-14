@@ -111,6 +111,31 @@ POWERBI_TABLES = {
             CAST(prioridad_intervencion AS STRING) AS prioridad_intervencion
         FROM municipal_gold.vw_dashboard_06_priorizacion_municipal
     """,
+    "pbi_kpi_resumen_ejecutivo": """
+        SELECT
+            CAST(year AS INT) AS year,
+            CAST(sec_ejec AS STRING) AS sec_ejec,
+            CAST(ubigeo AS STRING) AS ubigeo,
+            CAST(municipalidad_nombre AS STRING) AS municipalidad_nombre,
+            CAST(departamento_nombre AS STRING) AS departamento_nombre,
+            CAST(provincia_nombre AS STRING) AS provincia_nombre,
+            CAST(distrito_nombre AS STRING) AS distrito_nombre,
+            CAST(categoria_municipalidad AS STRING) AS categoria_municipalidad,
+            CAST(pia_total AS DOUBLE) AS pia_total,
+            CAST(pim_total AS DOUBLE) AS pim_total,
+            CAST(recaudacion_total AS DOUBLE) AS recaudacion_total,
+            CAST(kpi_pct_ejecucion_recaudacion AS DOUBLE) AS kpi_pct_ejecucion_recaudacion,
+            CAST(kpi_variacion_pim_pia AS DOUBLE) AS kpi_variacion_pim_pia,
+            CAST(recaudacion_predial_total AS DOUBLE) AS recaudacion_predial_total,
+            CAST(emision_predial_total AS DOUBLE) AS emision_predial_total,
+            CAST(saldo_predial_total AS DOUBLE) AS saldo_predial_total,
+            CAST(kpi_efectividad_predial AS DOUBLE) AS kpi_efectividad_predial,
+            CAST(kpi_brecha_predial AS DOUBLE) AS kpi_brecha_predial,
+            CAST(personal_municipal_total AS INT) AS personal_municipal_total,
+            CAST(kpi_capacidad_software_pct AS DOUBLE) AS kpi_capacidad_software_pct,
+            CAST(prioridad_intervencion AS STRING) AS prioridad_intervencion
+        FROM municipal_gold.vw_kpi_resumen_ejecutivo
+    """,
 }
 
 SQL_DIR = Path(__file__).resolve().parents[1] / "sql" / "hive"
@@ -121,6 +146,7 @@ TEMP_DASHBOARD_VIEWS = [
     "vw_dashboard_04_distribucion_efectividad",
     "vw_dashboard_05_software_tributario",
     "vw_dashboard_06_priorizacion_municipal",
+    "vw_kpi_resumen_ejecutivo",
 ]
 
 

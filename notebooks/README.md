@@ -15,5 +15,7 @@ Los notebooks Bronze separados por fuente fueron retirados para no duplicar
 evidencia durante la exposicion.
 
 Power BI debe consumir las tablas Hive `pbi_dashboard_01` a
-`pbi_dashboard_06`; las vistas `vw_dashboard_*` solo se usan internamente para
-materializar esas tablas y luego se eliminan del catalogo activo.
+`pbi_dashboard_06`; opcionalmente puede cargar `pbi_kpi_resumen_ejecutivo` para
+tarjetas ejecutivas. Las vistas `vw_dashboard_*` y `vw_kpi_resumen_ejecutivo`
+solo se usan internamente para materializar esas tablas y luego se eliminan del
+catalogo activo.

@@ -16,6 +16,8 @@ TRACE_COLUMNS = [
     "_bronze_ingestion_ts",
     "_bronze_ingestion_date",
 ]
+RENAMU_GESTION_COLUMNS = ["P19M_T", "P22_AT2", "P22_AT3", "P22_C2", "P22_C3"]
+RENAMU_SOFTWARE_COLUMNS = ["P16_5", "P17_2", "P17_3"]
 
 
 class SilverTransformService:
@@ -74,6 +76,46 @@ class SilverTransformService:
             required_columns=["SEC_EJEC", "UBIGEO", "MUNICIPALIDAD_NOMBRE"],
             unique_keys=["SEC_EJEC", "UBIGEO"],
             details={"renamu_match_count": curated.filter("renamu_match").count()},
+        )
+
+    def build_renamu_curated(self) -> Dict[str, Any]:
+        source = self._read("renamu")
+        curated = (
+            source.select(
+                self._code("Ubigeo", 6).alias("UBIGEO"),
+                F.col("Año").cast("int").alias("ANO_RENAMU"),
+                F.col("idmunici").cast("string").alias("idmunici"),
+                F.trim(F.col("Tipomuni")).alias("tipo_municipalidad_renamu"),
+                self._upper("Departamento").alias("DEPARTAMENTO_NOMBRE"),
+                self._upper("Provincia").alias("PROVINCIA_NOMBRE"),
+                self._upper("Distrito").alias("DISTRITO_NOMBRE"),
+                self._int_or_zero("P19M_T").alias("personal_municipal_total"),
+                self._is_selected("P22_AT2").alias("requiere_asistencia_at"),
+                self._is_selected("P22_AT3").alias("requiere_asistencia_catastro"),
+                self._is_selected("P22_C2").alias("requiere_capacitacion_at"),
+                self._is_selected("P22_C3").alias("requiere_capacitacion_catastro"),
+                self._is_selected("P16_5").alias("usa_srtm_estado"),
+                self._is_selected("P17_2").alias("usa_software_rentas_at"),
+                self._is_selected("P17_3").alias("usa_software_catastro"),
+                *self._existing_raw_columns(source, RENAMU_GESTION_COLUMNS + RENAMU_SOFTWARE_COLUMNS),
+                *self._existing_trace_columns(source),
+            )
+            .withColumn(
+                "usa_al_menos_un_software_at",
+                F.col("usa_srtm_estado") | F.col("usa_software_rentas_at") | F.col("usa_software_catastro"),
+            )
+            .withColumn("year", F.col("ANO_RENAMU").cast("string"))
+        )
+        invalid = self._any_null(["UBIGEO", "ANO_RENAMU"])
+        quarantine = curated.filter(invalid).withColumn("_quarantine_reason", F.lit("missing_renamu_key_or_year"))
+        conformed = curated.filter(~invalid).dropDuplicates(["UBIGEO", "ANO_RENAMU"])
+        return self._publish(
+            "renamu_curated",
+            conformed,
+            required_columns=["UBIGEO", "ANO_RENAMU", "personal_municipal_total"],
+            unique_keys=["UBIGEO", "ANO_RENAMU"],
+            quarantine=quarantine,
+            partition_columns=["year"],
         )
 
     def build_ingresos_municipales_curated(self) -> Dict[str, Any]:
@@ -492,6 +534,17 @@ class SilverTransformService:
             F.to_date(value, "d/M/yyyy HH:mm:ss"),
             F.to_date(value, "d/M/yyyy"),
         )
+
+    def _int_or_zero(self, column: str):
+        value = F.trim(F.col(column).cast("string"))
+        return F.when(value.rlike(r"^-?\d+$"), value.cast("int")).otherwise(F.lit(0))
+
+    def _is_selected(self, column: str):
+        value = F.trim(F.col(column).cast("string"))
+        return F.when(value.rlike(r"^-?\d+$"), value.cast("int") > 0).otherwise(F.lit(False))
+
+    def _existing_raw_columns(self, df: DataFrame, columns: List[str]):
+        return [F.col(column).cast("string").alias(f"{column}_raw") for column in columns if column in df.columns]
 
     def _normalize_municipality_name(self, value):
         normalized = F.upper(F.trim(value))

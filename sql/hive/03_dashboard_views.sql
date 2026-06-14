@@ -198,3 +198,28 @@ SELECT
         ELSE 'BAJA'
     END AS prioridad_intervencion
 FROM mart_dashboard_municipal mart;
+
+CREATE OR REPLACE VIEW vw_kpi_resumen_ejecutivo AS
+SELECT
+    year,
+    SEC_EJEC,
+    UBIGEO,
+    MUNICIPALIDAD_NOMBRE,
+    DEPARTAMENTO_NOMBRE,
+    PROVINCIA_NOMBRE,
+    DISTRITO_NOMBRE,
+    categoria_municipalidad,
+    pia_total,
+    pim_total,
+    recaudacion_total,
+    kpi_pct_ejecucion_recaudacion,
+    kpi_variacion_pim_pia,
+    recaudacion_predial_total,
+    emision_predial_total,
+    saldo_predial_total,
+    kpi_efectividad_predial,
+    kpi_brecha_predial,
+    personal_municipal_total,
+    kpi_capacidad_software_pct,
+    prioridad_intervencion
+FROM mart_kpi_resumen_ejecutivo;

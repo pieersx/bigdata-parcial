@@ -61,6 +61,7 @@ class SilverPipeline:
 
         builders = [
             ("municipalidades_curated", service.build_municipalidades_curated),
+            ("renamu_curated", service.build_renamu_curated),
             ("ingresos_municipales_curated", service.build_ingresos_municipales_curated),
             ("predial_esat_curated", service.build_predial_esat_curated),
             ("sismepre_respuestas_curated", service.build_sismepre_respuestas_curated),

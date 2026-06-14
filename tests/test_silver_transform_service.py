@@ -108,6 +108,40 @@ class SilverTransformServiceTest(unittest.TestCase):
         self.assertEqual(1, published.filter("renamu_match = false").count())
         self.assertEqual("MUNI A", published.filter("SEC_EJEC = '000001'").first()["MUNICIPALIDAD_NOMBRE"])
 
+    def test_renamu_curated_publishes_clean_parquet_dataset(self):
+        self.write_bronze(
+            "renamu",
+            [
+                {
+                    "Ubigeo": "10101", "Año": "2022", "idmunici": "1", "Tipomuni": " Provincial ",
+                    "Departamento": " amazonas ", "Provincia": " chachapoyas ", "Distrito": " chachapoyas ",
+                    "P19M_T": "12", "P22_AT2": "1", "P22_AT3": "0", "P22_C2": "1", "P22_C3": "",
+                    "P16_5": "1", "P17_2": "0", "P17_3": "1",
+                },
+                {
+                    "Ubigeo": "", "Año": "2022", "idmunici": "2", "Tipomuni": "Distrital",
+                    "Departamento": "x", "Provincia": "x", "Distrito": "x",
+                    "P19M_T": "x", "P22_AT2": "0", "P22_AT3": "0", "P22_C2": "0", "P22_C3": "0",
+                    "P16_5": "0", "P17_2": "0", "P17_3": "0",
+                },
+            ],
+        )
+
+        result = self.service.build_renamu_curated()
+        published = self.spark.read.parquet(result["storage"]["path"])
+        quarantined = self.spark.read.parquet(result["quarantine"]["path"])
+        row = published.first()
+
+        self.assertEqual(1, result["records_published"])
+        self.assertEqual(1, result["records_quarantined"])
+        self.assertEqual("010101", row["UBIGEO"])
+        self.assertEqual(2022, row["ANO_RENAMU"])
+        self.assertEqual("AMAZONAS", row["DEPARTAMENTO_NOMBRE"])
+        self.assertTrue(row["usa_srtm_estado"])
+        self.assertTrue(row["usa_software_catastro"])
+        self.assertTrue(row["usa_al_menos_un_software_at"])
+        self.assertEqual("missing_renamu_key_or_year", quarantined.first()["_quarantine_reason"])
+
     def test_predial_invalid_metric_goes_to_quarantine_with_raw_value(self):
         common = {
             "SEC_EJEC": "1", "UBIGEO": "010101", "ANO_APLICACION": "2024", "PERIODO": "1",

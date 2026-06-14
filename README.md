@@ -118,6 +118,7 @@ Gold construya el modelo analitico.
 | Dataset | Filas actuales | Uso |
 |---|---:|---|
 | `municipalidades_curated` | 1,113 | Relacion municipal limpia `SEC_EJEC -> UBIGEO`, nombres geograficos normalizados y enriquecimiento basico RENAMU. |
+| `renamu_curated` | Segun ejecucion | RENAMU 2022 tipado en Parquet: UBIGEO, tipo de municipalidad, personal municipal, asistencia AT/catastro y flags de software tributario. |
 | `ingresos_municipales_curated` | 8,950,779 | Movimientos SIAF municipales tipados, filtrados por `NIVEL_GOBIERNO = M` y consolidados por clave presupuestaria. |
 | `predial_esat_curated` | 133,938 | Indicadores prediales SISMEPRE tipados, deduplicados y con granularidad corregida. |
 | `sismepre_respuestas_curated` | 205,823 | Respuestas SISMEPRE normalizadas a formato largo, con tipos `texto`, `decimal`, `entero` y `fecha`. |
@@ -130,7 +131,12 @@ La logica que antes estaba mal ubicada en Silver fue movida a Gold:
 `dim_municipalidad_gold`, `dim_tiempo`, `dim_clasificador_ingreso`,
 `dim_formulario_sismepre`, `dim_pregunta_sismepre`,
 `fact_ingresos_mensuales`, `fact_ingresos_clasificador`,
-`fact_predial_mensual`, `fact_sismepre_cumplimiento` y los facts RENAMU.
+`fact_predial_mensual`, `fact_sismepre_cumplimiento`, los facts RENAMU y
+`mart_kpi_resumen_ejecutivo`.
+
+Importante: Gold no consume CSV ni Raw. Incluso RENAMU, que antes era usado
+directamente desde Bronze Parquet para construir facts, ahora pasa primero por
+`renamu_curated` en Silver para mantener la cadena Medallion completa.
 
 ### Municipalidades Curadas
 
@@ -335,6 +341,7 @@ las tablas analiticas finales recien aparecen en Gold.
 | `fact_renamu_gestion_tributaria` | 1,874 | Capacidad municipal RENAMU: personal municipal total y necesidades AT/catastro. |
 | `fact_renamu_software_at` | 1,874 | Software tributario RENAMU: SRTM, rentas, catastro y flag de al menos un software. |
 | `mart_dashboard_municipal` | 28,628 | Vista integrada SIAF, SISMEPRE, RENAMU y categorias para los seis dashboards. |
+| `mart_kpi_resumen_ejecutivo` | Segun ejecucion | Resumen por municipalidad y anio con KPIs de ejecucion, variacion presupuestaria, efectividad predial y capacidad tecnologica tributaria. |
 | `fact_calidad_datos` | 5,583 | Historial auditable de calidad Bronze, Silver y Gold. |
 
 El maestro conserva las `1,964` entidades municipales SIAF: `1,113` tienen
@@ -374,6 +381,17 @@ como fuente estatica 2022: el archivo local no trae literalmente "personal
 exclusivo AT", por eso el dashboard de capacidad tributaria usa
 `personal_municipal_total` y los indicadores de asistencia/capacitacion en
 administracion tributaria y catastro como aproximaciones documentadas.
+
+### KPIs Ejecutivos Gold
+
+Gold publica cuatro indicadores principales en `mart_kpi_resumen_ejecutivo`:
+
+| KPI | Calculo | Para que sirve |
+|---|---|---|
+| `% ejecucion de recaudacion` | `recaudacion_total / pim_total * 100` | Medir avance real de ingresos frente al presupuesto modificado. |
+| `variacion PIM - PIA` | `pim_total - pia_total` | Identificar cambios presupuestarios relevantes. |
+| `efectividad predial` | `recaudacion_predial_total / emision_predial_total * 100` | Priorizar mejora de cobranza predial. |
+| `capacidad software tributario` | Promedio de SRTM, software de rentas y catastro | Aproximar capacidad tecnologica de administracion tributaria. |
 
 Los controles de calidad permanecen disponibles en `fact_calidad_datos` como
 evidencia tecnica auditable, pero no ocupan una pagina de toma de decisiones.
@@ -440,6 +458,12 @@ Las vistas Hive para los seis dashboards estan en:
 sql/hive/03_dashboard_views.sql
 reports/dashboard_spec_hive_municipal.md
 ```
+
+Para Power BI se recomienda importar las tablas materializadas
+`pbi_dashboard_01` a `pbi_dashboard_06` y `pbi_kpi_resumen_ejecutivo`. Las
+vistas `vw_dashboard_*` y `vw_kpi_resumen_ejecutivo` sirven como paso de
+construccion, pero se pueden eliminar del catalogo activo porque algunos drivers
+ODBC fallan al previsualizar metadata de vistas complejas.
 
 Para generar un workbook desde Hive e importarlo en Power BI:
 

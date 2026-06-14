@@ -59,6 +59,7 @@ class GoldPipeline:
             ("fact_renamu_gestion_tributaria", service.build_fact_renamu_gestion_tributaria),
             ("fact_renamu_software_at", service.build_fact_renamu_software_at),
             ("mart_dashboard_municipal", service.build_mart_dashboard_municipal),
+            ("mart_kpi_resumen_ejecutivo", service.build_mart_kpi_resumen_ejecutivo),
             ("fact_calidad_datos", service.build_fact_calidad_datos),
         ]
         results: List[Dict[str, Any]] = []

@@ -321,20 +321,20 @@ class GoldTransformService:
         )
 
     def build_fact_renamu_gestion_tributaria(self) -> Dict[str, Any]:
-        source = self._read_bronze("renamu")
+        source = self._read("renamu_curated")
         master = self._renamu_master_lookup()
         curated = (
             source.select(
-                self._code("Ubigeo", 6).alias("UBIGEO"),
-                F.col("Año").cast("int").alias("ANO_RENAMU"),
-                F.col("idmunici").cast("string").alias("idmunici"),
-                F.trim(F.col("Tipomuni")).alias("tipo_municipalidad_renamu"),
-                self._int_or_zero("P19M_T").alias("personal_municipal_total"),
-                self._is_selected("P22_AT2").alias("requiere_asistencia_at"),
-                self._is_selected("P22_AT3").alias("requiere_asistencia_catastro"),
-                self._is_selected("P22_C2").alias("requiere_capacitacion_at"),
-                self._is_selected("P22_C3").alias("requiere_capacitacion_catastro"),
-                *self._existing_columns(source, RENAMU_GESTION_COLUMNS),
+                "UBIGEO",
+                "ANO_RENAMU",
+                "idmunici",
+                "tipo_municipalidad_renamu",
+                "personal_municipal_total",
+                "requiere_asistencia_at",
+                "requiere_asistencia_catastro",
+                "requiere_capacitacion_at",
+                "requiere_capacitacion_catastro",
+                *[F.col(f"{column}_raw") for column in RENAMU_GESTION_COLUMNS if f"{column}_raw" in source.columns],
                 *self._lineage_columns(source),
             )
             .join(master, "UBIGEO", "inner")
@@ -349,25 +349,22 @@ class GoldTransformService:
         )
 
     def build_fact_renamu_software_at(self) -> Dict[str, Any]:
-        source = self._read_bronze("renamu")
+        source = self._read("renamu_curated")
         master = self._renamu_master_lookup()
         curated = (
             source.select(
-                self._code("Ubigeo", 6).alias("UBIGEO"),
-                F.col("Año").cast("int").alias("ANO_RENAMU"),
-                F.col("idmunici").cast("string").alias("idmunici"),
-                F.trim(F.col("Tipomuni")).alias("tipo_municipalidad_renamu"),
-                self._is_selected("P16_5").alias("usa_srtm_estado"),
-                self._is_selected("P17_2").alias("usa_software_rentas_at"),
-                self._is_selected("P17_3").alias("usa_software_catastro"),
-                *self._existing_columns(source, RENAMU_SOFTWARE_COLUMNS),
+                "UBIGEO",
+                "ANO_RENAMU",
+                "idmunici",
+                "tipo_municipalidad_renamu",
+                "usa_srtm_estado",
+                "usa_software_rentas_at",
+                "usa_software_catastro",
+                "usa_al_menos_un_software_at",
+                *[F.col(f"{column}_raw") for column in RENAMU_SOFTWARE_COLUMNS if f"{column}_raw" in source.columns],
                 *self._lineage_columns(source),
             )
             .join(master, "UBIGEO", "inner")
-            .withColumn(
-                "usa_al_menos_un_software_at",
-                F.col("usa_srtm_estado") | F.col("usa_software_rentas_at") | F.col("usa_software_catastro"),
-            )
             .withColumn("year", F.col("ANO_RENAMU").cast("string"))
         )
         return self._publish(
@@ -461,6 +458,146 @@ class GoldTransformService:
             partition_columns=["year"],
         )
 
+    def build_mart_kpi_resumen_ejecutivo(self) -> Dict[str, Any]:
+        municipalities = self._drop_pipeline_metadata(
+            self.spark.read.parquet(str(self.storage.data_lake.gold_path / "dim_municipalidad_gold"))
+        )
+        income = self._drop_pipeline_metadata(
+            self.spark.read.parquet(str(self.storage.data_lake.gold_path / "fact_ingresos_mensuales"))
+        )
+        predial = self._drop_pipeline_metadata(
+            self.spark.read.parquet(str(self.storage.data_lake.gold_path / "fact_predial_mensual"))
+        )
+        gestion = self._drop_pipeline_metadata(
+            self.spark.read.parquet(str(self.storage.data_lake.gold_path / "fact_renamu_gestion_tributaria"))
+        )
+        software = self._drop_pipeline_metadata(
+            self.spark.read.parquet(str(self.storage.data_lake.gold_path / "fact_renamu_software_at"))
+        )
+        cumplimiento = self._drop_pipeline_metadata(
+            self.spark.read.parquet(str(self.storage.data_lake.gold_path / "fact_sismepre_cumplimiento"))
+        )
+
+        income_annual = (
+            income.groupBy("SEC_EJEC", "ANO_DOC")
+            .agg(
+                F.sum("MONTO_PIA").cast("decimal(24,2)").alias("pia_total"),
+                F.sum("MONTO_PIM").cast("decimal(24,2)").alias("pim_total"),
+                F.sum("MONTO_RECAUDADO").cast("decimal(24,2)").alias("recaudacion_total"),
+            )
+            .withColumn("year", F.col("ANO_DOC").cast("string"))
+        )
+        predial_annual = (
+            predial.groupBy("SEC_EJEC", F.col("ANO_ESTADISTICA").alias("ANO_DOC"))
+            .agg(
+                self._sum_if_present(predial, "MON_RECAUDACION_TOTAL", "recaudacion_predial_total"),
+                self._sum_if_present(predial, "MON_EMISIONPREDIAL_AFECTO", "emision_predial_total"),
+                self._sum_if_present(predial, "MON_SALDO_PREDIAL_TOTAL", "saldo_predial_total"),
+            )
+        )
+        gestion_latest = (
+            gestion.groupBy("SEC_EJEC")
+            .agg(
+                F.max("ANO_RENAMU").alias("ano_renamu_referencia"),
+                F.first("personal_municipal_total", ignorenulls=True).alias("personal_municipal_total"),
+                F.max(F.col("requiere_asistencia_at").cast("int")).alias("requiere_asistencia_at_flag"),
+            )
+        )
+        software_latest = (
+            software.groupBy("SEC_EJEC")
+            .agg(
+                F.max(F.col("usa_srtm_estado").cast("int")).alias("usa_srtm_estado_flag"),
+                F.max(F.col("usa_software_rentas_at").cast("int")).alias("usa_software_rentas_at_flag"),
+                F.max(F.col("usa_software_catastro").cast("int")).alias("usa_software_catastro_flag"),
+                F.max(F.col("usa_al_menos_un_software_at").cast("int")).alias("usa_al_menos_un_software_at_flag"),
+            )
+        )
+        cumplimiento_annual = (
+            cumplimiento.groupBy("SEC_EJEC", F.col("ANO_APLICACION").alias("ANO_DOC"))
+            .agg(
+                F.count("*").alias("periodos_sismepre_reportados"),
+                F.first("ESTADO", ignorenulls=True).alias("estado_sismepre_referencia"),
+                F.first("CLASIFICACION", ignorenulls=True).alias("clasificacion_sismepre_referencia"),
+                F.first("TIPO_META", ignorenulls=True).alias("tipo_meta_sismepre_referencia"),
+            )
+        )
+        curated = (
+            income_annual
+            .join(predial_annual, ["SEC_EJEC", "ANO_DOC"], "left")
+            .join(cumplimiento_annual, ["SEC_EJEC", "ANO_DOC"], "left")
+            .join(gestion_latest, "SEC_EJEC", "left")
+            .join(software_latest, "SEC_EJEC", "left")
+            .join(
+                municipalities.select(
+                    "SEC_EJEC", "UBIGEO", "MUNICIPALIDAD_NOMBRE", "DEPARTAMENTO_NOMBRE",
+                    "PROVINCIA_NOMBRE", "DISTRITO_NOMBRE", "categoria_municipalidad",
+                    "categoria_match_status", "categoria_rule_applied", "in_scope_presentacion",
+                ),
+                "SEC_EJEC",
+                "left",
+            )
+            .withColumn(
+                "kpi_pct_ejecucion_recaudacion",
+                F.when(F.col("pim_total") != 0, (F.col("recaudacion_total") / F.col("pim_total") * 100).cast("decimal(20,4)")),
+            )
+            .withColumn("kpi_variacion_pim_pia", (F.col("pim_total") - F.col("pia_total")).cast("decimal(24,2)"))
+            .withColumn(
+                "kpi_efectividad_predial",
+                F.when(
+                    F.coalesce(F.col("emision_predial_total"), F.lit(0)) != 0,
+                    (F.col("recaudacion_predial_total") / F.col("emision_predial_total") * 100).cast("decimal(20,4)"),
+                ),
+            )
+            .withColumn(
+                "kpi_brecha_predial",
+                (F.coalesce(F.col("emision_predial_total"), F.lit(0)) - F.coalesce(F.col("recaudacion_predial_total"), F.lit(0))).cast("decimal(24,2)"),
+            )
+            .withColumn(
+                "kpi_capacidad_software_pct",
+                (
+                    (
+                        F.coalesce(F.col("usa_srtm_estado_flag"), F.lit(0))
+                        + F.coalesce(F.col("usa_software_rentas_at_flag"), F.lit(0))
+                        + F.coalesce(F.col("usa_software_catastro_flag"), F.lit(0))
+                    )
+                    / F.lit(3)
+                    * F.lit(100)
+                ).cast("decimal(20,4)"),
+            )
+            .withColumn(
+                "prioridad_intervencion",
+                F.when(F.col("kpi_efectividad_predial").isNull(), F.lit("SIN INDICADOR"))
+                .when((F.col("kpi_efectividad_predial") < 50) & (F.coalesce(F.col("usa_al_menos_un_software_at_flag"), F.lit(0)) == 0), F.lit("ALTA"))
+                .when(F.col("kpi_efectividad_predial") < 70, F.lit("MEDIA"))
+                .otherwise(F.lit("BAJA")),
+            )
+            .select(
+                "SEC_EJEC", "UBIGEO", "MUNICIPALIDAD_NOMBRE", "DEPARTAMENTO_NOMBRE",
+                "PROVINCIA_NOMBRE", "DISTRITO_NOMBRE", "categoria_municipalidad",
+                "categoria_match_status", "categoria_rule_applied", "in_scope_presentacion",
+                "ANO_DOC", "year", "pia_total", "pim_total", "recaudacion_total",
+                "kpi_pct_ejecucion_recaudacion", "kpi_variacion_pim_pia",
+                "recaudacion_predial_total", "emision_predial_total", "saldo_predial_total",
+                "kpi_efectividad_predial", "kpi_brecha_predial",
+                "personal_municipal_total", "requiere_asistencia_at_flag",
+                "usa_srtm_estado_flag", "usa_software_rentas_at_flag",
+                "usa_software_catastro_flag", "usa_al_menos_un_software_at_flag",
+                "kpi_capacidad_software_pct", "periodos_sismepre_reportados",
+                "estado_sismepre_referencia", "clasificacion_sismepre_referencia",
+                "tipo_meta_sismepre_referencia", "prioridad_intervencion",
+            )
+        )
+        return self._publish(
+            "mart_kpi_resumen_ejecutivo",
+            curated,
+            required_columns=[
+                "SEC_EJEC", "year", "recaudacion_total", "pim_total",
+                "kpi_variacion_pim_pia",
+            ],
+            unique_keys=["SEC_EJEC", "year"],
+            partition_columns=["year"],
+        )
+
     def build_fact_calidad_datos(self) -> Dict[str, Any]:
         quality_path = Path(self.audit_path) / "quality_checks"
         if not quality_path.exists():
@@ -523,12 +660,6 @@ class GoldTransformService:
         path = Path(self.silver_path) / table_name
         if not path.exists():
             raise ValueError(f"Required Silver table does not exist: {path}")
-        return self.spark.read.parquet(str(path))
-
-    def _read_bronze(self, table_name: str) -> DataFrame:
-        path = self.storage.data_lake.bronze_path / table_name
-        if not path.exists():
-            raise ValueError(f"Required Bronze table does not exist: {path}")
         return self.spark.read.parquet(str(path))
 
     def _renamu_master_lookup(self) -> DataFrame:
@@ -667,17 +798,6 @@ class GoldTransformService:
     def _code(self, column: str, width: int):
         return F.lpad(F.regexp_replace(F.trim(F.col(column).cast("string")), r"\.0$", ""), width, "0")
 
-    def _int_or_zero(self, column: str):
-        value = F.trim(F.col(column).cast("string"))
-        return F.when(value.rlike(r"^-?\d+$"), value.cast("int")).otherwise(F.lit(0))
-
-    def _is_selected(self, column: str):
-        value = F.trim(F.col(column).cast("string"))
-        return F.when(value.rlike(r"^-?\d+$"), value.cast("int") > 0).otherwise(F.lit(False))
-
-    def _existing_columns(self, df: DataFrame, columns: List[str]):
-        return [F.col(column).cast("string").alias(f"{column}_raw") for column in columns if column in df.columns]
-
     def _drop_pipeline_metadata(self, df: DataFrame) -> DataFrame:
         metadata_columns = [
             column for column in df.columns
@@ -723,3 +843,8 @@ class GoldTransformService:
         if "_silver_source_row_count" in df.columns:
             return F.sum("_silver_source_row_count").alias("_gold_source_row_count")
         return F.count("*").alias("_gold_source_row_count")
+
+    def _sum_if_present(self, df: DataFrame, column: str, alias: str):
+        if column in df.columns:
+            return F.sum(column).cast("decimal(24,2)").alias(alias)
+        return F.sum(F.lit(None).cast("decimal(24,2)")).alias(alias)

@@ -10,58 +10,43 @@ from pyspark.sql import SparkSession
 EXPORT_QUERIES = {
     "01_recaudacion_capacidad": """
         SELECT *
-        FROM municipal_gold.vw_dashboard_01_recaudacion_capacidad
+        FROM municipal_gold.pbi_dashboard_01
         ORDER BY year DESC, recaudacion_total DESC
         LIMIT {row_limit}
     """,
     "02_clasificador_ingreso": """
-        SELECT
-            f.year,
-            m.DEPARTAMENTO_NOMBRE,
-            m.PROVINCIA_NOMBRE,
-            m.DISTRITO_NOMBRE,
-            m.categoria_municipalidad,
-            c.RUBRO_NOMBRE,
-            c.ESPECIFICA_NOMBRE,
-            SUM(f.MONTO_PIA) AS pia,
-            SUM(f.MONTO_PIM) AS pim,
-            SUM(f.MONTO_RECAUDADO) AS recaudado
-        FROM municipal_gold.fact_ingresos_clasificador f
-        JOIN municipal_gold.dim_municipalidad_gold m ON f.SEC_EJEC = m.SEC_EJEC
-        LEFT JOIN municipal_gold.dim_clasificador_ingreso c ON f.clasificador_id = c.clasificador_id
-        WHERE f.year >= 2022
-        GROUP BY
-            f.year,
-            m.DEPARTAMENTO_NOMBRE,
-            m.PROVINCIA_NOMBRE,
-            m.DISTRITO_NOMBRE,
-            m.categoria_municipalidad,
-            c.RUBRO_NOMBRE,
-            c.ESPECIFICA_NOMBRE
+        SELECT *
+        FROM municipal_gold.pbi_dashboard_02
         ORDER BY recaudado DESC
         LIMIT {row_limit}
     """,
     "03_predial_vs_efectividad": """
         SELECT *
-        FROM municipal_gold.vw_dashboard_03_predial_vs_efectividad
+        FROM municipal_gold.pbi_dashboard_03
         ORDER BY year DESC, recaudacion_predial_total DESC
         LIMIT {row_limit}
     """,
     "04_distribucion_efectividad": """
         SELECT *
-        FROM municipal_gold.vw_dashboard_04_distribucion_efectividad
+        FROM municipal_gold.pbi_dashboard_04
         ORDER BY year DESC, efectividad_predial_pct DESC
         LIMIT {row_limit}
     """,
     "05_software_tributario": """
         SELECT *
-        FROM municipal_gold.vw_dashboard_05_software_tributario
+        FROM municipal_gold.pbi_dashboard_05
         LIMIT {row_limit}
     """,
     "06_priorizacion_municipal": """
         SELECT *
-        FROM municipal_gold.vw_dashboard_06_priorizacion_municipal
+        FROM municipal_gold.pbi_dashboard_06
         ORDER BY year DESC, prioridad_intervencion, saldo_predial_total DESC
+        LIMIT {row_limit}
+    """,
+    "kpi_resumen_ejecutivo": """
+        SELECT *
+        FROM municipal_gold.pbi_kpi_resumen_ejecutivo
+        ORDER BY year DESC, recaudacion_total DESC
         LIMIT {row_limit}
     """,
 }
@@ -102,6 +87,9 @@ def main() -> int:
                 ("Emision Predial", "SUM('03_predial_vs_efectividad'[emision_predial_total])"),
                 ("Efectividad Predial", "DIVIDE([Recaudacion Predial], [Emision Predial])"),
                 ("Municipalidades Con Software AT", "COUNTROWS(FILTER('05_software_tributario', '05_software_tributario'[usa_al_menos_un_software_at] = TRUE()))"),
+                ("KPI Ejecucion Recaudacion", "AVERAGE('kpi_resumen_ejecutivo'[kpi_pct_ejecucion_recaudacion])"),
+                ("KPI Variacion PIM PIA", "SUM('kpi_resumen_ejecutivo'[kpi_variacion_pim_pia])"),
+                ("KPI Capacidad Software", "AVERAGE('kpi_resumen_ejecutivo'[kpi_capacidad_software_pct])"),
             ],
             columns=["Medida", "DAX"],
         )
