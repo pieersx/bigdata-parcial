@@ -131,6 +131,8 @@ spark:
   parquet_compression: "snappy"
   shuffle_partitions: 8
   timezone: "UTC"
+  driver_memory: "4g"
+  executor_memory: "4g"
 
 profiling:
   sample_limit: 50000

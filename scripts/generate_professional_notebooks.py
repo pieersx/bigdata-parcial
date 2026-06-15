@@ -46,7 +46,7 @@ from pyspark.sql import SparkSession, functions as F, types as T
 PROJECT_ROOT = Path.cwd()
 if PROJECT_ROOT.name == "notebooks":
     PROJECT_ROOT = PROJECT_ROOT.parent
-if PROJECT_ROOT.name in {"bronze", "silver", "gold", "hive"}:
+if PROJECT_ROOT.name in {"bronze", "silver", "gold"}:
     PROJECT_ROOT = PROJECT_ROOT.parent.parent
 
 spark = (
@@ -802,7 +802,7 @@ spark.createDataFrame(validations, ["table", "check", "status", "detail"]).show(
             """
 ## 5. Tablas agregadas para Power BI
 
-Objetivo: mapear las salidas Gold a las seis páginas de Power BI. Las tablas `pbi_dashboard_01..06` se materializan en Hive para evitar problemas de previsualización con vistas ODBC.
+Objetivo: mapear las salidas Gold a las seis páginas de Power BI. Las tablas `pbi_dashboard_01..06` se publican como carpetas Parquet bajo `data/gold` para conectarlas directamente desde Power BI Desktop, sin Hive ni ODBC.
 """
         ),
         code(
@@ -816,7 +816,7 @@ dashboard_mapping = [
     ("pbi_dashboard_06", "Priorización de Municipalidades", "SIAF + SISMEPRE + RENAMU + Categorías"),
     ("pbi_kpi_resumen_ejecutivo", "Resumen ejecutivo de KPIs", "Mart Gold de KPIs"),
 ]
-spark.createDataFrame(dashboard_mapping, ["tabla_hive_powerbi", "pagina", "fuentes"]).show(truncate=False)
+spark.createDataFrame(dashboard_mapping, ["tabla_gold_powerbi", "pagina", "fuentes"]).show(truncate=False)
 """
         ),
         md(
@@ -864,30 +864,39 @@ if WRITE_NOTEBOOK_PREVIEW and kpi is not None:
         ),
         md(
             """
-## 8. Revisión de Hive
+## 8. Revisión de consumo en Power BI
 
-Hive sí es útil en este proyecto para dos cosas:
+Para la entrega final se omite Hive. Power BI debe consumir directamente los Parquet Gold:
 
-- Consultas analíticas SQL sobre Parquet Gold.
-- Conexión Power BI vía ODBC usando tablas materializadas `pbi_dashboard_01..06` y `pbi_kpi_resumen_ejecutivo`.
+- `data/gold/pbi_dashboard_01`
+- `data/gold/pbi_dashboard_02`
+- `data/gold/pbi_dashboard_03`
+- `data/gold/pbi_dashboard_04`
+- `data/gold/pbi_dashboard_05`
+- `data/gold/pbi_dashboard_06`
 
-Las vistas `vw_dashboard_*` son útiles como paso intermedio, pero no se recomiendan directamente en Power BI porque el driver ODBC puede fallar al previsualizar metadata compleja. Por eso se materializan como tablas Parquet.
+Esta decisión elimina los errores ODBC/HiveServer2 y mantiene la arquitectura Medallion clara: Bronze, Silver y Gold almacenan Parquet; Power BI consume Gold.
 """
         ),
         code(
             r"""
-hive_sql = PROJECT_ROOT / "sql" / "hive" / "05_powerbi_tables.sql"
-if hive_sql.exists():
-    text = hive_sql.read_text(encoding="utf-8")
-    tables = [line.replace("DROP TABLE IF EXISTS", "").replace(";", "").strip() for line in text.splitlines() if line.strip().startswith("DROP TABLE IF EXISTS")]
-    spark.createDataFrame([(t,) for t in tables], ["hive_powerbi_table"]).show(50, truncate=False)
+powerbi_tables = [f"pbi_dashboard_{i:02d}" for i in range(1, 7)]
+powerbi_inventory = []
+for table in powerbi_tables:
+    path = gold_root / table
+    powerbi_inventory.append((table, str(path), path.exists(), len(list(path.rglob("*.parquet"))) if path.exists() else 0))
+
+spark.createDataFrame(
+    powerbi_inventory,
+    ["tabla_gold_powerbi", "parquet_path", "exists", "parquet_files"],
+).show(truncate=False)
 """
         ),
         md(
             """
 ## 9. Conclusión Gold
 
-Gold consume Silver Parquet, construye constelación de hechos/dimensiones, genera marts para seis dashboards y publica KPIs ejecutivos. Hive se mantiene como capa SQL/Power BI sobre Parquet, no como reemplazo de la arquitectura Medallion.
+Gold consume Silver Parquet, construye constelación de hechos/dimensiones, genera marts para seis dashboards y publica KPIs ejecutivos. El consumo final de Power BI se hace directamente desde Parquet Gold, no desde Excel ni Hive.
 """
         ),
     ]

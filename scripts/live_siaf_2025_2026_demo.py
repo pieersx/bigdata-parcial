@@ -16,7 +16,7 @@ LIVE_YEARS = {2025, 2026}
 
 
 def main() -> int:
-    print("Demo carga viva: SIAF ingresos 2025-2026 -> Bronze -> Silver -> Gold -> Excel Power BI")
+    print("Demo carga viva: SIAF ingresos 2025-2026 -> Bronze -> Silver -> Gold Parquet -> Power BI")
     print("=" * 90)
     _print_live_sources()
 
@@ -35,7 +35,8 @@ def main() -> int:
 
     print("\nDemo completed.")
     print("Bronze solo refresco las particiones 2025 y 2026 de SIAF ingresos.")
-    print("Silver, Gold y el Excel quedaron recalculados sobre el lake completo.")
+    print("Silver y Gold quedaron recalculados sobre el lake completo.")
+    print("Power BI debe conectarse a data/gold/pbi_dashboard_01..06; el Excel es evidencia auxiliar.")
     return 0
 
 

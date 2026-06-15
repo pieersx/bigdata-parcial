@@ -282,7 +282,6 @@ Ultima ejecucion Silver validada: `20260612_060020`.
 | [`notebooks/silver/01_Silver_Pipeline_Parcial.ipynb`](notebooks/silver/01_Silver_Pipeline_Parcial.ipynb) | Evidencia Silver: limpieza, estandarizacion, calidad, cuarentena y datasets curados. |
 | [`notebooks/silver/02_Silver_Data_Profiling.ipynb`](notebooks/silver/02_Silver_Data_Profiling.ipynb) | Profiling Silver profesional: duplicados, claves de negocio, nulos, dominios, cardinalidad, joins, cobertura de categorias, cuarentena, trazabilidad y reglas de negocio. |
 | [`notebooks/gold/01_Gold_Pipeline_Parcial.ipynb`](notebooks/gold/01_Gold_Pipeline_Parcial.ipynb) | Evidencia Gold: constelacion de hechos, dimensiones normalizadas, cobertura municipal, KPIs y mapeo de dashboards. |
-| [`notebooks/hive/01_Hive_Lab_Municipal.ipynb`](notebooks/hive/01_Hive_Lab_Municipal.ipynb) | Evidencia Hive/HDFS/Metastore, SQL analitico y conexion Power BI por ODBC. |
 
 La estructura completa esta documentada en [`notebooks/README.md`](notebooks/README.md).
 
@@ -399,114 +398,33 @@ evidencia tecnica auditable, pero no ocupan una pagina de toma de decisiones.
 La capa visual de Power BI queda separada del procesamiento: puede conectarse
 directamente a estos Parquet o a una exportacion posterior sin reprocesar Bronze.
 
-## Hive, HDFS Y Spark SQL
-
-El proyecto ahora incluye una capa de consulta analitica con HDFS, Hive,
-Metastore y Spark. Esta capa no crea una cuarta medalla; registra los Parquet
-Silver y Gold como tablas externas para demostrar SQL analitico y conectar
-Power BI por HiveServer2.
-
-```mermaid
-flowchart LR
-    S["Silver Parquet"] --> HDFS["HDFS"]
-    G["Gold Parquet"] --> HDFS
-    HDFS --> Hive["Hive external tables"]
-    Hive --> MS["Hive Metastore PostgreSQL"]
-    Spark["Spark SQL"] --> Hive
-    PBI["Power BI Desktop"] --> Hive
-```
-
-Servicios principales en Docker:
-
-| Servicio | Rol | Puerto |
-|---|---|---:|
-| `namenode` | HDFS NameNode | `9870`, `8020` |
-| `datanode` | HDFS DataNode | `9864` |
-| `hive-metastore-db` | PostgreSQL del metastore | interno |
-| `hive-metastore` | Catalogo Hive | `9083` |
-| `hive-server` | HiveServer2 para Power BI | `10000` |
-
-Para levantar el cluster:
-
-```powershell
-docker compose up -d namenode datanode hive-metastore-db hive-metastore hive-server transformers-networks
-```
-
-Para publicar las tablas externas desde Parquet:
-
-```powershell
-docker compose exec transformers-networks python scripts/hive_bootstrap.py --layer all
-```
-
-Para ejecutar el laboratorio Hive:
-
-```powershell
-docker compose exec transformers-networks python scripts/hive_lab_queries.py --create-views
-```
-
-El laboratorio cubre lectura de Parquet, agregaciones, filtros, ordenamiento,
-tratamiento de nulos, window functions, CTEs y joins complejos. La explicacion
-esta en:
-
-```text
-reports/hive_lab_municipal.md
-```
-
-Las vistas Hive para los seis dashboards estan en:
-
-```text
-sql/hive/03_dashboard_views.sql
-reports/dashboard_spec_hive_municipal.md
-```
-
-Para Power BI se recomienda importar las tablas materializadas
-`pbi_dashboard_01` a `pbi_dashboard_06` y `pbi_kpi_resumen_ejecutivo`. Las
-vistas `vw_dashboard_*` y `vw_kpi_resumen_ejecutivo` sirven como paso de
-construccion, pero se pueden eliminar del catalogo activo porque algunos drivers
-ODBC fallan al previsualizar metadata de vistas complejas.
-
-Para generar un workbook desde Hive e importarlo en Power BI:
-
-```powershell
-docker compose exec transformers-networks python scripts/export_powerbi_from_hive.py
-```
-
-Salida:
-
-```text
-data/powerbi/powerbi_municipal_hive.xlsx
-```
-
 ## Power BI Desktop
 
-El reporte Power BI implementado se encuentra en:
+El entregable principal debe consumir directamente los Parquet Gold, sin Hive,
+ODBC ni Excel como fuente principal. Gold publica seis carpetas listas para
+Power BI:
 
 ```text
-data/powerbi/Dashboard_Municipal_Gold.pbix
+data/gold/pbi_dashboard_01
+data/gold/pbi_dashboard_02
+data/gold/pbi_dashboard_03
+data/gold/pbi_dashboard_04
+data/gold/pbi_dashboard_05
+data/gold/pbi_dashboard_06
 ```
 
-El archivo importa un workbook de presentacion generado desde Gold:
+En Power BI Desktop se debe usar **Obtener datos > Carpeta** y seleccionar cada
+carpeta `pbi_dashboard_*`. Luego se combinan los archivos Parquet de esa carpeta
+y se renombran las consultas como `pbi_dashboard_01` a `pbi_dashboard_06`.
+
+La guia detallada esta en:
 
 ```text
-data/powerbi/powerbi_municipal_gold.xlsx
+reports/powerbi_direct_parquet_connection.md
 ```
 
-Tambien existe un HTML interactivo con el mismo estilo visual verde y blanco del
-ejemplo, pero debe tratarse como vista previa tecnica, no como sustituto del
-Power BI nativo:
-
-```text
-data/powerbi/dashboard_municipal_gold.html
-```
-
-Para el entregable principal, Power BI debe consumir:
-
-- Directo desde HiveServer2: `localhost:10000`, base `municipal_gold`, vistas
-  `vw_dashboard_01_*` a `vw_dashboard_06_*`.
-- O desde el workbook exportado por Hive:
-  `data/powerbi/powerbi_municipal_hive.xlsx`.
-
-Para regenerar las vistas de consumo despues de una nueva ejecucion Gold:
+El workbook Excel generado desde Gold queda solo como evidencia auxiliar, no
+como fuente principal:
 
 ```powershell
 docker compose run --rm --no-deps transformers-networks python scripts/export_powerbi_workbook.py
@@ -519,8 +437,8 @@ docker compose run --rm --no-deps transformers-networks python scripts/live_siaf
 ```
 
 Ese comando muestra metadata remota/local de SIAF 2025-2026, actualiza solo esas
-particiones Bronze de ingresos, reconstruye Silver y Gold, y regenera el workbook
-Power BI.
+particiones Bronze de ingresos, reconstruye Silver y Gold, y deja listos los
+Parquet `pbi_dashboard_*` para refrescar Power BI.
 
 El reporte contiene seis paginas:
 

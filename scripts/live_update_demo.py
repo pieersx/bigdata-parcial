@@ -15,7 +15,7 @@ LIVE_YEARS = {2025, 2026}
 
 
 def main() -> int:
-    print("Live update demo: SIAF 2025-2026 -> Bronze -> Silver -> Gold -> Power BI workbook")
+    print("Live update demo: SIAF 2025-2026 -> Bronze -> Silver -> Gold Parquet -> Power BI")
     print("=" * 80)
     _print_live_sources()
 
@@ -30,6 +30,8 @@ def main() -> int:
         subprocess.run(command, check=True)
 
     print("\nLive update demo completed.")
+    print("Gold dejo listos los Parquet pbi_dashboard_01..06 para Power BI.")
+    print("El workbook Excel se regenera solo como evidencia auxiliar.")
     return 0
 
 

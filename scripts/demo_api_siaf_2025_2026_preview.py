@@ -43,10 +43,10 @@ def main() -> int:
         "mode": "preview_only_no_write_no_pipeline",
         "purpose": "Demostracion segura de consulta remota SIAF 2025-2026 para exposicion.",
         "would_run_if_confirmed": [
-            "python main_bronze.py --dataset ingresos --years 2025 2026",
+            "python main.py ingresos",
             "python main_silver.py",
             "python main_gold.py",
-            "docker compose exec -T transformers-networks python scripts/materialize_powerbi_hive_tables.py",
+            "python scripts/export_powerbi_workbook.py",
         ],
         "resources": [],
     }

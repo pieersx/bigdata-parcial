@@ -1,22 +1,21 @@
 # Medidas DAX Y Diseño Manual Para Los 6 Dashboards Power BI
 
-Este archivo usa los nombres reales detectados en el PBIX `Dashboard_Municipal_Gold_Hive_2`.
-Actualmente las columnas quedaron con prefijo `vw_dashboard_*` porque se cargaron desde vistas Hive. Si luego cambias las consultas a `pbi_dashboard_01`...`pbi_dashboard_06` y Power BI cambia los nombres de columnas, solo reemplaza el prefijo en las medidas.
+Este archivo usa la versión final del proyecto: Power BI consume directamente las carpetas Parquet Gold `pbi_dashboard_01` a `pbi_dashboard_06`. Ya no se usa Hive, ODBC ni el PBIX `Dashboard_Municipal_Gold_Hive_2` como ruta principal.
 
 ## Tablas Que Debes Usar
 
-Para los dashboards carga estas tablas desde Hive:
+Para los dashboards carga estas carpetas Parquet desde `data/gold` con **Obtener datos > Carpeta**:
 
-```powerquery
-= Odbc.Query("dsn=MunicipalHive", "SELECT * FROM municipal_gold.pbi_dashboard_01")
-= Odbc.Query("dsn=MunicipalHive", "SELECT * FROM municipal_gold.pbi_dashboard_02")
-= Odbc.Query("dsn=MunicipalHive", "SELECT * FROM municipal_gold.pbi_dashboard_03")
-= Odbc.Query("dsn=MunicipalHive", "SELECT * FROM municipal_gold.pbi_dashboard_04")
-= Odbc.Query("dsn=MunicipalHive", "SELECT * FROM municipal_gold.pbi_dashboard_05")
-= Odbc.Query("dsn=MunicipalHive", "SELECT * FROM municipal_gold.pbi_dashboard_06")
+```text
+C:\Users\Pieers\dev\bigdata\parcial\BigData\data\gold\pbi_dashboard_01
+C:\Users\Pieers\dev\bigdata\parcial\BigData\data\gold\pbi_dashboard_02
+C:\Users\Pieers\dev\bigdata\parcial\BigData\data\gold\pbi_dashboard_03
+C:\Users\Pieers\dev\bigdata\parcial\BigData\data\gold\pbi_dashboard_04
+C:\Users\Pieers\dev\bigdata\parcial\BigData\data\gold\pbi_dashboard_05
+C:\Users\Pieers\dev\bigdata\parcial\BigData\data\gold\pbi_dashboard_06
 ```
 
-No cargues `vw_dashboard_*` para el dashboard final. Esas vistas sirven como evidencia SQL, pero las tablas `pbi_dashboard_*` son más estables para Power BI.
+Renombra las consultas en Power BI como `01_recaudacion_capacidad`, `02_clasificador_ingreso`, `03_predial_vs_efectividad`, `04_distribucion_efectividad`, `05_software_tributario` y `06_priorizacion_municipal`.
 
 ## Categorías A-G
 
@@ -43,17 +42,17 @@ Tabla: `01_recaudacion_capacidad`
 
 ```DAX
 Recaudacion Total =
-SUM('01_recaudacion_capacidad'[vw_dashboard_01_recaudacion_capacidad.recaudacion_total])
+SUM('01_recaudacion_capacidad'[RECAUDACION_TOTAL])
 ```
 
 ```DAX
 PIM Total Capacidad =
-SUM('01_recaudacion_capacidad'[vw_dashboard_01_recaudacion_capacidad.pim_total])
+SUM('01_recaudacion_capacidad'[PIM_TOTAL])
 ```
 
 ```DAX
 Personal Municipal =
-SUM('01_recaudacion_capacidad'[vw_dashboard_01_recaudacion_capacidad.personal_municipal_total])
+SUM('01_recaudacion_capacidad'[PERSONAL_MUNICIPAL_TOTAL])
 ```
 
 ```DAX
@@ -63,7 +62,7 @@ DIVIDE([Recaudacion Total], [Personal Municipal])
 
 ```DAX
 Municipalidades Capacidad =
-DISTINCTCOUNT('01_recaudacion_capacidad'[vw_dashboard_01_recaudacion_capacidad.sec_ejec])
+DISTINCTCOUNT('01_recaudacion_capacidad'[SEC_EJEC])
 ```
 
 ```DAX
@@ -84,17 +83,17 @@ Tabla: `02_clasificador_ingreso`
 
 ```DAX
 PIA Total =
-SUM('02_clasificador_ingreso'[vw_dashboard_02_clasificador_ingreso.pia])
+SUM('02_clasificador_ingreso'[PIA])
 ```
 
 ```DAX
 PIM Total =
-SUM('02_clasificador_ingreso'[vw_dashboard_02_clasificador_ingreso.pim])
+SUM('02_clasificador_ingreso'[PIM])
 ```
 
 ```DAX
 Recaudado Total =
-SUM('02_clasificador_ingreso'[vw_dashboard_02_clasificador_ingreso.recaudado])
+SUM('02_clasificador_ingreso'[RECAUDADO])
 ```
 
 ```DAX
@@ -109,7 +108,7 @@ Variacion PIM PIA =
 
 ```DAX
 Municipalidades Clasificador =
-DISTINCTCOUNT('02_clasificador_ingreso'[vw_dashboard_02_clasificador_ingreso.sec_ejec])
+DISTINCTCOUNT('02_clasificador_ingreso'[SEC_EJEC])
 ```
 
 Visuales recomendados:
@@ -125,12 +124,12 @@ Tabla: `03_predial_vs_efectividad`
 
 ```DAX
 Recaudacion Predial =
-SUM('03_predial_vs_efectividad'[vw_dashboard_03_predial_vs_efectividad.recaudacion_predial_total])
+SUM('03_predial_vs_efectividad'[RECAUDACION_PREDIAL_TOTAL])
 ```
 
 ```DAX
 Emision Predial =
-SUM('03_predial_vs_efectividad'[vw_dashboard_03_predial_vs_efectividad.emision_predial_total])
+SUM('03_predial_vs_efectividad'[EMISION_PREDIAL_TOTAL])
 ```
 
 ```DAX
@@ -145,7 +144,7 @@ Brecha Predial =
 
 ```DAX
 Municipalidades Predial =
-DISTINCTCOUNT('03_predial_vs_efectividad'[vw_dashboard_03_predial_vs_efectividad.sec_ejec])
+DISTINCTCOUNT('03_predial_vs_efectividad'[SEC_EJEC])
 ```
 
 Visuales recomendados:
@@ -161,22 +160,22 @@ Tabla: `04_distribucion_efectividad`
 
 ```DAX
 Efectividad Predial Promedio =
-AVERAGE('04_distribucion_efectividad'[vw_dashboard_04_distribucion_efectividad.efectividad_predial_pct]) / 100
+AVERAGE('04_distribucion_efectividad'[EFECTIVIDAD_PREDIAL_PCT]) / 100
 ```
 
 ```DAX
 Recaudacion Predial Dist =
-SUM('04_distribucion_efectividad'[vw_dashboard_04_distribucion_efectividad.recaudacion_predial_total])
+SUM('04_distribucion_efectividad'[RECAUDACION_PREDIAL_TOTAL])
 ```
 
 ```DAX
 Emision Predial Dist =
-SUM('04_distribucion_efectividad'[vw_dashboard_04_distribucion_efectividad.emision_predial_total])
+SUM('04_distribucion_efectividad'[EMISION_PREDIAL_TOTAL])
 ```
 
 ```DAX
 Municipalidades Distribucion =
-DISTINCTCOUNT('04_distribucion_efectividad'[vw_dashboard_04_distribucion_efectividad.sec_ejec])
+DISTINCTCOUNT('04_distribucion_efectividad'[SEC_EJEC])
 ```
 
 Visuales recomendados:
@@ -194,7 +193,7 @@ Estas medidas corrigen el error de comparar texto `SI/NO` contra booleanos.
 
 ```DAX
 Municipalidades Software =
-DISTINCTCOUNT('05_software_tributario'[vw_dashboard_05_software_tributario.sec_ejec])
+DISTINCTCOUNT('05_software_tributario'[SEC_EJEC])
 ```
 
 ```DAX
@@ -202,7 +201,7 @@ Municipalidades Con Software AT =
 COUNTROWS(
     FILTER(
         '05_software_tributario',
-        UPPER('05_software_tributario'[vw_dashboard_05_software_tributario.usa_al_menos_un_software_at]) = "SI"
+        UPPER('05_software_tributario'[USA_AL_MENOS_UN_SOFTWARE_AT]) = "SI"
     )
 )
 ```
@@ -212,7 +211,7 @@ Municipalidades Con SRTM =
 COUNTROWS(
     FILTER(
         '05_software_tributario',
-        UPPER('05_software_tributario'[vw_dashboard_05_software_tributario.usa_srtm_estado]) = "SI"
+        UPPER('05_software_tributario'[USA_SRTM_ESTADO]) = "SI"
     )
 )
 ```
@@ -222,7 +221,7 @@ Municipalidades Con Software Rentas =
 COUNTROWS(
     FILTER(
         '05_software_tributario',
-        UPPER('05_software_tributario'[vw_dashboard_05_software_tributario.usa_software_rentas_at]) = "SI"
+        UPPER('05_software_tributario'[USA_SOFTWARE_RENTAS_AT]) = "SI"
     )
 )
 ```
@@ -232,7 +231,7 @@ Municipalidades Con Software Catastro =
 COUNTROWS(
     FILTER(
         '05_software_tributario',
-        UPPER('05_software_tributario'[vw_dashboard_05_software_tributario.usa_software_catastro]) = "SI"
+        UPPER('05_software_tributario'[USA_SOFTWARE_CATASTRO]) = "SI"
     )
 )
 ```
@@ -256,27 +255,27 @@ Tabla: `06_priorizacion_municipal`
 
 ```DAX
 Recaudacion Total Priorizacion =
-SUM('06_priorizacion_municipal'[vw_dashboard_06_priorizacion_municipal.recaudacion_total])
+SUM('06_priorizacion_municipal'[RECAUDACION_TOTAL])
 ```
 
 ```DAX
 Saldo Predial Total =
-SUM('06_priorizacion_municipal'[vw_dashboard_06_priorizacion_municipal.saldo_predial_total])
+SUM('06_priorizacion_municipal'[SALDO_PREDIAL_TOTAL])
 ```
 
 ```DAX
 Recaudacion Predial Priorizacion =
-SUM('06_priorizacion_municipal'[vw_dashboard_06_priorizacion_municipal.recaudacion_predial_total])
+SUM('06_priorizacion_municipal'[RECAUDACION_PREDIAL_TOTAL])
 ```
 
 ```DAX
 Base Imponible Predial =
-SUM('06_priorizacion_municipal'[vw_dashboard_06_priorizacion_municipal.base_imponible_predial])
+SUM('06_priorizacion_municipal'[BASE_IMPONIBLE_PREDIAL])
 ```
 
 ```DAX
 Efectividad Priorizacion Promedio =
-AVERAGE('06_priorizacion_municipal'[vw_dashboard_06_priorizacion_municipal.efectividad_predial_pct]) / 100
+AVERAGE('06_priorizacion_municipal'[EFECTIVIDAD_PREDIAL_PCT]) / 100
 ```
 
 ```DAX
@@ -284,14 +283,14 @@ Municipalidades Alta Prioridad =
 COUNTROWS(
     FILTER(
         '06_priorizacion_municipal',
-        UPPER('06_priorizacion_municipal'[vw_dashboard_06_priorizacion_municipal.prioridad_intervencion]) = "ALTA"
+        UPPER('06_priorizacion_municipal'[PRIORIDAD_INTERVENCION]) = "ALTA"
     )
 )
 ```
 
 ```DAX
 Municipalidades Priorizacion =
-DISTINCTCOUNT('06_priorizacion_municipal'[vw_dashboard_06_priorizacion_municipal.sec_ejec])
+DISTINCTCOUNT('06_priorizacion_municipal'[SEC_EJEC])
 ```
 
 ```DAX
@@ -327,4 +326,3 @@ Usa este patrón en las 6 páginas:
 4. Distribución De Efectividad Predial.
 5. Software Tributario Municipal.
 6. Priorización De Municipalidades.
-

@@ -18,6 +18,8 @@ class SparkSessionFactory:
                 "spark.sql.shuffle.partitions",
                 str(config.get("shuffle_partitions", 8)),
             )
+            .config("spark.driver.memory", config.get("driver_memory", "4g"))
+            .config("spark.executor.memory", config.get("executor_memory", "4g"))
             .config("spark.sql.sources.partitionOverwriteMode", "dynamic")
         )
         return builder.getOrCreate()

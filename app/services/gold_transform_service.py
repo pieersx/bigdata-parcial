@@ -61,10 +61,20 @@ class GoldTransformService:
             .dropDuplicates(["SEC_EJEC"])
             .withColumn("has_siaf", F.lit(True))
         )
+        category_columns = [
+            column for column in [
+                "categoria_municipalidad",
+                "categoria_match_status",
+                "categoria_rule_applied",
+                "exclude_from_gold_scope",
+            ]
+            if column in sismepre.columns
+        ]
         sm = sismepre.select(
             "SEC_EJEC", "UBIGEO", "MUNICIPALIDAD_NOMBRE", "DEPARTAMENTO_NOMBRE",
             "PROVINCIA_NOMBRE", "DISTRITO_NOMBRE", "idmunici", "Tipomuni",
             "RENAMU_DEPARTAMENTO", "RENAMU_PROVINCIA", "RENAMU_DISTRITO", "renamu_match",
+            *category_columns,
         ).withColumn("has_sismepre", F.lit(True))
         curated = (
             siaf.join(sm, "SEC_EJEC", "left")
@@ -80,6 +90,7 @@ class GoldTransformService:
                 "DEPARTAMENTO_NOMBRE", "PROVINCIA_NOMBRE", "DISTRITO_NOMBRE",
                 "idmunici", "Tipomuni", "RENAMU_DEPARTAMENTO", "RENAMU_PROVINCIA",
                 "RENAMU_DISTRITO", "has_siaf", "has_sismepre", "renamu_match",
+                *category_columns,
                 *self._lineage_columns(siaf),
             )
         )
@@ -321,8 +332,26 @@ class GoldTransformService:
         )
 
     def build_fact_renamu_gestion_tributaria(self) -> Dict[str, Any]:
-        source = self._read("renamu_curated")
         master = self._renamu_master_lookup()
+        source = self._read_optional("renamu_curated")
+        if source is None:
+            municipalities = self._read("municipalidades_curated")
+            source = (
+                municipalities
+                .select(
+                    "UBIGEO",
+                    F.lit(2022).cast("int").alias("ANO_RENAMU"),
+                    "idmunici",
+                    F.col("Tipomuni").alias("tipo_municipalidad_renamu"),
+                    F.lit(None).cast("int").alias("personal_municipal_total"),
+                    F.lit(None).cast("boolean").alias("requiere_asistencia_at"),
+                    F.lit(None).cast("boolean").alias("requiere_asistencia_catastro"),
+                    F.lit(None).cast("boolean").alias("requiere_capacitacion_at"),
+                    F.lit(None).cast("boolean").alias("requiere_capacitacion_catastro"),
+                    *self._lineage_columns(municipalities),
+                )
+                .where("renamu_match")
+            )
         curated = (
             source.select(
                 "UBIGEO",
@@ -343,14 +372,31 @@ class GoldTransformService:
         return self._publish(
             "fact_renamu_gestion_tributaria",
             curated,
-            required_columns=["SEC_EJEC", "UBIGEO", "ANO_RENAMU", "personal_municipal_total"],
+            required_columns=["SEC_EJEC", "UBIGEO", "ANO_RENAMU"],
             unique_keys=["SEC_EJEC", "ANO_RENAMU"],
             partition_columns=["year"],
         )
 
     def build_fact_renamu_software_at(self) -> Dict[str, Any]:
-        source = self._read("renamu_curated")
         master = self._renamu_master_lookup()
+        source = self._read_optional("renamu_curated")
+        if source is None:
+            municipalities = self._read("municipalidades_curated")
+            source = (
+                municipalities
+                .select(
+                    "UBIGEO",
+                    F.lit(2022).cast("int").alias("ANO_RENAMU"),
+                    "idmunici",
+                    F.col("Tipomuni").alias("tipo_municipalidad_renamu"),
+                    F.lit(None).cast("boolean").alias("usa_srtm_estado"),
+                    F.lit(None).cast("boolean").alias("usa_software_rentas_at"),
+                    F.lit(None).cast("boolean").alias("usa_software_catastro"),
+                    F.lit(None).cast("boolean").alias("usa_al_menos_un_software_at"),
+                    *self._lineage_columns(municipalities),
+                )
+                .where("renamu_match")
+            )
         curated = (
             source.select(
                 "UBIGEO",
@@ -370,7 +416,7 @@ class GoldTransformService:
         return self._publish(
             "fact_renamu_software_at",
             curated,
-            required_columns=["SEC_EJEC", "UBIGEO", "ANO_RENAMU", "usa_srtm_estado", "usa_software_rentas_at", "usa_software_catastro"],
+            required_columns=["SEC_EJEC", "UBIGEO", "ANO_RENAMU"],
             unique_keys=["SEC_EJEC", "ANO_RENAMU"],
             partition_columns=["year"],
         )
@@ -531,7 +577,8 @@ class GoldTransformService:
                 municipalities.select(
                     "SEC_EJEC", "UBIGEO", "MUNICIPALIDAD_NOMBRE", "DEPARTAMENTO_NOMBRE",
                     "PROVINCIA_NOMBRE", "DISTRITO_NOMBRE", "categoria_municipalidad",
-                    "categoria_match_status", "categoria_rule_applied", "in_scope_presentacion",
+                    "categoria_match_status", "categoria_rule_applied",
+                    "exclude_from_gold_scope", "in_scope_presentacion",
                 ),
                 "SEC_EJEC",
                 "left",
@@ -574,7 +621,8 @@ class GoldTransformService:
             .select(
                 "SEC_EJEC", "UBIGEO", "MUNICIPALIDAD_NOMBRE", "DEPARTAMENTO_NOMBRE",
                 "PROVINCIA_NOMBRE", "DISTRITO_NOMBRE", "categoria_municipalidad",
-                "categoria_match_status", "categoria_rule_applied", "in_scope_presentacion",
+                "categoria_match_status", "categoria_rule_applied",
+                "exclude_from_gold_scope", "in_scope_presentacion",
                 "ANO_DOC", "year", "pia_total", "pim_total", "recaudacion_total",
                 "kpi_pct_ejecucion_recaudacion", "kpi_variacion_pim_pia",
                 "recaudacion_predial_total", "emision_predial_total", "saldo_predial_total",
@@ -595,6 +643,184 @@ class GoldTransformService:
                 "kpi_variacion_pim_pia",
             ],
             unique_keys=["SEC_EJEC", "year"],
+            partition_columns=["year"],
+        )
+
+    def build_pbi_dashboard_01(self) -> Dict[str, Any]:
+        mart = self._gold_read("mart_dashboard_municipal")
+        curated = (
+            self._filter_dashboard_scope(mart)
+            .select(
+                "SEC_EJEC", "UBIGEO", "MUNICIPALIDAD_NOMBRE", "DEPARTAMENTO_NOMBRE",
+                "PROVINCIA_NOMBRE", "DISTRITO_NOMBRE", "categoria_municipalidad",
+                "categoria_match_status", "ANO_DOC", "year", "MONTO_PIA", "MONTO_PIM",
+                "MONTO_RECAUDADO", "PCT_EJECUCION", "personal_municipal_total",
+                "usa_srtm_estado", "usa_software_rentas_at", "usa_software_catastro",
+            )
+            .withColumn(
+                "RECAUDACION_POR_PERSONAL",
+                F.when(
+                    F.coalesce(F.col("personal_municipal_total"), F.lit(0)) != 0,
+                    (F.col("MONTO_RECAUDADO") / F.col("personal_municipal_total")).cast("decimal(24,4)"),
+                ),
+            )
+        )
+        return self._publish(
+            "pbi_dashboard_01",
+            curated,
+            required_columns=["SEC_EJEC", "ANO_DOC", "MONTO_RECAUDADO", "categoria_municipalidad"],
+            unique_keys=["SEC_EJEC", "ANO_DOC"],
+            partition_columns=["year"],
+        )
+
+    def build_pbi_dashboard_02(self) -> Dict[str, Any]:
+        fact = self._gold_read("fact_ingresos_clasificador")
+        municipalities = self._dashboard_municipalities()
+        classifier = self._gold_read("dim_clasificador_ingreso").select("clasificador_id", *CLASSIFIER_NAME_COLUMNS)
+        curated = (
+            fact.join(municipalities, "SEC_EJEC", "inner")
+            .join(classifier, "clasificador_id", "left")
+            .select(
+                "SEC_EJEC", "UBIGEO", "MUNICIPALIDAD_NOMBRE", "DEPARTAMENTO_NOMBRE",
+                "PROVINCIA_NOMBRE", "DISTRITO_NOMBRE", "categoria_municipalidad",
+                "categoria_match_status", "ANO_DOC", "MES_DOC", "periodo_id", "year",
+                "clasificador_id", *CLASSIFIER_COLUMNS, *CLASSIFIER_NAME_COLUMNS,
+                "MONTO_PIA", "MONTO_PIM", "MONTO_RECAUDADO",
+            )
+            .withColumn(
+                "PCT_EJECUCION",
+                F.when(F.col("MONTO_PIM") != 0, (F.col("MONTO_RECAUDADO") / F.col("MONTO_PIM") * 100).cast("decimal(20,4)")),
+            )
+        )
+        return self._publish(
+            "pbi_dashboard_02",
+            curated,
+            required_columns=["SEC_EJEC", "ANO_DOC", "MES_DOC", "clasificador_id", "MONTO_RECAUDADO"],
+            unique_keys=["SEC_EJEC", "ANO_DOC", "MES_DOC", "clasificador_id"],
+            partition_columns=["year"],
+        )
+
+    def build_pbi_dashboard_03(self) -> Dict[str, Any]:
+        predial = self._gold_read("fact_predial_mensual")
+        municipalities = self._dashboard_municipalities()
+        curated = (
+            predial.join(municipalities, "SEC_EJEC", "inner")
+            .select(
+                "SEC_EJEC", "UBIGEO", "MUNICIPALIDAD_NOMBRE", "DEPARTAMENTO_NOMBRE",
+                "PROVINCIA_NOMBRE", "DISTRITO_NOMBRE", "categoria_municipalidad",
+                "categoria_match_status", "ANO_ESTADISTICA", "MES_ESTADISTICA",
+                "periodo_id", "year", "TIPO_META", "MON_RECAUDACTUAL_ORDIN",
+                "MON_RECAUDACTUAL_COAC", "MON_RECAUDACION_TOTAL",
+                "MON_SALDO_PREDIAL_TOTAL", "MON_BASEIMPONIBLE_AFECTO",
+                "NUM_CONTRIPREDIO", "NUM_PREDIOTOTAL",
+            )
+            .withColumn(
+                "PCT_RECUPERACION_PREDIAL",
+                F.when(
+                    F.coalesce(F.col("MON_RECAUDACION_TOTAL"), F.lit(0)) + F.coalesce(F.col("MON_SALDO_PREDIAL_TOTAL"), F.lit(0)) != 0,
+                    (
+                        F.coalesce(F.col("MON_RECAUDACION_TOTAL"), F.lit(0))
+                        / (F.coalesce(F.col("MON_RECAUDACION_TOTAL"), F.lit(0)) + F.coalesce(F.col("MON_SALDO_PREDIAL_TOTAL"), F.lit(0)))
+                        * 100
+                    ).cast("decimal(20,4)"),
+                ),
+            )
+        )
+        return self._publish(
+            "pbi_dashboard_03",
+            curated,
+            required_columns=["SEC_EJEC", "ANO_ESTADISTICA", "MES_ESTADISTICA", "MON_RECAUDACION_TOTAL"],
+            unique_keys=["SEC_EJEC", "ANO_ESTADISTICA", "MES_ESTADISTICA"],
+            partition_columns=["year"],
+        )
+
+    def build_pbi_dashboard_04(self) -> Dict[str, Any]:
+        predial = self._gold_read("fact_predial_mensual")
+        municipalities = self._dashboard_municipalities()
+        curated = (
+            predial.groupBy("SEC_EJEC", F.col("ANO_ESTADISTICA").alias("ANO_DOC"))
+            .agg(
+                self._sum_if_present(predial, "MON_RECAUDACION_TOTAL", "MON_RECAUDACION_TOTAL"),
+                self._sum_if_present(predial, "MON_SALDO_PREDIAL_TOTAL", "MON_SALDO_PREDIAL_TOTAL"),
+                self._sum_if_present(predial, "MON_BASEIMPONIBLE_AFECTO", "MON_BASEIMPONIBLE_AFECTO"),
+                self._sum_if_present(predial, "NUM_CONTRIPREDIO", "NUM_CONTRIPREDIO"),
+            )
+            .join(municipalities, "SEC_EJEC", "inner")
+            .withColumn("year", F.col("ANO_DOC").cast("string"))
+            .withColumn(
+                "PCT_RECUPERACION_PREDIAL",
+                F.when(
+                    F.coalesce(F.col("MON_RECAUDACION_TOTAL"), F.lit(0)) + F.coalesce(F.col("MON_SALDO_PREDIAL_TOTAL"), F.lit(0)) != 0,
+                    (
+                        F.coalesce(F.col("MON_RECAUDACION_TOTAL"), F.lit(0))
+                        / (F.coalesce(F.col("MON_RECAUDACION_TOTAL"), F.lit(0)) + F.coalesce(F.col("MON_SALDO_PREDIAL_TOTAL"), F.lit(0)))
+                        * 100
+                    ).cast("decimal(20,4)"),
+                ),
+            )
+        )
+        return self._publish(
+            "pbi_dashboard_04",
+            curated,
+            required_columns=["SEC_EJEC", "ANO_DOC", "PCT_RECUPERACION_PREDIAL", "categoria_municipalidad"],
+            unique_keys=["SEC_EJEC", "ANO_DOC"],
+            partition_columns=["year"],
+        )
+
+    def build_pbi_dashboard_05(self) -> Dict[str, Any]:
+        software = self._gold_read("fact_renamu_software_at").drop("UBIGEO")
+        gestion = self._gold_read("fact_renamu_gestion_tributaria").select(
+            "SEC_EJEC", "ANO_RENAMU", "personal_municipal_total",
+            "requiere_asistencia_at", "requiere_asistencia_catastro",
+            "requiere_capacitacion_at", "requiere_capacitacion_catastro",
+        )
+        municipalities = self._dashboard_municipalities()
+        curated = (
+            software.join(gestion, ["SEC_EJEC", "ANO_RENAMU"], "left")
+            .join(municipalities, "SEC_EJEC", "inner")
+            .select(
+                "SEC_EJEC", "UBIGEO", "MUNICIPALIDAD_NOMBRE", "DEPARTAMENTO_NOMBRE",
+                "PROVINCIA_NOMBRE", "DISTRITO_NOMBRE", "categoria_municipalidad",
+                "categoria_match_status", "ANO_RENAMU", "year", "tipo_municipalidad_renamu",
+                "personal_municipal_total", "usa_srtm_estado", "usa_software_rentas_at",
+                "usa_software_catastro", "usa_al_menos_un_software_at",
+                "requiere_asistencia_at", "requiere_asistencia_catastro",
+                "requiere_capacitacion_at", "requiere_capacitacion_catastro",
+            )
+        )
+        return self._publish(
+            "pbi_dashboard_05",
+            curated,
+            required_columns=["SEC_EJEC", "ANO_RENAMU", "usa_srtm_estado", "usa_software_rentas_at", "usa_software_catastro"],
+            unique_keys=["SEC_EJEC", "ANO_RENAMU"],
+            partition_columns=["year"],
+        )
+
+    def build_pbi_dashboard_06(self) -> Dict[str, Any]:
+        kpi = self._gold_read("mart_kpi_resumen_ejecutivo")
+        curated = (
+            self._filter_dashboard_scope(kpi)
+            .select(
+                "SEC_EJEC", "UBIGEO", "MUNICIPALIDAD_NOMBRE", "DEPARTAMENTO_NOMBRE",
+                "PROVINCIA_NOMBRE", "DISTRITO_NOMBRE", "categoria_municipalidad",
+                "categoria_match_status", "ANO_DOC", "year", "recaudacion_total",
+                "pim_total", "pia_total", "kpi_pct_ejecucion_recaudacion",
+                "kpi_variacion_pim_pia", "recaudacion_predial_total",
+                "emision_predial_total", "saldo_predial_total", "kpi_efectividad_predial",
+                "kpi_brecha_predial", "personal_municipal_total",
+                "requiere_asistencia_at_flag", "usa_srtm_estado_flag",
+                "usa_software_rentas_at_flag", "usa_software_catastro_flag",
+                "usa_al_menos_un_software_at_flag", "kpi_capacidad_software_pct",
+                "periodos_sismepre_reportados", "estado_sismepre_referencia",
+                "clasificacion_sismepre_referencia", "tipo_meta_sismepre_referencia",
+                "prioridad_intervencion",
+            )
+        )
+        return self._publish(
+            "pbi_dashboard_06",
+            curated,
+            required_columns=["SEC_EJEC", "ANO_DOC", "recaudacion_total", "prioridad_intervencion"],
+            unique_keys=["SEC_EJEC", "ANO_DOC"],
             partition_columns=["year"],
         )
 
@@ -662,6 +888,42 @@ class GoldTransformService:
             raise ValueError(f"Required Silver table does not exist: {path}")
         return self.spark.read.parquet(str(path))
 
+    def _read_optional(self, table_name: str) -> DataFrame | None:
+        path = Path(self.silver_path) / table_name
+        if not path.exists() or not any(path.rglob("*.parquet")):
+            return None
+        return self.spark.read.parquet(str(path))
+
+    def _gold_read(self, table_name: str) -> DataFrame:
+        path = self.storage.data_lake.gold_path / table_name
+        if not path.exists() or not any(path.rglob("*.parquet")):
+            raise ValueError(f"Required Gold table does not exist: {path}")
+        return self._drop_pipeline_metadata(self.spark.read.parquet(str(path)))
+
+    def _dashboard_municipalities(self) -> DataFrame:
+        master = self._gold_read("dim_municipalidad_gold")
+        return self._filter_dashboard_scope(master).select(
+            "SEC_EJEC", "UBIGEO", "MUNICIPALIDAD_NOMBRE", "DEPARTAMENTO_NOMBRE",
+            "PROVINCIA_NOMBRE", "DISTRITO_NOMBRE",
+            F.coalesce(F.col("categoria_municipalidad"), F.lit("Sin categoria")).alias("categoria_municipalidad"),
+            "categoria_match_status",
+        )
+
+    def _filter_dashboard_scope(self, df: DataFrame) -> DataFrame:
+        result = df
+        if "in_scope_presentacion" in result.columns and (self.scope_metrics or {}).get("scope_status") == "aplicado":
+            result = result.filter(F.col("in_scope_presentacion"))
+        if "exclude_from_gold_scope" in result.columns:
+            eligible = result.filter(~F.coalesce(F.col("exclude_from_gold_scope"), F.lit(False)))
+            if eligible.limit(1).count() > 0:
+                result = eligible
+        if "categoria_municipalidad" in result.columns:
+            result = result.withColumn(
+                "categoria_municipalidad",
+                F.coalesce(F.col("categoria_municipalidad"), F.lit("Sin categoria")),
+            )
+        return result
+
     def _renamu_master_lookup(self) -> DataFrame:
         master_path = self.storage.data_lake.gold_path / "dim_municipalidad_gold"
         if not master_path.exists() or not any(master_path.rglob("*.parquet")):
@@ -670,7 +932,9 @@ class GoldTransformService:
         if "in_scope_presentacion" in master.columns and (self.scope_metrics or {}).get("scope_status") == "aplicado":
             master = master.filter("in_scope_presentacion")
         if "exclude_from_gold_scope" in master.columns:
-            master = master.filter(~F.col("exclude_from_gold_scope"))
+            eligible = master.filter(~F.coalesce(F.col("exclude_from_gold_scope"), F.lit(False)))
+            if eligible.limit(1).count() > 0:
+                master = eligible
         return master.select("SEC_EJEC", "UBIGEO").where("SEC_EJEC IS NOT NULL AND UBIGEO IS NOT NULL").dropDuplicates(["SEC_EJEC"])
 
     def _filter_scope(self, df: DataFrame) -> DataFrame:
@@ -687,7 +951,9 @@ class GoldTransformService:
             select_columns.append("exclude_from_gold_scope")
         master = master_source.select(*select_columns)
         if "exclude_from_gold_scope" in master.columns:
-            master = master.filter(~F.col("exclude_from_gold_scope"))
+            eligible = master.filter(~F.coalesce(F.col("exclude_from_gold_scope"), F.lit(False)))
+            if eligible.limit(1).count() > 0:
+                master = eligible
         scope_state = self.scope_metrics or {}
         if scope_state.get("scope_status") != "aplicado":
             return df.join(master.select("SEC_EJEC"), "SEC_EJEC", "inner")
@@ -706,6 +972,28 @@ class GoldTransformService:
             json.dump(payload, file_handle, indent=2, ensure_ascii=False)
 
     def _enrich_with_category(self, municipalities: DataFrame) -> DataFrame:
+        if {"categoria_municipalidad", "categoria_match_status", "categoria_rule_applied"}.issubset(set(municipalities.columns)):
+            result = (
+                municipalities
+                .withColumn("categoria_match_status", F.coalesce(F.col("categoria_match_status"), F.lit("unmatched")))
+                .withColumn("categoria_rule_applied", F.coalesce(F.col("categoria_rule_applied"), F.lit("no_master_match")))
+            )
+            if "exclude_from_gold_scope" not in result.columns:
+                result = result.withColumn("exclude_from_gold_scope", F.col("categoria_match_status") == F.lit("unmatched"))
+            else:
+                result = result.withColumn("exclude_from_gold_scope", F.coalesce(F.col("exclude_from_gold_scope"), F.lit(True)))
+            self._write_category_metrics({
+                "category_status": "heredado_desde_municipalidades_silver",
+                "total_municipalities": result.count(),
+                "category_source_count": result.filter(F.col("categoria_municipalidad").isNotNull()).count(),
+                "matched_count": result.filter("categoria_match_status = 'matched'").count(),
+                "resolved_multiple_lima_count": result.filter("categoria_match_status = 'resolved_multiple_lima'").count(),
+                "resolved_multiple_non_lima_count": result.filter("categoria_match_status = 'resolved_multiple_non_lima'").count(),
+                "unmatched_count": result.filter("categoria_match_status = 'unmatched'").count(),
+                "excluded_count": result.filter("exclude_from_gold_scope").count(),
+            })
+            return result
+
         category_path = Path(self.silver_path) / "categorias_municipalidades_curated"
         if not category_path.exists() or not any(category_path.rglob("*.parquet")):
             result = (
@@ -754,15 +1042,69 @@ class GoldTransformService:
             })
             return enriched
 
+        if {"municipalidad_categoria_norm", "categoria_municipalidad"}.issubset(set(category_source.columns)):
+            categories = (
+                category_source
+                .select(
+                    F.col("municipalidad_categoria_norm").alias("_categoria_nombre_norm"),
+                    F.upper(F.trim(F.col("categoria_municipalidad"))).alias("_categoria_valor"),
+                )
+                .where("_categoria_nombre_norm IS NOT NULL AND _categoria_valor IS NOT NULL")
+                .dropDuplicates(["_categoria_nombre_norm", "_categoria_valor"])
+                .groupBy("_categoria_nombre_norm")
+                .agg(
+                    F.collect_set("_categoria_valor").alias("_categorias_disponibles"),
+                    F.countDistinct("_categoria_valor").alias("_categoria_distinct_count"),
+                )
+            )
+            enriched = (
+                municipalities
+                .withColumn("_municipalidad_nombre_norm", self._normalize_municipality_name(F.col("MUNICIPALIDAD_NOMBRE")))
+                .join(categories, F.col("_municipalidad_nombre_norm") == F.col("_categoria_nombre_norm"), "left")
+                .withColumn(
+                    "categoria_municipalidad",
+                    F.when(F.col("_categoria_distinct_count") == 1, F.element_at(F.sort_array("_categorias_disponibles"), 1))
+                    .when((F.col("_categoria_distinct_count") > 1) & (F.upper(F.col("DEPARTAMENTO_NOMBRE")) == F.lit("LIMA")), F.lit("C"))
+                    .when(F.col("_categoria_distinct_count") > 1, F.lit("G")),
+                )
+                .withColumn(
+                    "categoria_match_status",
+                    F.when(F.col("_categoria_distinct_count") == 1, F.lit("matched"))
+                    .when((F.col("_categoria_distinct_count") > 1) & (F.upper(F.col("DEPARTAMENTO_NOMBRE")) == F.lit("LIMA")), F.lit("resolved_multiple_lima"))
+                    .when(F.col("_categoria_distinct_count") > 1, F.lit("resolved_multiple_non_lima"))
+                    .otherwise(F.lit("unmatched")),
+                )
+                .withColumn(
+                    "categoria_rule_applied",
+                    F.when(F.col("categoria_match_status") == F.lit("matched"), F.lit("single_master_category"))
+                    .when(F.col("categoria_match_status") == F.lit("resolved_multiple_lima"), F.lit("multiple_categories_lima_to_c"))
+                    .when(F.col("categoria_match_status") == F.lit("resolved_multiple_non_lima"), F.lit("multiple_categories_non_lima_to_g"))
+                    .otherwise(F.lit("no_master_match")),
+                )
+                .withColumn("exclude_from_gold_scope", F.col("categoria_match_status") == F.lit("unmatched"))
+                .drop("_municipalidad_nombre_norm", "_categoria_nombre_norm", "_categorias_disponibles", "_categoria_distinct_count")
+            )
+            self._write_category_metrics({
+                "category_status": "aplicado_por_nombre_normalizado_en_gold",
+                "total_municipalities": enriched.count(),
+                "category_source_count": category_source.count(),
+                "matched_count": enriched.filter("categoria_match_status = 'matched'").count(),
+                "resolved_multiple_lima_count": enriched.filter("categoria_match_status = 'resolved_multiple_lima'").count(),
+                "resolved_multiple_non_lima_count": enriched.filter("categoria_match_status = 'resolved_multiple_non_lima'").count(),
+                "unmatched_count": enriched.filter("categoria_match_status = 'unmatched'").count(),
+                "excluded_count": enriched.filter("exclude_from_gold_scope").count(),
+            })
+            return enriched
+
         enriched = (
             municipalities
             .withColumn("categoria_municipalidad", F.lit(None).cast("string"))
-            .withColumn("categoria_match_status", F.lit("category_source_without_sec_ejec"))
-            .withColumn("categoria_rule_applied", F.lit("category_source_without_sec_ejec"))
+            .withColumn("categoria_match_status", F.lit("category_source_without_match_key"))
+            .withColumn("categoria_rule_applied", F.lit("category_source_without_match_key"))
             .withColumn("exclude_from_gold_scope", F.lit(True))
         )
         self._write_category_metrics({
-            "category_status": "category_source_without_sec_ejec",
+            "category_status": "category_source_without_match_key",
             "total_municipalities": enriched.count(),
             "category_source_count": category_source.count(),
             "matched_count": 0,
