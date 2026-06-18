@@ -828,11 +828,29 @@ class GoldTransformService:
         quality_path = Path(self.audit_path) / "quality_checks"
         if not quality_path.exists():
             raise ValueError(f"Audit quality checks path does not exist: {quality_path}")
-        source = (
-            self.spark.read.option("recursiveFileLookup", "true")
-            .option("multiLine", "true")
-            .json(str(quality_path))
-        )
+        records = []
+        for file_path in quality_path.rglob("*.json"):
+            try:
+                payload = json.loads(file_path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                continue
+            records.append(
+                {
+                    "check_id": payload.get("check_id"),
+                    "check_name": payload.get("check_name"),
+                    "check_type": payload.get("check_type"),
+                    "status": payload.get("status"),
+                    "timestamp": payload.get("timestamp"),
+                    "dataset": payload.get("dataset"),
+                    "records_checked": payload.get("records_checked"),
+                    "records_passed": payload.get("records_passed"),
+                    "records_failed": payload.get("records_failed"),
+                    "failure_rate": payload.get("failure_rate"),
+                }
+            )
+        if not records:
+            raise ValueError(f"No quality check JSON files found in: {quality_path}")
+        source = self.spark.createDataFrame(records)
         curated = (
             source.select(
                 "check_id", "check_name", "check_type", "status", "timestamp", "dataset",
@@ -844,7 +862,7 @@ class GoldTransformService:
                 .when(F.col("check_name").startswith("silver_"), F.lit("silver"))
                 .otherwise(F.lit("bronze")),
             )
-            .withColumn("year", F.year("timestamp").cast("string"))
+            .withColumn("year", F.substring(F.col("timestamp").cast("string"), 1, 4))
             .dropDuplicates(["check_id"])
         )
         return self._publish(
@@ -1023,13 +1041,77 @@ class GoldTransformService:
             ]
             categories = category_source.select(
                 *[column for column in category_columns if column in category_source.columns]
-            ).dropDuplicates(["SEC_EJEC"])
+            ).where("SEC_EJEC IS NOT NULL").dropDuplicates(["SEC_EJEC"])
             enriched = (
                 municipalities.join(categories, "SEC_EJEC", "left")
                 .withColumn("categoria_match_status", F.coalesce(F.col("categoria_match_status"), F.lit("unmatched")))
                 .withColumn("categoria_rule_applied", F.coalesce(F.col("categoria_rule_applied"), F.lit("no_master_match")))
                 .withColumn("exclude_from_gold_scope", F.coalesce(F.col("exclude_from_gold_scope"), F.lit(True)))
             )
+            lookup_path = Path(self.silver_path) / "categorias_municipalidades_lookup"
+            if lookup_path.exists() and any(lookup_path.rglob("*.parquet")):
+                lookup = (
+                    self.spark.read.parquet(str(lookup_path))
+                    .select(
+                        F.col("municipalidad_categoria_norm").alias("_categoria_nombre_norm"),
+                        "categorias_maestro",
+                        "categoria_distinct_count",
+                    )
+                    .where("_categoria_nombre_norm IS NOT NULL")
+                    .dropDuplicates(["_categoria_nombre_norm"])
+                )
+                enriched = (
+                    enriched
+                    .withColumn("_municipalidad_nombre_norm", self._normalize_municipality_name(F.col("MUNICIPALIDAD_NOMBRE")))
+                    .join(lookup, F.col("_municipalidad_nombre_norm") == F.col("_categoria_nombre_norm"), "left")
+                    .withColumn(
+                        "_categoria_fallback",
+                        F.when(F.col("categoria_distinct_count") == 1, F.element_at("categorias_maestro", 1))
+                        .when(
+                            (F.col("categoria_distinct_count") > 1)
+                            & (F.upper(F.trim(F.col("DEPARTAMENTO_NOMBRE"))) == F.lit("LIMA")),
+                            F.lit("C"),
+                        )
+                        .when(F.col("categoria_distinct_count") > 1, F.lit("G")),
+                    )
+                    .withColumn(
+                        "_categoria_status_fallback",
+                        F.when(F.col("categoria_distinct_count") == 1, F.lit("matched"))
+                        .when(
+                            (F.col("categoria_distinct_count") > 1)
+                            & (F.upper(F.trim(F.col("DEPARTAMENTO_NOMBRE"))) == F.lit("LIMA")),
+                            F.lit("resolved_multiple_lima"),
+                        )
+                        .when(F.col("categoria_distinct_count") > 1, F.lit("resolved_multiple_non_lima")),
+                    )
+                    .withColumn(
+                        "_categoria_rule_fallback",
+                        F.when(F.col("_categoria_status_fallback") == F.lit("matched"), F.lit("unique_master_category_name_fallback"))
+                        .when(F.col("_categoria_status_fallback") == F.lit("resolved_multiple_lima"), F.lit("multiple_master_lima_to_c"))
+                        .when(F.col("_categoria_status_fallback") == F.lit("resolved_multiple_non_lima"), F.lit("multiple_master_non_lima_to_g")),
+                    )
+                    .withColumn(
+                        "categoria_municipalidad",
+                        F.when(F.col("categoria_match_status") == F.lit("unmatched"), F.coalesce(F.col("_categoria_fallback"), F.col("categoria_municipalidad")))
+                        .otherwise(F.col("categoria_municipalidad")),
+                    )
+                    .withColumn(
+                        "categoria_match_status",
+                        F.when(F.col("categoria_match_status") == F.lit("unmatched"), F.coalesce(F.col("_categoria_status_fallback"), F.col("categoria_match_status")))
+                        .otherwise(F.col("categoria_match_status")),
+                    )
+                    .withColumn(
+                        "categoria_rule_applied",
+                        F.when(F.col("categoria_rule_applied") == F.lit("no_master_match"), F.coalesce(F.col("_categoria_rule_fallback"), F.col("categoria_rule_applied")))
+                        .otherwise(F.col("categoria_rule_applied")),
+                    )
+                    .withColumn("exclude_from_gold_scope", F.col("categoria_match_status") == F.lit("unmatched"))
+                    .drop(
+                        "_municipalidad_nombre_norm", "_categoria_nombre_norm",
+                        "categorias_maestro", "categoria_distinct_count",
+                        "_categoria_fallback", "_categoria_status_fallback", "_categoria_rule_fallback",
+                    )
+                )
             self._write_category_metrics({
                 "category_status": "aplicado_desde_silver",
                 "total_municipalities": enriched.count(),

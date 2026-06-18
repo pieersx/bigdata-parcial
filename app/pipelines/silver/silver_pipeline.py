@@ -83,6 +83,7 @@ class SilverPipeline:
                 ["ANO_APLICACION", "PERIODO", "FORMULARIO_ID", "TITULO"],
                 ["ANO_APLICACION", "PERIODO", "FORMULARIO_ID"],
             )),
+            ("categorias_municipalidades_lookup", service.build_categorias_municipalidades_lookup),
             ("categorias_municipalidades_curated", service.build_categorias_municipalidades_curated),
         ]
         results: List[Dict[str, Any]] = []

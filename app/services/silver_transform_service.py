@@ -427,6 +427,50 @@ class SilverTransformService:
             },
         )
 
+    def build_categorias_municipalidades_lookup(self) -> Dict[str, Any]:
+        source = self._read("categorias_municipalidades")
+        curated = (
+            source.select(
+                F.trim(F.col("Municipalidad")).alias("municipalidad_categoria_raw"),
+                F.upper(F.trim(F.col("Categoria"))).alias("categoria_municipalidad"),
+                *self._existing_trace_columns(source),
+            )
+            .withColumn(
+                "municipalidad_categoria_norm",
+                self._normalize_municipality_name(F.col("municipalidad_categoria_raw")),
+            )
+        )
+        valid = curated.filter(
+            F.col("municipalidad_categoria_raw").isNotNull()
+            & (F.col("municipalidad_categoria_raw") != "")
+            & F.col("categoria_municipalidad").isin("A", "B", "C", "D", "E", "F", "G")
+        )
+        lookup = (
+            valid.groupBy("municipalidad_categoria_norm")
+            .agg(
+                F.first("municipalidad_categoria_raw", ignorenulls=True).alias("municipalidad_categoria_raw"),
+                F.array_sort(F.collect_set("categoria_municipalidad")).alias("categorias_maestro"),
+                F.countDistinct("categoria_municipalidad").alias("categoria_distinct_count"),
+                *[
+                    F.first(column, ignorenulls=True).alias(column)
+                    for column in TRACE_COLUMNS
+                    if column in valid.columns
+                ],
+            )
+            .withColumn("categoria_source", F.lit("CategoriasMunicipalidades.csv"))
+        )
+        return self._publish(
+            "categorias_municipalidades_lookup",
+            lookup,
+            required_columns=["municipalidad_categoria_norm", "categorias_maestro", "categoria_distinct_count"],
+            unique_keys=["municipalidad_categoria_norm"],
+            details={
+                "category_master_keys": lookup.count(),
+                "single_category_keys": lookup.filter("categoria_distinct_count = 1").count(),
+                "multiple_category_keys": lookup.filter("categoria_distinct_count > 1").count(),
+            },
+        )
+
     def build_curated_dataset(
         self,
         table_name: str,
@@ -559,9 +603,4 @@ class SilverTransformService:
         return F.trim(normalized)
 
     def _is_lima_municipality(self):
-        geo_columns = ["DEPARTAMENTO_NOMBRE", "PROVINCIA_NOMBRE", "DISTRITO_NOMBRE"]
-        expressions = [
-            F.upper(F.trim(F.coalesce(F.col(column).cast("string"), F.lit("")))) == F.lit("LIMA")
-            for column in geo_columns
-        ]
-        return self._any(expressions)
+        return F.upper(F.trim(F.coalesce(F.col("DEPARTAMENTO_NOMBRE").cast("string"), F.lit("")))) == F.lit("LIMA")
