@@ -2,6 +2,7 @@ from typing import Any, Dict, List
 
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
+from pyspark.sql.window import Window
 from pyspark import StorageLevel
 
 from app.quality.silver_quality_analyzer import SilverQualityAnalyzer
@@ -362,6 +363,17 @@ class SilverTransformService:
 
         municipal_path = self.storage.data_lake.silver_path / "municipalidades_curated"
         if municipal_path.exists() and any(municipal_path.rglob("*.parquet")):
+            category_master_prefixed = category_master.select(
+                F.col("municipalidad_categoria_norm").alias("_category_norm"),
+                "municipalidad_categoria_raw",
+                "categorias_maestro",
+                "categoria_distinct_count",
+                *[
+                    F.col(column)
+                    for column in TRACE_COLUMNS
+                    if column in category_master.columns
+                ],
+            )
             municipalities = (
                 self.spark.read.parquet(str(municipal_path))
                 .select(
@@ -373,9 +385,71 @@ class SilverTransformService:
                     "municipalidad_categoria_norm",
                     self._normalize_municipality_name(F.col("MUNICIPALIDAD_NOMBRE")),
                 )
+                .withColumn(
+                    "_name_before_dash_norm",
+                    self._normalize_municipality_name(
+                        F.element_at(F.split(F.col("MUNICIPALIDAD_NOMBRE"), r"\s+-\s+"), 1)
+                    ),
+                )
+                .withColumn(
+                    "_district_constructed_norm",
+                    self._normalize_municipality_name(
+                        F.concat(F.lit("MUNICIPALIDAD DISTRITAL DE "), F.coalesce(F.col("DISTRITO_NOMBRE"), F.lit("")))
+                    ),
+                )
+                .withColumn(
+                    "_province_constructed_norm",
+                    self._normalize_municipality_name(
+                        F.concat(F.lit("MUNICIPALIDAD PROVINCIAL DE "), F.coalesce(F.col("PROVINCIA_NOMBRE"), F.lit("")))
+                    ),
+                )
+            )
+            # Se usan claves alternativas conservadoras para corregir variantes
+            # oficiales de nombres sin hacer matches ambiguos por provincia.
+            candidate_keys = municipalities.select(
+                "*",
+                F.explode(
+                    F.array(
+                        F.struct(F.lit(1).alias("_match_priority"), F.lit("name").alias("_match_key_type"), F.col("municipalidad_categoria_norm").alias("_match_key_norm")),
+                        F.struct(F.lit(2).alias("_match_priority"), F.lit("name_before_dash").alias("_match_key_type"), F.col("_name_before_dash_norm").alias("_match_key_norm")),
+                        F.struct(
+                            F.lit(3).alias("_match_priority"),
+                            F.lit("district_constructed").alias("_match_key_type"),
+                            F.when(
+                                F.upper(F.col("MUNICIPALIDAD_NOMBRE")).contains("DISTRITAL"),
+                                F.col("_district_constructed_norm"),
+                            ).alias("_match_key_norm"),
+                        ),
+                        F.struct(
+                            F.lit(4).alias("_match_priority"),
+                            F.lit("province_constructed").alias("_match_key_type"),
+                            F.when(
+                                F.upper(F.col("MUNICIPALIDAD_NOMBRE")).contains("PROVINCIAL")
+                                | F.upper(F.col("MUNICIPALIDAD_NOMBRE")).contains("METROPOLITANA"),
+                                F.col("_province_constructed_norm"),
+                            ).alias("_match_key_norm"),
+                        ),
+                    )
+                ).alias("_candidate"),
+            ).select(
+                *municipalities.columns,
+                F.col("_candidate._match_priority").alias("_match_priority"),
+                F.col("_candidate._match_key_type").alias("_match_key_type"),
+                F.col("_candidate._match_key_norm").alias("_match_key_norm"),
+            ).filter(F.col("_match_key_norm").isNotNull() & (F.col("_match_key_norm") != ""))
+            match_condition = (
+                (F.col("_match_key_norm") == F.col("_category_norm"))
+                | F.expr("_match_key_norm LIKE concat(_category_norm, ' %')")
+            )
+            best_match_window = Window.partitionBy("SEC_EJEC").orderBy(
+                (F.col("_match_key_norm") == F.col("_category_norm")).cast("int").desc(),
+                F.col("_match_priority").asc(),
+                F.length(F.col("_category_norm")).desc_nulls_last(),
             )
             conformed = (
-                municipalities.join(category_master, "municipalidad_categoria_norm", "left")
+                candidate_keys.join(category_master_prefixed, match_condition, "left")
+                .withColumn("_category_match_rank", F.row_number().over(best_match_window))
+                .filter(F.col("_category_match_rank") == 1)
                 .withColumn("_has_master_category", F.col("categoria_distinct_count").isNotNull())
                 .withColumn("_is_lima", self._is_lima_municipality())
                 .withColumn(
@@ -400,7 +474,12 @@ class SilverTransformService:
                     .otherwise(F.lit("multiple_master_non_lima_to_g")),
                 )
                 .withColumn("exclude_from_gold_scope", ~F.col("_has_master_category"))
-                .drop("_has_master_category", "_is_lima")
+                .withColumn("categoria_match_key_type", F.when(F.col("_has_master_category"), F.col("_match_key_type")))
+                .drop(
+                    "_category_norm", "_category_match_rank", "_has_master_category", "_is_lima",
+                    "_name_before_dash_norm", "_district_constructed_norm", "_province_constructed_norm",
+                    "_match_priority", "_match_key_type", "_match_key_norm",
+                )
             )
         else:
             conformed = (
@@ -608,12 +687,15 @@ class SilverTransformService:
 
     def _normalize_municipality_name(self, value):
         normalized = F.upper(F.trim(value))
+        normalized = F.regexp_replace(normalized, "�", "Ñ")
         normalized = F.translate(normalized, "ÁÉÍÓÚÜÑáéíóúüñ", "AEIOUUNAEIOUUN")
-        normalized = F.regexp_replace(normalized, r"\bM\s*\.\s*D\s*\.\s*DE\b", "M D DE")
-        normalized = F.regexp_replace(normalized, r"\bM\s*\.\s*P\s*\.\s*DE\b", "M P DE")
+        normalized = F.regexp_replace(normalized, r"\bM\s*\.?\s*D\s*\.?\s*(?:DE)?\b", "M D ")
+        normalized = F.regexp_replace(normalized, r"\bM\s*\.?\s*P\s*\.?\s*(?:DE)?\b", "M P ")
         normalized = F.regexp_replace(normalized, r"\bMUNICIPALIDAD\b", "M")
         normalized = F.regexp_replace(normalized, r"\bDISTRITAL\b", "D")
         normalized = F.regexp_replace(normalized, r"\bPROVINCIAL\b", "P")
+        normalized = F.regexp_replace(normalized, r"\bM\s+D\s+DE\b", "M D")
+        normalized = F.regexp_replace(normalized, r"\bM\s+P\s+DE\b", "M P")
         normalized = F.regexp_replace(normalized, r"[^A-Z0-9]+", " ")
         normalized = F.regexp_replace(normalized, r"\s+", " ")
         return F.trim(normalized)

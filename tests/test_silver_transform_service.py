@@ -203,6 +203,7 @@ class SilverTransformServiceTest(unittest.TestCase):
                 {"SEC_EJEC": "300004", "UBIGEO": "010103", "MUNICIPALIDAD_NOMBRE": "MUNICIPALIDAD DISTRITAL DE SIN CATEGORIA", "DEPARTAMENTO_NOMBRE": "AMAZONAS", "PROVINCIA_NOMBRE": "CHACHAPOYAS", "DISTRITO_NOMBRE": "SIN CATEGORIA"},
                 {"SEC_EJEC": "300005", "UBIGEO": "150139", "MUNICIPALIDAD_NOMBRE": "MUNICIPALIDAD DISTRITAL DE SANTA ROSA", "DEPARTAMENTO_NOMBRE": "LIMA", "PROVINCIA_NOMBRE": "LIMA", "DISTRITO_NOMBRE": "SANTA ROSA"},
                 {"SEC_EJEC": "300006", "UBIGEO": "210808", "MUNICIPALIDAD_NOMBRE": "MUNICIPALIDAD DISTRITAL DE SANTA ROSA", "DEPARTAMENTO_NOMBRE": "PUNO", "PROVINCIA_NOMBRE": "MELGAR", "DISTRITO_NOMBRE": "SANTA ROSA"},
+                {"SEC_EJEC": "300007", "UBIGEO": "050115", "MUNICIPALIDAD_NOMBRE": "MUNICIPALIDAD DISTRITAL JESUS NAZARENO", "DEPARTAMENTO_NOMBRE": "AYACUCHO", "PROVINCIA_NOMBRE": "HUAMANGA", "DISTRITO_NOMBRE": "JESUS NAZARENO"},
             ]
         ).write.mode("overwrite").parquet(str(self.data_lake.silver_path / "municipalidades_curated"))
         self.write_bronze(
@@ -216,6 +217,7 @@ class SilverTransformServiceTest(unittest.TestCase):
                 {"Municipalidad": "M. D. DE SANTA ROSA", "Categoria": "E"},
                 {"Municipalidad": "M. D. DE SANTA ROSA", "Categoria": "F"},
                 {"Municipalidad": "M. D. DE SANTA ROSA", "Categoria": "G"},
+                {"Municipalidad": "M. D. DE JESUS NAZARENO", "Categoria": "D"},
                 {"Municipalidad": "", "Categoria": "A"},
                 {"Municipalidad": "M. D. DE INVALIDA", "Categoria": "Z"},
             ],
@@ -225,7 +227,7 @@ class SilverTransformServiceTest(unittest.TestCase):
         published = self.spark.read.parquet(result["storage"]["path"])
         quarantined = self.spark.read.parquet(result["quarantine"]["path"])
 
-        self.assertEqual(6, result["records_published"])
+        self.assertEqual(7, result["records_published"])
         self.assertEqual(2, result["records_quarantined"])
         self.assertEqual("F", published.filter("SEC_EJEC = '300001'").first()["categoria_municipalidad"])
         self.assertEqual("C", published.filter("SEC_EJEC = '300002'").first()["categoria_municipalidad"])
@@ -236,6 +238,8 @@ class SilverTransformServiceTest(unittest.TestCase):
         self.assertEqual("resolved_multiple_lima", published.filter("SEC_EJEC = '300005'").first()["categoria_match_status"])
         self.assertEqual("G", published.filter("SEC_EJEC = '300006'").first()["categoria_municipalidad"])
         self.assertEqual("resolved_multiple_non_lima", published.filter("SEC_EJEC = '300006'").first()["categoria_match_status"])
+        self.assertEqual("D", published.filter("SEC_EJEC = '300007'").first()["categoria_municipalidad"])
+        self.assertEqual("matched", published.filter("SEC_EJEC = '300007'").first()["categoria_match_status"])
         self.assertTrue(published.filter("SEC_EJEC = '300004'").first()["exclude_from_gold_scope"])
         reasons = {row["_quarantine_reason"] for row in quarantined.select("_quarantine_reason").collect()}
         self.assertEqual({"invalid_category_or_name"}, reasons)

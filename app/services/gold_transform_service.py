@@ -1230,12 +1230,15 @@ class GoldTransformService:
 
     def _normalize_municipality_name(self, value):
         normalized = F.upper(F.trim(value))
+        normalized = F.regexp_replace(normalized, "�", "Ñ")
         normalized = F.translate(normalized, "ÁÉÍÓÚÜÑáéíóúüñ", "AEIOUUNAEIOUUN")
-        normalized = F.regexp_replace(normalized, r"\bM\s*\.\s*D\s*\.\s*DE\b", "M D DE")
-        normalized = F.regexp_replace(normalized, r"\bM\s*\.\s*P\s*\.\s*DE\b", "M P DE")
+        normalized = F.regexp_replace(normalized, r"\bM\s*\.?\s*D\s*\.?\s*(?:DE)?\b", "M D ")
+        normalized = F.regexp_replace(normalized, r"\bM\s*\.?\s*P\s*\.?\s*(?:DE)?\b", "M P ")
         normalized = F.regexp_replace(normalized, r"\bMUNICIPALIDAD\b", "M")
         normalized = F.regexp_replace(normalized, r"\bDISTRITAL\b", "D")
         normalized = F.regexp_replace(normalized, r"\bPROVINCIAL\b", "P")
+        normalized = F.regexp_replace(normalized, r"\bM\s+D\s+DE\b", "M D")
+        normalized = F.regexp_replace(normalized, r"\bM\s+P\s+DE\b", "M P")
         normalized = F.regexp_replace(normalized, r"[^A-Z0-9]+", " ")
         normalized = F.regexp_replace(normalized, r"\s+", " ")
         return F.trim(normalized)
