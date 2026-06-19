@@ -44,6 +44,8 @@ class GoldPipeline:
             reference_path=str(settings.raw_path.parent / "reference"),
         )
         builders = [
+            # Gold es la unica capa que construye modelo dimensional:
+            # primero dimensiones, luego hechos y finalmente salidas auxiliares.
             ("dim_municipalidad_gold", service.build_dim_municipalidad_gold),
             ("dim_ubigeo", service.build_dim_ubigeo),
             ("dim_tiempo", service.build_dim_tiempo),
@@ -58,6 +60,8 @@ class GoldPipeline:
             ("fact_sismepre_respuestas_resumen", service.build_fact_sismepre_respuestas_resumen),
             ("fact_renamu_gestion_tributaria", service.build_fact_renamu_gestion_tributaria),
             ("fact_renamu_software_at", service.build_fact_renamu_software_at),
+            # Estas salidas son auxiliares para consumo rapido; para exponer
+            # el modelo se deben priorizar las tablas dim_* y fact_*.
             ("mart_dashboard_municipal", service.build_mart_dashboard_municipal),
             ("mart_kpi_resumen_ejecutivo", service.build_mart_kpi_resumen_ejecutivo),
             ("pbi_dashboard_01", service.build_pbi_dashboard_01),

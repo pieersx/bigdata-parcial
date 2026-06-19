@@ -43,8 +43,9 @@ class SilverPipeline:
             required_government_level=silver_config.get("required_government_level", "M"),
             quarantine_enabled=bool(silver_config.get("quarantine_enabled", True)),
         )
-        # Clean up obsolete Silver outputs from the earlier dimensional version.
-        # Silver now publishes only curated datasets; fact/dim tables belong to Gold.
+        # Limpieza defensiva: si existen salidas antiguas con nombres dim_/fact_,
+        # se eliminan porque Silver no debe hacer modelado dimensional.
+        # Silver solo deja datasets curados y Gold construye dimensiones/hechos.
         legacy_modeled_outputs = [
             "dim_municipalidad",
             "fact_ingresos_municipales",
@@ -60,6 +61,8 @@ class SilverPipeline:
             storage.clear_quarantine(legacy_table)
 
         builders = [
+            # Cada builder produce un dataset Silver limpio en Parquet:
+            # tipado, normalizado, deduplicado y validado con cuarentena.
             ("municipalidades_curated", service.build_municipalidades_curated),
             ("renamu_curated", service.build_renamu_curated),
             ("ingresos_municipales_curated", service.build_ingresos_municipales_curated),

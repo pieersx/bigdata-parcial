@@ -45,6 +45,8 @@ class GoldTransformService:
     def build_dim_municipalidad_gold(self) -> Dict[str, Any]:
         income = self._read("ingresos_municipales_curated")
         sismepre = self._read("municipalidades_curated")
+        # Maestro municipal Gold: parte de SIAF para conservar todas las
+        # ejecutoras municipales y se enriquece con SISMEPRE, RENAMU y categorias.
         siaf = (
             income.select(
                 "SEC_EJEC",
@@ -77,6 +79,8 @@ class GoldTransformService:
             *category_columns,
         ).withColumn("has_sismepre", F.lit(True))
         curated = (
+            # SISMEPRE aporta la geografia curada; si no existe match,
+            # se usa la geografia SIAF como respaldo para no perder registros.
             siaf.join(sm, "SEC_EJEC", "left")
             .withColumn("UBIGEO", F.coalesce("UBIGEO", "SIAF_UBIGEO"))
             .withColumn("MUNICIPALIDAD_NOMBRE", F.coalesce("MUNICIPALIDAD_NOMBRE", "SIAF_MUNICIPALIDAD_NOMBRE"))
@@ -118,6 +122,7 @@ class GoldTransformService:
 
     def build_dim_tiempo(self) -> Dict[str, Any]:
         income = self._read("ingresos_municipales_curated")
+        # Dimension calendario mensual construida desde el rango real de SIAF.
         bounds = income.select(
             F.min(F.make_date("ANO_DOC", "MES_DOC", F.lit(1))).alias("min_date"),
             F.max(F.make_date("ANO_DOC", "MES_DOC", F.lit(1))).alias("max_date"),
@@ -143,6 +148,8 @@ class GoldTransformService:
 
     def build_dim_clasificador_ingreso(self) -> Dict[str, Any]:
         income = self._read("ingresos_municipales_curated")
+        # Jerarquia presupuestaria normalizada para analizar ingresos por rubro,
+        # generica, subgenerica y especifica.
         curated = (
             income.select(*CLASSIFIER_COLUMNS, *CLASSIFIER_NAME_COLUMNS)
             .dropDuplicates(CLASSIFIER_COLUMNS)
@@ -215,6 +222,8 @@ class GoldTransformService:
 
     def build_fact_ingresos_mensuales(self) -> Dict[str, Any]:
         income = self._filter_scope(self._read("ingresos_municipales_curated"))
+        # Fact SIAF mensual: concentra PIA, PIM y recaudado por municipalidad,
+        # ano y mes. Es la base de KPIs de ejecucion y brecha.
         curated = (
             income.repartition(96, "ANO_DOC", "MES_DOC", "SEC_EJEC")
             .groupBy("SEC_EJEC", "ANO_DOC", "MES_DOC")
@@ -241,6 +250,8 @@ class GoldTransformService:
     def build_fact_ingresos_clasificador(self) -> Dict[str, Any]:
         income = self._filter_scope(self._read("ingresos_municipales_curated"))
         keys = ["SEC_EJEC", "ANO_DOC", "MES_DOC", *CLASSIFIER_COLUMNS]
+        # Fact SIAF por clasificador: permite explicar de donde viene la
+        # recaudacion y hacer drill-down presupuestario.
         curated = (
             income.repartition(96, *keys)
             .groupBy(*keys)
@@ -264,6 +275,8 @@ class GoldTransformService:
         predial = self._filter_scope(self._read("predial_esat_curated"))
         metrics = [column for column in predial.columns if column.startswith("MON_") or column.startswith("NUM_")]
         keys = ["SEC_EJEC", "ANO_ESTADISTICA", "MES_ESTADISTICA"]
+        # Fact predial: resume montos y cantidades SISMEPRE por municipalidad
+        # y mes estadistico para medir recaudacion, saldos y efectividad.
         curated = (
             predial.groupBy(*keys)
             .agg(
@@ -286,6 +299,8 @@ class GoldTransformService:
 
     def build_fact_sismepre_cumplimiento(self) -> Dict[str, Any]:
         source = self._filter_scope(self._read("sismepre_entidad_estado_curated"))
+        # Fact de cumplimiento: conserva estado, clasificacion y tipo de meta
+        # para analizar cobertura y avance SISMEPRE por periodo.
         curated = (
             source.select(
                 "SEC_EJEC", "ANO_APLICACION", "PERIODO", "ESTADO", "CLASIFICACION",
@@ -306,6 +321,8 @@ class GoldTransformService:
     def build_fact_sismepre_respuestas_resumen(self) -> Dict[str, Any]:
         source = self._filter_scope(self._read("sismepre_respuestas_curated"))
         keys = ["SEC_EJEC", "ANO_APLICACION", "PERIODO", "FORMULARIO_ID", "PREGUNTA_ID", "response_type"]
+        # Fact agregado de respuestas: resume respuestas normalizadas de Silver
+        # para analizar formularios y preguntas sin explotar el detalle completo.
         curated = (
             source.groupBy(*keys)
             .agg(
@@ -352,6 +369,8 @@ class GoldTransformService:
                 )
                 .where("renamu_match")
             )
+        # Fact RENAMU de gestion: mide personal y necesidades de asistencia o
+        # capacitacion tributaria municipal.
         curated = (
             source.select(
                 "UBIGEO",
@@ -397,6 +416,8 @@ class GoldTransformService:
                 )
                 .where("renamu_match")
             )
+        # Fact RENAMU de software: identifica SRTM, software de rentas,
+        # catastro y uso de al menos una herramienta tributaria.
         curated = (
             source.select(
                 "UBIGEO",

@@ -34,6 +34,8 @@ class BronzeTransformService:
         execution_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         raw_path = Path(landing_result["raw_path"])
+        # Bronze lee los CSV tal como llegan. Todavia no corrige valores:
+        # solo los estructura como DataFrame y agrega columnas de auditoria.
         df = read_csv_as_bronze_dataframe(self.spark, raw_path, asset["read_options"])
         df = self._add_bronze_metadata(
             df,
@@ -61,6 +63,8 @@ class BronzeTransformService:
             partition_columns=partition_columns,
         )
 
+        # Profiling y calidad quedan como evidencia tecnica de la ingesta:
+        # permiten demostrar disponibilidad, trazabilidad y problemas iniciales.
         quality_results = []
         if self.quality_analyzer and asset.get("quality_enabled", False):
             quality_results = self.quality_analyzer.analyze(
@@ -111,6 +115,8 @@ class BronzeTransformService:
         execution_id: Optional[str],
     ) -> DataFrame:
         source_checksum = self._sha256(raw_path)
+        # Estas columnas explican de donde vino cada registro y en que
+        # ejecucion fue cargado; son clave para auditoria de la arquitectura.
         return (
             df.withColumn("_bronze_dataset", F.lit(dataset))
             .withColumn("_bronze_asset_name", F.lit(asset["name"]))

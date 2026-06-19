@@ -27,6 +27,8 @@ class BronzeIngestionPipeline(ABC):
     def run(self) -> List[Dict[str, Any]]:
         results: List[Dict[str, Any]] = []
         for asset in self.build_assets():
+            # Bronze siempre parte del raw: descarga o reutiliza el archivo fuente
+            # y luego lo convierte a Parquet con metadatos de trazabilidad.
             landing_result = self.landing_service.fetch(self.dataset_name, asset)
             if landing_result["status"] == "error":
                 results.append(landing_result)
@@ -41,6 +43,8 @@ class BronzeIngestionPipeline(ABC):
                 continue
 
             try:
+                # La transformacion Bronze no modela datos; solo conserva la
+                # fuente en formato analitico Parquet para que Silver la limpie.
                 results.append(
                     self.bronze_transform_service.transform(
                         dataset=self.dataset_name,

@@ -42,6 +42,8 @@ class SilverTransformService:
     def build_municipalidades_curated(self) -> Dict[str, Any]:
         esat = self._read("sismepre/rentas_esat_estadistica_atm")
         renamu = self._read("renamu")
+        # La municipalidad canonica nace de SISMEPRE porque trae la relacion
+        # estable SEC_EJEC -> UBIGEO usada luego para cruzar SIAF, SISMEPRE y RENAMU.
         mappings = (
             esat.select(
                 self._code("SEC_EJEC", 6).alias("SEC_EJEC"),
@@ -56,6 +58,8 @@ class SilverTransformService:
             .dropDuplicates(["SEC_EJEC", "UBIGEO"])
         )
         renamu_dim = (
+            # RENAMU en Silver es enriquecimiento basico. No filtra municipios:
+            # si no hay match, el registro queda marcado para auditoria.
             renamu.select(
                 self._code("Ubigeo", 6).alias("UBIGEO"),
                 self._code("idmunici", 6).alias("idmunici"),
@@ -120,6 +124,8 @@ class SilverTransformService:
 
     def build_ingresos_municipales_curated(self) -> Dict[str, Any]:
         source = self._read("ingresos")
+        # El caso de negocio es municipal, por eso Silver filtra SIAF a nivel M.
+        # El tipado y la consolidacion ocurren aqui, el modelado ocurre en Gold.
         municipal = source.filter(F.col("NIVEL_GOBIERNO") == self.required_government_level)
         source_count = source.count()
         municipal_count = municipal.count()
@@ -170,6 +176,8 @@ class SilverTransformService:
             F.count("*").alias("_silver_source_row_count")
         ]
         conformed = (
+            # Se consolida por clave presupuestaria para evitar duplicados
+            # operativos sin crear aun una tabla fact dimensional.
             valid.repartition(96, *key_columns)
             .groupBy(*key_columns)
             .agg(*aggregations)
@@ -312,6 +320,8 @@ class SilverTransformService:
 
     def build_categorias_municipalidades_curated(self) -> Dict[str, Any]:
         source = self._read("categorias_municipalidades")
+        # La categoria A-G solo viene del maestro del profesor. Primero se
+        # normaliza el nombre para poder cruzarlo contra municipalidades.
         curated = (
             source.select(
                 F.trim(F.col("Municipalidad")).alias("municipalidad_categoria_raw"),
@@ -335,6 +345,8 @@ class SilverTransformService:
         valid = curated.filter(~invalid)
 
         category_master = (
+            # El maestro puede traer el mismo nombre con varias categorias.
+            # Guardamos todas las categorias observadas para resolverlas con regla.
             valid.groupBy("municipalidad_categoria_norm")
             .agg(
                 F.first("municipalidad_categoria_raw", ignorenulls=True).alias("municipalidad_categoria_raw"),
@@ -368,6 +380,8 @@ class SilverTransformService:
                 .withColumn("_is_lima", self._is_lima_municipality())
                 .withColumn(
                     "categoria_municipalidad",
+                    # Regla oficial: categoria unica se conserva; multiples
+                    # categorias se resuelven como C para Lima y G para no Lima.
                     F.when(F.col("categoria_distinct_count") == 1, F.element_at("categorias_maestro", 1))
                     .when(F.col("categoria_distinct_count") > 1, F.when(F.col("_is_lima"), F.lit("C")).otherwise(F.lit("G"))),
                 )
@@ -429,6 +443,8 @@ class SilverTransformService:
 
     def build_categorias_municipalidades_lookup(self) -> Dict[str, Any]:
         source = self._read("categorias_municipalidades")
+        # Lookup reutilizable para Gold: no duplica municipalidades, solo
+        # resume el maestro por nombre normalizado y categorias observadas.
         curated = (
             source.select(
                 F.trim(F.col("Municipalidad")).alias("municipalidad_categoria_raw"),
